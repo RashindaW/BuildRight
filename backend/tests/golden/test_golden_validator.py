@@ -55,3 +55,23 @@ def test_no_substring_false_positive():
 def test_empty_grounded_set_blocks_any_price():
     r = validate_response("It costs $3.00.", [])
     assert not r.ok
+
+
+def test_threshold_price_not_flagged():
+    # "under $5" is a filter the customer asked about, not an item-price claim.
+    # The listed item prices are grounded; $5.00 is only the threshold -> must pass.
+    ans = "Here are our vegan options under $5: Green Tea ($3.25) and Fresh Lemonade ($3.75)."
+    r = validate_response(ans, GROUNDED + [
+        {"id": "tea", "name": "Green Tea", "category": "drink", "description": "",
+         "price": 3.25, "dietary_tags": [], "keywords": []},
+        {"id": "lem", "name": "Fresh Lemonade", "category": "drink", "description": "",
+         "price": 3.75, "dietary_tags": [], "keywords": []},
+    ])
+    assert r.ok, r.reason
+
+
+def test_threshold_does_not_excuse_fabricated_item_price():
+    # A real fabricated item price must still be caught even alongside a threshold.
+    ans = "Options under $5: the Mega Burger is $50.00."
+    r = validate_response(ans, GROUNDED)
+    assert not r.ok and "$50.00" in r.ungrounded_prices

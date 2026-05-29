@@ -52,6 +52,36 @@ def extract_prices(text: str) -> set[str]:
     return found
 
 
+# Comparison/threshold cues: a price here is a *filter* the customer asked about
+# ("vegan options under $5"), NOT a claim that an item costs that amount. We must
+# not flag these, or legitimate answers get blocked. Item-price assertions
+# ("the burger is $50") have no such cue and remain validated.
+_THRESHOLD_PRE = (
+    "under", "below", "over", "above", "less than", "more than", "fewer than",
+    "up to", "within", "around", "about", "cheaper than", "between", "at most",
+    "at least", "max", "maximum", "no more than", "or less", "or under",
+)
+_THRESHOLD_POST = ("or less", "or under", "or more", "and under", "and over", "or fewer")
+
+
+def _in_threshold_context(text: str, start: int, end: int) -> bool:
+    pre = text[max(0, start - 18):start].lower()
+    post = text[end:end + 12].lower()
+    return any(c in pre for c in _THRESHOLD_PRE) or any(c in post for c in _THRESHOLD_POST)
+
+
+def _claimed_prices(text: str) -> set[str]:
+    """Prices the text asserts as item prices (excluding threshold/filter mentions)."""
+    claimed: set[str] = set()
+    for m in _PRICE_RE.finditer(text):
+        if not _in_threshold_context(text, m.start(), m.end()):
+            claimed.add(_normalize_price(m.group(1)))
+    for m in _DOLLARS_RE.finditer(text):
+        if not _in_threshold_context(text, m.start(), m.end()):
+            claimed.add(_normalize_price(m.group(1)))
+    return claimed
+
+
 def grounded_price_set(items: list[dict]) -> set[str]:
     return {f"${item['price']:.2f}" for item in items}
 
@@ -75,7 +105,9 @@ def validate_response(response: str, grounded_items: list[dict]) -> ValidationRe
     (a guessed/invented price, or echoing a customer's asserted price).
     """
     allowed = grounded_price_set(grounded_items)
-    mentioned = extract_prices(response)
+    # Only validate prices the answer asserts as item prices; ignore threshold
+    # references like "under $5" that the customer asked to filter by.
+    mentioned = _claimed_prices(response)
     ungrounded = sorted(p for p in mentioned if p not in allowed)
     return ValidationResult(ok=not ungrounded, ungrounded_prices=ungrounded)
 
