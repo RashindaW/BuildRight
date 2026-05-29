@@ -113,6 +113,20 @@ def _is_generic_browse(query_lower: str) -> bool:
     return any(phrase in query_lower for phrase in _GENERIC_BROWSE_PHRASES)
 
 
+# Recommendation / meal-time intent: a vague "what's good for lunch?" matches no
+# specific item, but we should still help by grounding on the whole menu so the
+# model can recommend real items (rather than claiming it has no menu).
+_RECOMMENDATION_CUES = (
+    "recommend", "suggest", "suggestion", "best", "popular", "favorite", "favourite",
+    "what's good", "whats good", "what is good", "hungry", "lunch", "dinner",
+    "breakfast", "brunch", "what should i", "something to eat", "what do you like",
+)
+
+
+def _is_recommendation(query_lower: str) -> bool:
+    return any(cue in query_lower for cue in _RECOMMENDATION_CUES)
+
+
 def _score_item(item: dict, tokens: list[str]) -> int:
     score = 0
     name_lower = item["name"].lower()
@@ -158,10 +172,20 @@ def retrieve_relevant_items(query: str, menu: list[dict] = MENU_DATA) -> list[di
     if category_hits:
         return category_hits
 
+    # Recommendation/meal-time intent (no specific item or category named) grounds
+    # on the full menu so the model can suggest real items. Checked after dietary
+    # and category so "best pizza" / "gluten-free lunch" still narrow correctly.
+    if _is_recommendation(query_lower):
+        return list(menu)
+
     scored = [(item, _score_item(item, tokens)) for item in menu]
     hits = [(item, s) for item, s in scored if s > 0]
-    hits.sort(key=lambda pair: pair[1], reverse=True)
-    return [item for item, _ in hits[:5]]
+    if hits:
+        hits.sort(key=lambda pair: pair[1], reverse=True)
+        return [item for item, _ in hits[:5]]
+
+    # Genuinely off-menu request (e.g. "sushi") -> empty -> the apology fires.
+    return []
 
 
 # ============================================================

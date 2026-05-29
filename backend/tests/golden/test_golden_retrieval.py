@@ -63,3 +63,21 @@ def test_topk_cap_for_keyword_queries():
 @pytest.mark.parametrize("query", ["the", "  ", "!!!"])
 def test_empty_token_queries_return_empty(query):
     assert retrieve_relevant_items(query, MENU_DATA) == []
+
+
+@pytest.mark.parametrize("query", [
+    "best recommendation for lunch?",
+    "what do you recommend?",
+    "I'm hungry, what's good?",
+    "what should I get for dinner?",
+])
+def test_recommendation_queries_ground_on_full_menu(query):
+    # Vague recommendation intents must NOT come back empty — they ground on the
+    # whole menu so the assistant can suggest real items.
+    assert len(retrieve_relevant_items(query, MENU_DATA)) == len(MENU_DATA)
+
+
+@pytest.mark.parametrize("query", ["do you sell sushi?", "do you have ramen?", "got any tacos?"])
+def test_off_menu_requests_still_empty(query):
+    # Genuinely off-menu items must still retrieve nothing (-> apology preserved).
+    assert retrieve_relevant_items(query, MENU_DATA) == []
