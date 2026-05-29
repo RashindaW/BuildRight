@@ -13,8 +13,13 @@ from collections.abc import AsyncIterator
 import anthropic
 
 from app.ai import models
-from app.ai.guardrails import SAFE_FALLBACK, SYSTEM_PROMPT, validate_response
-from app.ai.prompts import build_grounded_turn, build_user_message
+from app.ai.guardrails import (
+    SAFE_FALLBACK,
+    SYSTEM_PROMPT,
+    SYSTEM_PROMPT_TOOLS,
+    validate_response,
+)
+from app.ai.prompts import build_user_message
 from app.core.config import settings
 
 logger = logging.getLogger("app.ai")
@@ -64,83 +69,109 @@ def complete(user_question: str, grounded_items: list[dict], max_tokens: int | N
     return text
 
 
-# ---- Multi-turn streaming ----------------------------------------------
+# ---- Multi-turn chat with tool-use -------------------------------------
+
+_MAX_TOOL_ROUNDS = 4
+
+
+def _emit_chunks(text: str, size: int = 48):
+    """Split a final answer into word-aligned chunks for a streaming feel."""
+    words = text.split(" ")
+    buf = ""
+    for w in words:
+        buf = w if not buf else f"{buf} {w}"
+        if len(buf) >= size:
+            yield buf + " "
+            buf = ""
+    if buf:
+        yield buf
+
 
 async def stream_chat(
     prior_messages: list[dict],
-    grounded_items: list[dict],
+    menu: list[dict],
     user_question: str,
     max_tokens: int | None = None,
 ) -> AsyncIterator[dict]:
     """Yield SSE event dicts: {event, data}.
 
+    The model grounds itself by calling the `search_menu` tool; we accumulate the
+    items it fetched into the turn's grounded set and validate every price in the
+    final answer against that set before emitting a single token. A fabricated
+    price is therefore never shown.
+
     Events: start | delta | validated | done | error
-    Buffer-on-price: any chunk containing a '$' is held until the full text is
-    validated, so an ungrounded price is never emitted.
     """
+    from app.ai import tools  # local import avoids a cycle at module load
+
+    client = _get_async_client()
     messages = list(prior_messages)
-    messages.append({"role": "user", "content": build_grounded_turn(grounded_items, user_question)})
+    messages.append({"role": "user", "content": user_question})
 
     yield {"event": "start", "data": {}}
 
-    full_text = ""
-    pending = ""  # buffered text that contains an unvalidated price
-    input_tokens = 0
-    output_tokens = 0
+    grounded: list[dict] = []
+    final_text = ""
+    input_tokens = output_tokens = 0
 
     try:
-        async with _get_async_client().messages.stream(
-            model=models.MODEL,
-            max_tokens=max_tokens or models.MAX_TOKENS,
-            temperature=models.TEMPERATURE,
-            system=SYSTEM_PROMPT,
-            messages=messages,
-        ) as stream:
-            async for text in stream.text_stream:
-                full_text += text
-                pending += text
-                # If the buffer holds a '$', keep buffering until validated.
-                if "$" in pending:
-                    continue
-                yield {"event": "delta", "data": {"text": pending}}
-                pending = ""
+        for _ in range(_MAX_TOOL_ROUNDS):
+            resp = await client.messages.create(
+                model=models.MODEL,
+                max_tokens=max_tokens or models.MAX_TOKENS,
+                temperature=models.TEMPERATURE,
+                system=SYSTEM_PROMPT_TOOLS,
+                tools=tools.TOOLS,
+                messages=messages,
+            )
+            input_tokens += resp.usage.input_tokens
+            output_tokens += resp.usage.output_tokens
 
-            final = await stream.get_final_message()
-            input_tokens = final.usage.input_tokens
-            output_tokens = final.usage.output_tokens
+            if resp.stop_reason == "tool_use":
+                messages.append({"role": "assistant", "content": resp.content})
+                tool_results = []
+                for block in resp.content:
+                    if block.type == "tool_use" and block.name == "search_menu":
+                        result_json, items = tools.execute_search_menu(block.input, menu)
+                        grounded.extend(items)
+                        tool_results.append({
+                            "type": "tool_result",
+                            "tool_use_id": block.id,
+                            "content": result_json,
+                        })
+                messages.append({"role": "user", "content": tool_results})
+                continue
 
+            final_text = "".join(b.text for b in resp.content if b.type == "text").strip()
+            break
     except (anthropic.APIConnectionError, anthropic.RateLimitError, anthropic.APIError) as e:
-        logger.warning('"llm_stream_error: %s"', type(e).__name__)
+        logger.warning('"llm_chat_error: %s"', type(e).__name__)
         yield {"event": "error", "data": {"message": models.API_ERROR_MESSAGE}}
         return
 
-    # Validate the complete answer against the grounded set.
-    result = validate_response(full_text, grounded_items)
-    if not result.ok:
-        logger.warning('"guardrail_violation_stream: %s"', result.reason)
-        # Replace the entire answer — never show the fabricated price.
-        yield {"event": "validated", "data": {"replace": True, "text": SAFE_FALLBACK}}
-        yield {
-            "event": "done",
-            "data": {
-                "text": SAFE_FALLBACK,
-                "input_tokens": input_tokens,
-                "output_tokens": output_tokens,
-                "guardrail_violation": True,
-            },
-        }
-        return
+    # Deduplicate grounded items by id for the validator + persistence.
+    seen, grounded_unique = set(), []
+    for it in grounded:
+        if it["id"] not in seen:
+            seen.add(it["id"])
+            grounded_unique.append(it)
 
-    # Flush any buffered (price-bearing but validated) tail.
-    if pending:
-        yield {"event": "delta", "data": {"text": pending}}
+    result = validate_response(final_text, grounded_unique)
+    if not result.ok:
+        logger.warning('"guardrail_violation_chat: %s"', result.reason)
+        final_text = SAFE_FALLBACK
+
+    # Validated in full before emitting — safe to stream chunk by chunk.
+    for chunk in _emit_chunks(final_text):
+        yield {"event": "delta", "data": {"text": chunk}}
 
     yield {
         "event": "done",
         "data": {
-            "text": full_text,
+            "text": final_text,
             "input_tokens": input_tokens,
             "output_tokens": output_tokens,
-            "guardrail_violation": False,
+            "guardrail_violation": not result.ok,
+            "grounded_item_ids": [it["id"] for it in grounded_unique],
         },
     }

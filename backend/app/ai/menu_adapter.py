@@ -20,6 +20,7 @@ def item_to_dict(item: MenuItem) -> dict:
         "description": item.description,
         "price": item.price_cents / 100,
         "dietary_tags": sorted(t.slug for t in item.dietary_tags),
+        "allergens": sorted(a.slug for a in item.allergens),
         "keywords": list(item.keywords or []),
     }
 
@@ -28,6 +29,7 @@ def get_menu_for_assistant(db: Session, available_only: bool = True) -> list[dic
     stmt = select(MenuItem).options(
         selectinload(MenuItem.category),
         selectinload(MenuItem.dietary_tags),
+        selectinload(MenuItem.allergens),
     )
     if available_only:
         stmt = stmt.where(MenuItem.is_available.is_(True))

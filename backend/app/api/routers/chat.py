@@ -11,7 +11,6 @@ from sqlalchemy.orm import Session, selectinload
 from app.ai import service
 from app.ai.history import build_prior_messages
 from app.ai.menu_adapter import get_menu_for_assistant
-from app.ai.retrieval import retrieve_relevant_items
 from app.core.config import settings
 from app.core.db import get_db
 from app.core.deps import get_optional_user
@@ -82,9 +81,8 @@ def chat_stream(
     db.add(Message(conversation_id=conv.id, role="user", content=body.message))
     db.commit()
 
-    # Re-ground every turn against the live DB menu
+    # The model grounds itself via the search_menu tool over the live DB menu.
     full_menu = get_menu_for_assistant(db)
-    grounded = retrieve_relevant_items(body.message, full_menu)
     history = build_prior_messages(
         db.execute(
             select(Message).where(Message.conversation_id == conv.id)
@@ -98,18 +96,20 @@ def chat_stream(
         yield _sse("meta", {"conversation_id": conv_id, "session_id": session_id})
         assistant_text = ""
         out_tokens = 0
-        async for ev in service.stream_chat(history, grounded, body.message,
-                                             max_tokens=settings.llm_max_tokens):
+        grounded_ids: list[str] = []
+        async for ev in service.stream_chat(history, full_menu, body.message,
+                                            max_tokens=settings.llm_max_tokens):
             if ev["event"] == "done":
                 assistant_text = ev["data"]["text"]
                 out_tokens = ev["data"].get("output_tokens", 0)
+                grounded_ids = ev["data"].get("grounded_item_ids", [])
             yield _sse(ev["event"], ev["data"])
         # Persist assistant message + token accounting (new session for safety)
         from app.core.db import SessionLocal
         s = SessionLocal()
         try:
             s.add(Message(conversation_id=conv_id, role="assistant", content=assistant_text,
-                          grounded_item_ids=[i["id"] for i in grounded]))
+                          grounded_item_ids=grounded_ids))
             c = s.get(Conversation, conv_id)
             if c:
                 c.total_output_tokens += out_tokens
