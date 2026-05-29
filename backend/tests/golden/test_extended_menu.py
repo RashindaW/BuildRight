@@ -31,6 +31,22 @@ def test_pizza_retrieval():
     assert any("Pizza" in n for n in names)
 
 
+def test_plural_category_queries_return_whole_category():
+    # Regression: "pizzas" (plural) must match the singular 'pizza' category.
+    pizzas = retrieve_relevant_items("what pizzas do you have?", MENU_DATA)
+    expected = {i["name"] for i in MENU_DATA if i["category"] == "pizza"}
+    assert {i["name"] for i in pizzas} == expected and len(expected) == 3
+
+    desserts = retrieve_relevant_items("show me your desserts", MENU_DATA)
+    assert all(i["category"] == "dessert" for i in desserts) and len(desserts) >= 5
+
+
+def test_plural_item_word_matches_singular():
+    # "lattes" -> "latte"
+    items = retrieve_relevant_items("do you have lattes?", MENU_DATA)
+    assert any("Latte" in i["name"] for i in items)
+
+
 def test_every_item_has_core_fields():
     for i in MENU_DATA:
         for f in ("id", "name", "category", "description", "price", "dietary_tags", "keywords"):

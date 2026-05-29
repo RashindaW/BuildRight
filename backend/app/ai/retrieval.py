@@ -63,6 +63,31 @@ def _tokenize(query: str) -> list[str]:
     return [t for t in no_punct.split() if t and t not in _STOPWORDS]
 
 
+def _singularize(tok: str) -> str:
+    """Naive depluralization so 'pizzas' matches 'pizza', 'drinks' -> 'drink'."""
+    if len(tok) > 4 and tok.endswith("ies"):
+        return tok[:-3] + "y"
+    if len(tok) > 4 and tok.endswith("es") and tok[-3] in "sxz":
+        return tok[:-2]
+    if len(tok) > 3 and tok.endswith("s"):
+        return tok[:-1]
+    return tok
+
+
+def _token_variants(tok: str) -> set[str]:
+    return {tok, _singularize(tok)}
+
+
+def _check_category(tokens: list[str], menu: list[dict]) -> list[dict] | None:
+    """If the query names a category (e.g. 'pizzas', 'desserts'), return all of it."""
+    categories = {item["category"] for item in menu}
+    for tok in tokens:
+        for v in _token_variants(tok):
+            if v in categories:
+                return [item for item in menu if item["category"] == v]
+    return None
+
+
 def _check_dietary_short_circuit(query_lower: str, menu: list[dict]) -> list[dict] | None:
     for phrase, tag in _NEGATIVE_DIETARY_PHRASES:
         if phrase in query_lower:
@@ -84,13 +109,15 @@ def _score_item(item: dict, tokens: list[str]) -> int:
     category_lower = item["category"].lower()
     keywords_lower = [k.lower() for k in item["keywords"]]
     for tok in tokens:
-        if tok in name_lower:
+        # Match the token or its singular form (so plurals like "pizzas" hit).
+        variants = _token_variants(tok)
+        if any(v in name_lower for v in variants):
             score += 3
-        if tok in keywords_lower:
+        if any(v in keywords_lower for v in variants):
             score += 2
-        if tok == category_lower:
+        if any(v == category_lower for v in variants):
             score += 2
-        if tok in desc_lower:
+        if any(v in desc_lower for v in variants):
             score += 1
     return score
 
@@ -115,6 +142,11 @@ def retrieve_relevant_items(query: str, menu: list[dict]) -> list[dict]:
     tokens = _tokenize(query)
     if not tokens:
         return []
+
+    # "what pizzas do you have?" / "show me desserts" -> return the whole category.
+    category_hits = _check_category(tokens, menu)
+    if category_hits:
+        return category_hits
 
     scored = [(item, _score_item(item, tokens)) for item in menu]
     hits = [(item, s) for item, s in scored if s > 0]
