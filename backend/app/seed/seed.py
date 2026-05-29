@@ -31,6 +31,7 @@ from app.models.user import User
 logger = logging.getLogger("app.seed")
 
 _ROOT = Path(__file__).resolve().parents[3]
+_IMG_DIR = _ROOT / "frontend" / "public" / "img" / "menu"
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
@@ -145,6 +146,12 @@ def seed_menu(db: Session, menu_data: list[dict] | None = None) -> int:
                 _get_or_create(db, Allergen, a, label=ALLERGEN_LABELS.get(a, a.title()))
                 for a in entry["allergens"]
             ]
+        # Auto-wire a downloaded photo if present (refreshed every seed).
+        # Files live in frontend/public/img/menu/<slug>.jpg (gitignored).
+        if entry.get("image_url"):
+            item.image_url = entry["image_url"]
+        elif (_IMG_DIR / f"{entry['id']}.jpg").exists():
+            item.image_url = f"menu/{entry['id']}.jpg"
 
     db.commit()
     return count

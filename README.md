@@ -47,6 +47,10 @@ pip install -r requirements-dev.txt
 
 python -m app.seed                 # create tables + load the 35-item menu + admin
 uvicorn app.main:app --reload      # http://localhost:8000  (docs at /docs in dev)
+
+# (optional) download matching menu photos — saved to frontend/public/img/menu/
+# (gitignored; the seed auto-wires them). Re-run app.seed afterward to attach.
+#   python ..\scripts\fetch_images.py ; python -m app.seed
 ```
 
 ### 2. Frontend
