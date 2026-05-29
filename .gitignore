@@ -1,0 +1,29 @@
+# Secrets — never commit
+.env
+**/.env
+!**/.env.example
+
+# Python
+.venv/
+**/.venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+*.db
+*.sqlite3
+
+# Node / frontend
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+frontend/public/img/menu/*
+
+# Tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+playwright-report/
+test-results/

@@ -1,0 +1,148 @@
+"""Mock menu data for the cafe assistant PoC.
+
+Controlled dietary-tag vocabulary:
+  vegan, vegetarian, gluten-free, dairy-free, contains-nuts
+"""
+
+MENU_DATA = [
+    # ---- Salads ----
+    {
+        "id": "caesar-salad",
+        "name": "Classic Caesar Salad",
+        "category": "salad",
+        "description": "Crisp romaine, shaved parmesan, garlic croutons, and house Caesar dressing with anchovy.",
+        "price": 11.50,
+        "dietary_tags": ["vegetarian"],
+        "keywords": ["caesar", "romaine", "parmesan"],
+    },
+    {
+        "id": "vegan-buddha-bowl",
+        "name": "Vegan Buddha Bowl",
+        "category": "salad",
+        "description": "Quinoa, roasted chickpeas, kale, avocado, and tahini-lemon dressing.",
+        "price": 13.95,
+        "dietary_tags": ["vegan", "gluten-free", "dairy-free"],
+        "keywords": ["bowl", "quinoa", "chickpea", "avocado", "healthy"],
+    },
+    {
+        "id": "chicken-cobb-salad",
+        "name": "Grilled Chicken Cobb Salad",
+        "category": "salad",
+        "description": "Grilled chicken breast, bacon, hard-boiled egg, avocado, and blue cheese over mixed greens.",
+        "price": 14.50,
+        "dietary_tags": ["gluten-free"],
+        "keywords": ["chicken", "cobb", "bacon", "egg", "avocado"],
+    },
+    # ---- Sandwiches / Wraps ----
+    {
+        "id": "turkey-club",
+        "name": "Turkey Club Sandwich",
+        "category": "sandwich",
+        "description": "Sliced turkey, crispy bacon, lettuce, tomato, and mayo on toasted sourdough.",
+        "price": 12.75,
+        "dietary_tags": [],
+        "keywords": ["turkey", "bacon", "lettuce", "tomato", "club"],
+    },
+    {
+        "id": "vegan-avocado-wrap",
+        "name": "Vegan Avocado Wrap",
+        "category": "sandwich",
+        "description": "Mashed avocado, hummus, spinach, cucumber, and pickled onion in a whole-wheat tortilla.",
+        "price": 11.95,
+        "dietary_tags": ["vegan", "dairy-free"],
+        "keywords": ["wrap", "avocado", "hummus", "spinach", "tortilla"],
+    },
+    {
+        "id": "gf-veggie-panini",
+        "name": "Gluten-Free Grilled Veggie Panini",
+        "category": "sandwich",
+        "description": "Zucchini, bell pepper, eggplant, and mozzarella pressed on gluten-free bread with pesto.",
+        "price": 13.25,
+        "dietary_tags": ["vegetarian", "gluten-free"],
+        "keywords": ["panini", "veggie", "vegetable", "grilled", "zucchini"],
+    },
+    # ---- Pastas ----
+    {
+        "id": "margherita-pasta",
+        "name": "Margherita Pasta",
+        "category": "pasta",
+        "description": "Penne tossed with San Marzano tomato sauce, fresh basil, and mozzarella pearls.",
+        "price": 13.50,
+        "dietary_tags": ["vegetarian"],
+        "keywords": ["pasta", "tomato", "basil", "mozzarella", "pomodoro", "penne"],
+    },
+    {
+        "id": "shrimp-linguine",
+        "name": "Shrimp Linguine",
+        "category": "pasta",
+        "description": "Linguine with sauteed shrimp, garlic, white wine, and chili flakes.",
+        "price": 17.95,
+        "dietary_tags": ["dairy-free"],
+        "keywords": ["pasta", "shrimp", "seafood", "linguine", "garlic"],
+    },
+    # ---- Drinks ----
+    {
+        "id": "classic-latte",
+        "name": "Classic Latte",
+        "category": "drink",
+        "description": "Double espresso topped with steamed milk and a thin layer of foam.",
+        "price": 4.50,
+        "dietary_tags": ["vegetarian"],
+        "keywords": ["latte", "coffee", "espresso", "milk", "hot"],
+    },
+    {
+        "id": "iced-oat-latte",
+        "name": "Iced Oat Milk Latte",
+        "category": "drink",
+        "description": "Double espresso shaken with cold oat milk over ice.",
+        "price": 5.25,
+        "dietary_tags": ["vegan", "dairy-free"],
+        "keywords": ["iced", "coffee", "oat", "cold", "espresso"],
+    },
+    {
+        "id": "fresh-lemonade",
+        "name": "Fresh Lemonade",
+        "category": "drink",
+        "description": "Hand-squeezed lemons, cane sugar, and sparkling water over ice.",
+        "price": 3.75,
+        "dietary_tags": ["vegan", "gluten-free", "dairy-free"],
+        "keywords": ["lemonade", "lemon", "cold", "refreshing", "sweet"],
+    },
+    {
+        "id": "mango-smoothie",
+        "name": "Mango Smoothie",
+        "category": "drink",
+        "description": "Frozen mango blended with vanilla yogurt and a hint of lime.",
+        "price": 5.95,
+        "dietary_tags": ["vegetarian", "gluten-free"],
+        "keywords": ["smoothie", "mango", "yogurt", "cold", "fruit", "sweet"],
+    },
+    # ---- Desserts ----
+    {
+        "id": "chocolate-lava-cake",
+        "name": "Chocolate Lava Cake",
+        "category": "dessert",
+        "description": "Warm chocolate cake with a molten chocolate center, served with vanilla ice cream.",
+        "price": 7.50,
+        "dietary_tags": ["vegetarian"],
+        "keywords": ["chocolate", "cake", "lava", "dessert", "sweet", "warm"],
+    },
+    {
+        "id": "almond-croissant",
+        "name": "Almond Croissant",
+        "category": "dessert",
+        "description": "Flaky butter croissant filled with almond cream and topped with sliced almonds.",
+        "price": 4.25,
+        "dietary_tags": ["vegetarian", "contains-nuts"],
+        "keywords": ["pastry", "almond", "croissant", "breakfast", "sweet"],
+    },
+    {
+        "id": "flourless-chocolate-torte",
+        "name": "Flourless Chocolate Torte",
+        "category": "dessert",
+        "description": "Dense, rich chocolate torte with a dusting of cocoa powder.",
+        "price": 6.75,
+        "dietary_tags": ["vegetarian", "gluten-free"],
+        "keywords": ["chocolate", "torte", "flourless", "cake", "dessert", "sweet"],
+    },
+]

@@ -1,0 +1,160 @@
+"""Idempotent seed: loads the v1 menu from the root menu_data.py and provisions
+a default admin. Safe to run repeatedly (upsert-by-slug; insert-if-absent).
+
+Run with:  python -m app.seed
+(after `alembic upgrade head` or create_all).
+"""
+
+from __future__ import annotations
+
+import logging
+import sys
+from pathlib import Path
+
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from app.core.config import settings
+from app.core.db import SessionLocal, engine
+from app.core.security import hash_password
+from app.models import Base
+from app.models.menu import Allergen, Category, DietaryTag, MenuItem
+from app.models.user import User
+
+logger = logging.getLogger("app.seed")
+
+_ROOT = Path(__file__).resolve().parents[3]
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
+
+from menu_data import MENU_DATA  # noqa: E402
+
+CATEGORY_LABELS = {
+    "salad": "Salads",
+    "sandwich": "Sandwiches & Wraps",
+    "pasta": "Pasta",
+    "drink": "Drinks",
+    "dessert": "Desserts",
+    "starter": "Starters",
+    "pizza": "Pizza",
+    "main": "Mains",
+    "side": "Sides",
+    "kids": "Kids",
+}
+
+DIETARY_LABELS = {
+    "vegan": "Vegan",
+    "vegetarian": "Vegetarian",
+    "gluten-free": "Gluten-Free",
+    "dairy-free": "Dairy-Free",
+    "contains-nuts": "Contains Nuts",
+}
+
+ALLERGEN_LABELS = {
+    "gluten": "Gluten",
+    "dairy": "Dairy",
+    "egg": "Egg",
+    "soy": "Soy",
+    "tree-nuts": "Tree Nuts",
+    "peanuts": "Peanuts",
+    "shellfish": "Shellfish",
+    "fish": "Fish",
+    "sesame": "Sesame",
+}
+
+
+def _get_or_create(db: Session, model, slug: str, **defaults):
+    obj = db.execute(select(model).where(model.slug == slug)).scalar_one_or_none()
+    if obj is None:
+        obj = model(slug=slug, **defaults)
+        db.add(obj)
+        db.flush()
+    return obj
+
+
+def seed_menu(db: Session, menu_data: list[dict] | None = None) -> int:
+    menu_data = menu_data if menu_data is not None else MENU_DATA
+
+    for slug, label in CATEGORY_LABELS.items():
+        _get_or_create(db, Category, slug, name=label, display_order=0)
+    for slug, label in DIETARY_LABELS.items():
+        _get_or_create(db, DietaryTag, slug, label=label)
+    for slug, label in ALLERGEN_LABELS.items():
+        _get_or_create(db, Allergen, slug, label=label)
+    db.flush()
+
+    count = 0
+    for entry in menu_data:
+        cat = _get_or_create(
+            db, Category, entry["category"],
+            name=CATEGORY_LABELS.get(entry["category"], entry["category"].title()),
+        )
+        item = db.execute(
+            select(MenuItem).where(MenuItem.slug == entry["id"])
+        ).scalar_one_or_none()
+        price_cents = round(float(entry["price"]) * 100)
+        if item is None:
+            item = MenuItem(
+                slug=entry["id"],
+                name=entry["name"],
+                description=entry["description"],
+                price_cents=price_cents,
+                category_id=cat.id,
+                keywords=list(entry.get("keywords", [])),
+                calories=entry.get("calories"),
+                spice_level=entry.get("spice_level", 0),
+                is_available=True,
+                featured=entry.get("featured", False),
+                image_url=entry.get("image_url"),
+            )
+            db.add(item)
+            db.flush()
+            count += 1
+        # (re)attach dietary tags
+        tags = [
+            _get_or_create(db, DietaryTag, t, label=DIETARY_LABELS.get(t, t.title()))
+            for t in entry.get("dietary_tags", [])
+        ]
+        item.dietary_tags = tags
+        # allergens (extended menu)
+        if entry.get("allergens"):
+            item.allergens = [
+                _get_or_create(db, Allergen, a, label=ALLERGEN_LABELS.get(a, a.title()))
+                for a in entry["allergens"]
+            ]
+
+    db.commit()
+    return count
+
+
+def seed_admin(db: Session) -> bool:
+    email = settings.admin_email.lower()
+    existing = db.execute(select(User).where(User.email == email)).scalar_one_or_none()
+    if existing:
+        return False
+    admin = User(
+        email=email,
+        hashed_password=hash_password(settings.admin_password.get_secret_value()),
+        full_name="Administrator",
+        role="admin",
+        is_active=True,
+    )
+    db.add(admin)
+    db.commit()
+    return True
+
+
+def run() -> None:
+    Base.metadata.create_all(bind=engine)
+    db = SessionLocal()
+    try:
+        n = seed_menu(db)
+        made_admin = seed_admin(db)
+        logger.info('"seed complete: %d new items, admin_created=%s"', n, made_admin)
+        print(f"Seed complete: {n} new menu items inserted; admin_created={made_admin}")
+    finally:
+        db.close()
+
+
+if __name__ == "__main__":
+    run()
