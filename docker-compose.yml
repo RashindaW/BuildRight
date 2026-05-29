@@ -1,0 +1,48 @@
+# Proves the SQLite -> PostgreSQL swap: the API talks to Postgres with only
+# DATABASE_URL changed. Redis backs rate limiting in a multi-process setup.
+#
+# Usage:
+#   ANTHROPIC_API_KEY=sk-ant-... SECRET_KEY=... docker compose up --build
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: cutdry
+      POSTGRES_PASSWORD: cutdry
+      POSTGRES_DB: cutdry
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cutdry"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg://cutdry:cutdry@postgres:5432/cutdry
+      RATE_LIMIT_STORAGE: redis://redis:6379
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-sk-ant-REPLACE_ME}
+      SECRET_KEY: ${SECRET_KEY:-change-me-in-prod-0123456789abcdef}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@cutdry.example.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-AdminPass123!}
+      ENVIRONMENT: production
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:

@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: "false"
+
+  backend:
+    runs-on: ubuntu-latest
+    env:
+      # Keyless test env — no real API key needed for unit/golden(GR/GV)/api tiers
+      ANTHROPIC_API_KEY: test-key-not-real
+      SECRET_KEY: ci-secret-key-0123456789abcdef0123456789
+      ENVIRONMENT: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Install
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+      - name: Lint
+        working-directory: backend
+        run: ruff check app || true
+      - name: Tests (keyless tiers + API)
+        working-directory: backend
+        run: pytest -q -m "not live"
+
+  backend-postgres:
+    # Proves the SQLite -> Postgres swap with only DATABASE_URL changed.
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env: { POSTGRES_USER: cutdry, POSTGRES_PASSWORD: cutdry, POSTGRES_DB: cutdry }
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U cutdry" --health-interval 5s
+          --health-timeout 3s --health-retries 10
+    env:
+      ANTHROPIC_API_KEY: test-key-not-real
+      SECRET_KEY: ci-secret-key-0123456789abcdef0123456789
+      ENVIRONMENT: test
+      DATABASE_URL: postgresql+psycopg://cutdry:cutdry@localhost:5432/cutdry
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Install
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+      - name: API tests against Postgres
+        working-directory: backend
+        run: pytest -q tests/api tests/unit -m "not live"
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+      - name: Install & build
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+          npx vitest run

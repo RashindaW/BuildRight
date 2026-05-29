@@ -109,7 +109,32 @@ def create_app() -> FastAPI:
     def version():
         return {"name": "Cut_Dry API", "version": "1.0.0", "environment": settings.environment}
 
+    _mount_spa(app)
     return app
+
+
+def _mount_spa(app: FastAPI) -> None:
+    """Serve the built React SPA (frontend/dist) with history-API fallback,
+    so the app runs single-origin in production. No-op if dist is absent."""
+    from pathlib import Path
+
+    from fastapi.responses import FileResponse
+    from fastapi.staticfiles import StaticFiles
+
+    dist = Path(__file__).resolve().parents[2] / "frontend" / "dist"
+    if not dist.exists():
+        return
+    app.mount("/assets", StaticFiles(directory=dist / "assets"), name="assets")
+
+    @app.get("/{full_path:path}")
+    def spa(full_path: str):
+        if full_path.startswith(("api/", "health", "version", "docs", "openapi")):
+            return JSONResponse(status_code=404, content={"error": {"code": "not_found",
+                                "message": "Not found"}})
+        candidate = dist / full_path
+        if full_path and candidate.is_file():
+            return FileResponse(candidate)
+        return FileResponse(dist / "index.html")
 
 
 app = create_app()
