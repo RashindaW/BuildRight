@@ -11,8 +11,8 @@ from __future__ import annotations
 import re
 
 _PATTERNS = [
-    re.compile(r"ignore (all |your |previous )?(instructions|rules)", re.I),
-    re.compile(r"disregard (the |your )?(above|previous|rules)", re.I),
+    re.compile(r"ignore\b[\w\s]{0,30}\b(instructions|rules)", re.I),
+    re.compile(r"disregard\b[\w\s]{0,30}\b(above|previous|rules|instructions)", re.I),
     re.compile(r"you are now", re.I),
     re.compile(r"system prompt", re.I),
     re.compile(r"pretend (to be|you)", re.I),

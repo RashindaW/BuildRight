@@ -23,4 +23,7 @@ from menu_data import MENU_DATA  # noqa: E402
 
 def answer_customer_query(user_question: str) -> str:
     items = retrieve_relevant_items(user_question, MENU_DATA)
-    return complete(user_question, items)
+    # Dietary/browse queries can return many items; give the model room to list
+    # them all so the complete set (e.g. every vegan item) is never truncated.
+    budget = 700 if len(items) > 5 else None
+    return complete(user_question, items, max_tokens=budget)

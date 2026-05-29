@@ -201,10 +201,14 @@ def answer_customer_query(user_question: str) -> str:
     items = retrieve_relevant_items(user_question)
     user_message = _build_user_message(items, user_question)
 
+    # Dietary/browse queries return many items; give the model room to list
+    # the complete set (e.g. every vegan item) without truncation.
+    max_tokens = 700 if len(items) > 5 else _MAX_TOKENS
+
     try:
         response = _get_client().messages.create(
             model=_MODEL,
-            max_tokens=_MAX_TOKENS,
+            max_tokens=max_tokens,
             temperature=_TEMPERATURE,
             system=SYSTEM_PROMPT,
             messages=[{"role": "user", "content": user_message}],

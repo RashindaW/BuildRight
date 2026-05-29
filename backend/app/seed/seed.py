@@ -18,7 +18,14 @@ from app.core.config import settings
 from app.core.db import SessionLocal, engine
 from app.core.security import hash_password
 from app.models import Base
-from app.models.menu import Allergen, Category, DietaryTag, MenuItem
+from app.models.menu import (
+    Allergen,
+    Category,
+    DietaryTag,
+    MenuItem,
+    OptionChoice,
+    OptionGroup,
+)
 from app.models.user import User
 
 logger = logging.getLogger("app.seed")
@@ -110,6 +117,22 @@ def seed_menu(db: Session, menu_data: list[dict] | None = None) -> int:
             db.add(item)
             db.flush()
             count += 1
+            # Options/modifiers — only on first insert (avoids duplicate groups on re-seed)
+            for grp in entry.get("options", []):
+                og = OptionGroup(
+                    menu_item_id=item.id, name=grp["name"],
+                    min_select=grp.get("min_select", 0),
+                    max_select=grp.get("max_select", 1),
+                    required=grp.get("required", False),
+                )
+                db.add(og)
+                db.flush()
+                for ch in grp["choices"]:
+                    db.add(OptionChoice(
+                        option_group_id=og.id, name=ch["name"],
+                        price_delta_cents=round(float(ch.get("price_delta", 0)) * 100),
+                        is_default=ch.get("is_default", False),
+                    ))
         # (re)attach dietary tags
         tags = [
             _get_or_create(db, DietaryTag, t, label=DIETARY_LABELS.get(t, t.title()))
