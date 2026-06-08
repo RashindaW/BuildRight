@@ -25,6 +25,17 @@ def build_user_message(items: list[dict], user_question: str) -> str:
     )
 
 
+def build_memory_preamble(preferences: dict[str, str]) -> str:
+    """Return a short preamble injected before the user question when prefs exist.
+
+    Capped at 10 preferences, values truncated to 80 chars to stay within token budget.
+    """
+    if not preferences:
+        return ""
+    lines = [f"- {k}: {str(v)[:80]}" for k, v in list(preferences.items())[:10]]
+    return "[Saved preferences]\n" + "\n".join(lines) + "\n\n"
+
+
 def build_grounded_turn(items: list[dict], user_question: str) -> str:
     """Multi-turn user turn: the MENU block is trusted context; the customer
     text is explicitly delimited as untrusted so embedded 'ignore your rules'

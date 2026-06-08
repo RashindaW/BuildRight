@@ -21,8 +21,8 @@ export default function Home() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       <div className="mb-6 rounded-2xl bg-gradient-to-r from-brand-500 to-brand-700 p-8 text-white">
-        <h1 className="text-3xl font-bold">Cut &amp; Dry Cafe</h1>
-        <p className="mt-1 opacity-90">Fresh food, honest answers. Ask our assistant anything about the menu.</p>
+        <h1 className="text-3xl font-bold">BuildRight Hardware</h1>
+        <p className="mt-1 opacity-90">Quality tools, honest answers. Ask our assistant about any product or store policy.</p>
       </div>
 
       <FilterBar

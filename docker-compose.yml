@@ -5,7 +5,7 @@
 #   ANTHROPIC_API_KEY=sk-ant-... SECRET_KEY=... docker compose up --build
 services:
   postgres:
-    image: postgres:16-alpine
+    image: pgvector/pgvector:pg16
     environment:
       POSTGRES_USER: cutdry
       POSTGRES_PASSWORD: cutdry
@@ -38,6 +38,9 @@ services:
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-AdminPass123!}
       ENVIRONMENT: production
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
     ports:
       - "8000:8000"
     depends_on:

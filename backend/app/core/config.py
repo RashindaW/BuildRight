@@ -53,6 +53,20 @@ class Settings(BaseSettings):
     # Moderation toggle
     enable_moderation: bool = False
 
+    # Embeddings
+    embedding_provider: str = "fastembed"
+    embedding_model: str = "BAAI/bge-small-en-v1.5"
+    embedding_dim: int = 384
+    rag_top_k: int = 12
+    kb_top_k: int = 4
+    rrf_k: int = 60
+
+    # Stripe
+    stripe_secret_key: SecretStr = SecretStr("")
+    stripe_publishable_key: str = ""
+    stripe_webhook_secret: SecretStr = SecretStr("")
+    stripe_currency: str = "cad"
+
     @field_validator("cors_origins", mode="before")
     @classmethod
     def parse_cors(cls, v: str) -> str:

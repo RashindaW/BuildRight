@@ -51,6 +51,34 @@ export const ordersApi = {
   get: (id: string) => api<Order>(`/orders/${id}`),
 };
 
+// ---- Payments ----
+export interface CreateIntentResponse {
+  client_secret: string;
+  order_id: string;
+  publishable_key: string;
+}
+
+export interface PaymentStatusResponse {
+  payment_status: string;
+  order_status: string;
+  order_id: string;
+}
+
+export const paymentsApi = {
+  createIntent: (notes?: string) =>
+    api<CreateIntentResponse>("/payments/create-intent", {
+      method: "POST",
+      body: { notes: notes ?? null },
+    }),
+  confirm: (orderId: string) =>
+    api<{ payment_status: string; order_status: string; pi_status: string }>(
+      `/payments/confirm/${orderId}`,
+      { method: "POST" }
+    ),
+  status: (orderId: string) =>
+    api<PaymentStatusResponse>(`/payments/status/${orderId}`),
+};
+
 // ---- Admin ----
 export const adminApi = {
   createItem: (body: Record<string, unknown>) =>

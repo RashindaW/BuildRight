@@ -1,10 +1,11 @@
 import { useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { streamChat } from "../../lib/api/chatStream";
+import { queryClient } from "../../lib/queryClient";
 import { useUiStore } from "../../store/uiStore";
 import type { ChatMessage } from "../../types";
 
-const QUICK = ["What's vegan?", "Do you have gluten-free options?", "What pizzas do you have?"];
+const QUICK = ["Where are cordless drills?", "What's your return policy?", "Do you price match?"];
 
 export function ChatWidget() {
   const { chatOpen, setChatOpen, sessionId } = useUiStore();
@@ -37,7 +38,9 @@ export function ChatWidget() {
         if (ev.event === "meta") convId.current = (ev.data.conversation_id as string) ?? convId.current;
         else if (ev.event === "delta") setLast((c) => c + (ev.data.text as string));
         else if (ev.event === "validated" && ev.data.replace) setLast(() => ev.data.text as string);
-        else if (ev.event === "error") setLast((c) => c || (ev.data.message as string));
+        else if (ev.event === "done" && ev.data.cart_dirty) {
+          queryClient.invalidateQueries({ queryKey: ["cart"] });
+        } else if (ev.event === "error") setLast((c) => c || (ev.data.message as string));
         scrollDown();
       });
     } finally {
@@ -64,14 +67,14 @@ export function ChatWidget() {
   return (
     <div className="fixed bottom-6 right-6 z-40 flex h-[32rem] w-96 max-w-[calc(100vw-2rem)] flex-col card">
       <div className="flex items-center justify-between border-b bg-brand-600 px-4 py-3 text-white rounded-t-xl">
-        <span className="font-semibold">Menu Assistant</span>
+        <span className="font-semibold">Store Assistant</span>
         <button onClick={() => setChatOpen(false)} aria-label="Close chat">✕</button>
       </div>
 
       <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto p-4">
         {messages.length === 0 && (
           <div className="text-sm text-gray-500">
-            <p className="mb-2">Hi! Ask me about the menu, dietary options, or prices.</p>
+            <p className="mb-2">Hi! Ask me about any product, price, or store policy.</p>
             <div className="flex flex-wrap gap-2">
               {QUICK.map((q) => (
                 <button key={q} className="rounded-full bg-gray-100 px-3 py-1 text-xs hover:bg-gray-200" onClick={() => send(q)}>

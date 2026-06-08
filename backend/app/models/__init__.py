@@ -4,6 +4,7 @@ from app.models.audit import AuditLog
 from app.models.base import Base
 from app.models.cart import Cart, CartItem, CartItemOption
 from app.models.chat import Conversation, Message
+from app.models.knowledge import Document, DocumentChunk
 from app.models.menu import (
     Allergen,
     Category,
@@ -13,12 +14,15 @@ from app.models.menu import (
     OptionGroup,
 )
 from app.models.order import Order, OrderItem, OrderItemOption
+from app.models.product_embedding import ProductEmbedding
 from app.models.user import RefreshToken, User
+from app.models.user_memory import UserPreference
 
 __all__ = [
     "Base",
     "User",
     "RefreshToken",
+    "UserPreference",
     "Category",
     "DietaryTag",
     "Allergen",
@@ -34,4 +38,7 @@ __all__ = [
     "Conversation",
     "Message",
     "AuditLog",
+    "Document",
+    "DocumentChunk",
+    "ProductEmbedding",
 ]

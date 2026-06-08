@@ -12,7 +12,7 @@ from pathlib import Path
 import anthropic
 from dotenv import load_dotenv
 
-from menu_data import MENU_DATA
+from menu_data_legacy_cafe import MENU_DATA
 
 # Load API key from .env in the project root (this file's directory).
 _HERE = Path(__file__).resolve().parent

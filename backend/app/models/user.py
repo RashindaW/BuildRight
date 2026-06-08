@@ -26,6 +26,9 @@ class User(TimestampMixin, Base):
     carts: Mapped[list["Cart"]] = relationship(back_populates="user")  # noqa: F821
     orders: Mapped[list["Order"]] = relationship(back_populates="user")  # noqa: F821
     conversations: Mapped[list["Conversation"]] = relationship(back_populates="user")  # noqa: F821
+    preferences: Mapped[list["UserPreference"]] = relationship(  # noqa: F821
+        "UserPreference", cascade="all, delete-orphan", foreign_keys="UserPreference.user_id"
+    )
 
 
 class RefreshToken(Base):

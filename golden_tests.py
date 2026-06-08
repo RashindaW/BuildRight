@@ -25,7 +25,7 @@ import os
 import sys
 
 from assistant import answer_customer_query
-from menu_data import MENU_DATA
+from menu_data_legacy_cafe import MENU_DATA
 
 
 # ============================================================

@@ -36,5 +36,6 @@ class Message(TimestampMixin, Base):
     # Opaque tool-use payload (Anthropic content blocks) if any
     tool_payload: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     grounded_item_ids: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    grounded_doc_ids: Mapped[list | None] = mapped_column(JSON, nullable=True)
 
     conversation: Mapped[Conversation] = relationship(back_populates="messages")

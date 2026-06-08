@@ -5,7 +5,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, new_id
 
-ORDER_STATUSES = ("placed", "preparing", "ready", "completed", "cancelled")
+ORDER_STATUSES = ("pending_payment", "placed", "preparing", "ready", "completed", "cancelled")
+PAYMENT_STATUSES = ("unpaid", "pending", "paid", "failed", "refunded")
 
 
 class Order(TimestampMixin, Base):
@@ -20,6 +21,14 @@ class Order(TimestampMixin, Base):
     subtotal_cents: Mapped[int] = mapped_column(Integer, nullable=False)
     total_cents: Mapped[int] = mapped_column(Integer, nullable=False)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    stripe_payment_intent_id: Mapped[str | None] = mapped_column(
+        String(255), nullable=True, index=True
+    )
+    payment_status: Mapped[str] = mapped_column(
+        Enum(*PAYMENT_STATUSES, name="payment_status"), default="unpaid", nullable=False
+    )
+    amount_paid_cents: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    currency: Mapped[str] = mapped_column(String(3), default="cad", nullable=False)
 
     user = relationship("User", back_populates="orders")
     items: Mapped[list["OrderItem"]] = relationship(

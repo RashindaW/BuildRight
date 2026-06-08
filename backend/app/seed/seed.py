@@ -38,36 +38,37 @@ if str(_ROOT) not in sys.path:
 from menu_data import MENU_DATA  # noqa: E402
 
 CATEGORY_LABELS = {
-    "salad": "Salads",
-    "sandwich": "Sandwiches & Wraps",
-    "pasta": "Pasta",
-    "drink": "Drinks",
-    "dessert": "Desserts",
-    "starter": "Starters",
-    "pizza": "Pizza",
-    "main": "Mains",
-    "side": "Sides",
-    "kids": "Kids",
+    "power-tools": "Power Tools",
+    "hand-tools": "Hand Tools",
+    "hardware": "Hardware & Fasteners",
+    "automotive": "Automotive",
+    "kitchen": "Kitchen Appliances",
+    "outdoor": "Outdoor & Garden",
+    "cleaning": "Cleaning",
+    "paint": "Paint & Coatings",
+    "electrical": "Electrical",
+    "plumbing": "Plumbing",
+    "seasonal": "Seasonal",
 }
 
 DIETARY_LABELS = {
-    "vegan": "Vegan",
-    "vegetarian": "Vegetarian",
-    "gluten-free": "Gluten-Free",
-    "dairy-free": "Dairy-Free",
-    "contains-nuts": "Contains Nuts",
+    "cordless": "Cordless",
+    "corded": "Corded",
+    "battery-powered": "Battery-Powered",
+    "outdoor": "Outdoor Use",
+    "indoor": "Indoor Use",
+    "professional": "Professional Grade",
+    "sale": "On Sale",
+    "new-arrival": "New Arrival",
 }
 
 ALLERGEN_LABELS = {
-    "gluten": "Gluten",
-    "dairy": "Dairy",
-    "egg": "Egg",
-    "soy": "Soy",
-    "tree-nuts": "Tree Nuts",
-    "peanuts": "Peanuts",
-    "shellfish": "Shellfish",
-    "fish": "Fish",
-    "sesame": "Sesame",
+    "requires-assembly": "Requires Assembly",
+    "flammable": "Flammable",
+    "contains-battery": "Contains Battery",
+    "heavy-item": "Heavy Item",
+    "sharp-blade": "Sharp Blade",
+    "power-tool": "Power Tool",
 }
 
 
@@ -180,8 +181,25 @@ def run() -> None:
     try:
         n = seed_menu(db)
         made_admin = seed_admin(db)
-        logger.info('"seed complete: %d new items, admin_created=%s"', n, made_admin)
-        print(f"Seed complete: {n} new menu items inserted; admin_created={made_admin}")
+
+        from app.seed.seed_kb import ingest_knowledge_base
+        n_chunks = ingest_knowledge_base(db)
+
+        from app.ai.embeddings.provider import get_embedding_provider
+        from app.ai.embeddings.indexer import embed_products, embed_documents
+        provider = get_embedding_provider()
+        n_prod_embs = embed_products(db, provider)
+        n_chunk_embs = embed_documents(db, provider)
+
+        logger.info(
+            '"seed complete: %d items, %d KB chunks, %d product embs, %d chunk embs, admin=%s"',
+            n, n_chunks, n_prod_embs, n_chunk_embs, made_admin,
+        )
+        print(
+            f"Seed complete: {n} new items | {n_chunks} KB chunks | "
+            f"{n_prod_embs} product embeddings | {n_chunk_embs} chunk embeddings | "
+            f"admin_created={made_admin}"
+        )
     finally:
         db.close()
 
