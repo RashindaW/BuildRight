@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Literal
 
-from pydantic import SecretStr, field_validator
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -66,11 +66,6 @@ class Settings(BaseSettings):
     stripe_publishable_key: str = ""
     stripe_webhook_secret: SecretStr = SecretStr("")
     stripe_currency: str = "cad"
-
-    @field_validator("cors_origins", mode="before")
-    @classmethod
-    def parse_cors(cls, v: str) -> str:
-        return v
 
     @property
     def cors_origins_list(self) -> list[str]:

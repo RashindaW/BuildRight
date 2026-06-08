@@ -48,6 +48,10 @@ def chunk_document(text: str, max_tokens: int = 256, overlap_tokens: int = 32) -
         words = body.split()
         window_words = _tokens_to_words(max_tokens)
         overlap_words = _tokens_to_words(overlap_tokens)
+        # Guard: overlap must be strictly smaller than the window, else step<=0
+        # and the loop would emit O(n) near-duplicate chunks (relying on max(1,step)).
+        if overlap_words >= window_words:
+            overlap_words = window_words - 1
         if len(words) <= window_words:
             chunk_text = f"{heading}\n\n{body}" if heading else body
             chunks.append(RawChunk(
@@ -59,8 +63,11 @@ def chunk_document(text: str, max_tokens: int = 256, overlap_tokens: int = 32) -
             idx += 1
         else:
             start = 0
-            while start < len(words):
-                window = words[start: start + window_words]
+            n = len(words)
+            step = max(1, window_words - overlap_words)
+            while start < n:
+                end = start + window_words
+                window = words[start:end]
                 chunk_text_parts = []
                 if heading:
                     chunk_text_parts.append(heading)
@@ -74,8 +81,11 @@ def chunk_document(text: str, max_tokens: int = 256, overlap_tokens: int = 32) -
                     token_count=_approx_tokens(chunk_text),
                 ))
                 idx += 1
-                step = window_words - overlap_words
-                start += max(1, step)
+                # The window already reached the section end — emit it once and stop,
+                # rather than sliding forward to produce a tiny all-overlap tail chunk.
+                if end >= n:
+                    break
+                start += step
     return chunks
 
 

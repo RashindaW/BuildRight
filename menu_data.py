@@ -16,8 +16,9 @@ Controlled vocabularies (repurposed for retail):
                   kitchen, outdoor, cleaning, paint, electrical,
                   plumbing, seasonal
 
-NOTE: The original cafe data (needed by golden_tests.py) is preserved in
-      menu_data_legacy_cafe.py.  This file is the live retail catalog.
+NOTE: The original cafe data (the frozen lexical-retrieval regression baseline
+      used by backend/tests/golden/) is preserved in menu_data_legacy_cafe.py.
+      This file is the live retail catalog.
 """
 
 MENU_DATA = [

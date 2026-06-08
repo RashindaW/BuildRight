@@ -17,6 +17,7 @@ node_modules/
 **/node_modules/
 dist/
 **/dist/
+*.tsbuildinfo
 frontend/public/img/menu/*
 
 # Tooling

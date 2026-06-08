@@ -1,8 +1,14 @@
 """Embedding generation for products and knowledge-base chunks.
 
-Both functions are idempotent: they skip rows whose content hasn't changed
-(using a content hash) and whose model_id matches the current provider.
-This matches the 'safe to re-run' philosophy of seed.py.
+embed_products is idempotent via a stored content_hash + model_id on
+ProductEmbedding: a product is re-embedded only when its canonical text or the
+provider model changes.
+
+embed_documents has no per-chunk hash column, so it simply skips chunks that
+already carry an embedding. Re-embedding on content change is handled upstream
+by seed_kb, which deletes and recreates a document's chunks (embedding=None)
+whenever the source markdown changes — so changed content always gets fresh
+vectors. This matches the 'safe to re-run' philosophy of seed.py.
 """
 
 from __future__ import annotations
@@ -65,7 +71,7 @@ def embed_products(db: Session, provider: EmbeddingProvider) -> int:
                 content_hash=h, model_id=provider.model_id,
             ))
     db.commit()
-    logger.info('"embed_products: upserted %d embeddings"', len(to_upsert))
+    logger.info("embed_products: upserted %d embeddings", len(to_upsert))
     return len(to_upsert)
 
 
@@ -79,8 +85,10 @@ def embed_documents(db: Session, provider: EmbeddingProvider) -> int:
     texts, to_update = [], []
     for row in chunks:
         chunk = row.DocumentChunk
-        h = _content_hash(chunk.content)
-        if chunk.embedding is not None and _content_hash(chunk.content) == h:
+        # No content_hash column on DocumentChunk: a chunk that already has an
+        # embedding is skipped. seed_kb deletes+recreates chunks (embedding=None)
+        # when the source doc changes, so changed content is always re-embedded.
+        if chunk.embedding is not None:
             continue
         texts.append(chunk.content)
         to_update.append(chunk)
@@ -92,5 +100,5 @@ def embed_documents(db: Session, provider: EmbeddingProvider) -> int:
     for chunk, vec in zip(to_update, vectors):
         chunk.embedding = vec
     db.commit()
-    logger.info('"embed_documents: updated %d chunk embeddings"', len(to_update))
+    logger.info("embed_documents: updated %d chunk embeddings", len(to_update))
     return len(to_update)

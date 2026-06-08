@@ -6,7 +6,9 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
-from menu_data import MENU_DATA  # noqa: E402
+# Frozen cafe corpus — this is the lexical-retrieval regression baseline
+# (pizza/latte/caesar). The live retail catalog lives in menu_data.py.
+from menu_data_legacy_cafe import MENU_DATA  # noqa: E402
 
 from app.ai.retrieval import retrieve_relevant_items  # noqa: E402
 from app.safety.injection import looks_like_injection  # noqa: E402

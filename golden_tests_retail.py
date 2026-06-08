@@ -1,9 +1,9 @@
-"""Golden tests for the BuildRight Hardware retail catalog.
+"""Live golden tests for the BuildRight Hardware retail catalog.
 
-Mirrors the structure of golden_tests.py but exercises retail products,
-price guardrails, and the tag/category system.
+Exercises retail products, price guardrails, and the tag/category system against
+the same retrieval + guardrail stack the live app uses (no separate PoC module).
 
-Usage:
+Usage (needs ANTHROPIC_API_KEY for the LLM cases; pure cases run without it):
     python golden_tests_retail.py
 """
 
@@ -12,9 +12,11 @@ from __future__ import annotations
 import os
 import sys
 
-# assistant.py must stay importable for the sync complete() path
-# We create a thin wrapper using the same retrieval + guardrail stack
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Put the repo root (for menu_data) AND backend/ (for app.ai) on the path BEFORE
+# importing app.* — otherwise the module-level imports below fail.
+_ROOT = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, _ROOT)
+sys.path.insert(0, os.path.join(_ROOT, "backend"))
 
 from menu_data import MENU_DATA
 from app.ai.retrieval import retrieve_relevant_items
@@ -111,7 +113,7 @@ GOLDEN_CASES = [
 ]
 
 
-# ---- Runner (mirrors golden_tests.py pattern) ---------------------------
+# ---- Runner -------------------------------------------------------------
 
 def _check(response: str, case: dict) -> list[str]:
     errors = []
@@ -180,7 +182,6 @@ def run_golden_tests() -> int:
 
 
 if __name__ == "__main__":
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "backend"))
     print("=" * 60)
     print("BuildRight Hardware — Retail Golden Tests")
     print("=" * 60)

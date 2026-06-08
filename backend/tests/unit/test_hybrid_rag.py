@@ -56,6 +56,20 @@ def test_rrf_empty_lists():
     assert fused == []
 
 
+def test_rrf_tie_break_is_first_seen_order():
+    # Two disjoint single-item lists -> both rank 1 -> equal score -> first-seen wins.
+    fused = reciprocal_rank_fusion([["a"], ["b"]], key_fn=lambda x: x, k=60)
+    assert [k for k, _ in fused] == ["a", "b"], "equal scores must keep first-seen order"
+
+
+def test_rrf_summed_score_for_overlap():
+    # 'b' appears at rank 2 in list1 and rank 1 in list2 -> score = 1/62 + 1/61.
+    fused = reciprocal_rank_fusion([["a", "b"], ["b"]], key_fn=lambda x: x, k=60)
+    scores = {k: s for k, s in fused}
+    assert abs(scores["b"] - (1 / 62 + 1 / 61)) < 1e-9
+    assert abs(scores["a"] - (1 / 61)) < 1e-9
+
+
 def test_rrf_scores_positive():
     items = ["p", "q"]
     fused = reciprocal_rank_fusion([items], key_fn=lambda x: x)
@@ -98,6 +112,24 @@ def test_chunk_document_long_section_splits():
 def test_chunk_document_empty():
     chunks = chunk_document("")
     assert chunks == []
+
+
+def test_chunk_document_no_duplicate_tail():
+    # 60 words, window≈49, overlap≈24 -> exactly 2 windows; the final window reaches
+    # the end and must NOT spawn a third all-overlap tail chunk.
+    body = " ".join(f"w{i}" for i in range(60))
+    chunks = chunk_document(f"# T\n\n## Sec\n{body}", max_tokens=64, overlap_tokens=32)
+    assert len(chunks) == 2
+    assert "w0" in chunks[0].content
+    assert "w59" in chunks[-1].content
+
+
+def test_chunk_document_degenerate_overlap_terminates():
+    # overlap >= window would make step<=0; the guard must keep it terminating.
+    body = " ".join(f"w{i}" for i in range(40))
+    chunks = chunk_document(f"# T\n\n## Sec\n{body}", max_tokens=8, overlap_tokens=64)
+    assert len(chunks) > 0
+    assert "w39" in chunks[-1].content
 
 
 # ---- HashEmbeddingProvider -----------------------------------------------

@@ -25,13 +25,13 @@ def test_admin_endpoints_require_auth(client):
     assert client.get("/api/v1/admin/orders").status_code == 401
 
 
-def test_admin_can_create_and_delete_item(admin_client):
+def test_admin_can_create_and_delete_item(admin_client, seeded_item):
     slug = f"test-item-{uuid.uuid4().hex[:6]}"
     r = admin_client.post("/api/v1/admin/menu", json={
         "slug": slug, "name": "Test Item", "price_cents": 500,
-        "category": "drink", "dietary_tags": ["vegan"]})
+        "category": seeded_item["category"], "dietary_tags": ["cordless"]})
     assert r.status_code == 201, r.text
-    assert r.json()["dietary_tags"] == ["vegan"]
+    assert r.json()["dietary_tags"] == ["cordless"]
     item_id = r.json()["id"]
 
     d = admin_client.delete(f"/api/v1/admin/menu/{item_id}")

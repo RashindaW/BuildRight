@@ -43,12 +43,12 @@ def _extract_title(text: str, fallback: str) -> str:
 def ingest_knowledge_base(db: Session) -> int:
     """Upsert all KB markdown docs and their chunks. Returns total chunks written."""
     if not _KB_DIR.exists():
-        logger.warning('"knowledge_base/ directory not found at %s — skipping KB seed"', _KB_DIR)
+        logger.warning("knowledge_base/ directory not found at %s — skipping KB seed", _KB_DIR)
         return 0
 
     md_files = sorted(_KB_DIR.glob("*.md"))
     if not md_files:
-        logger.warning('"No .md files found in %s"', _KB_DIR)
+        logger.warning("No .md files found in %s", _KB_DIR)
         return 0
 
     total = 0
@@ -91,7 +91,7 @@ def ingest_knowledge_base(db: Session) -> int:
                 token_count=rc.token_count,
             ))
         total += len(raw_chunks)
-        logger.info('"seed_kb: %s -> %d chunks"', slug, len(raw_chunks))
+        logger.info("seed_kb: %s -> %d chunks", slug, len(raw_chunks))
 
     db.commit()
     return total

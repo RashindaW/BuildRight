@@ -15,7 +15,7 @@ function PaymentForm({
   onPaid,
 }: {
   orderId: string;
-  onPaid: () => void;
+  onPaid: (orderId: string) => void;
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -38,12 +38,12 @@ function PaymentForm({
       // Payment confirmed client-side; re-verify server-side (no tunnel needed)
       const result = await paymentsApi.confirm(orderId);
       if (result.payment_status === "paid") {
-        onPaid();
+        onPaid(orderId);
       } else {
         toast("Payment could not be confirmed. Please contact support.", "error");
       }
     } catch (err) {
-      toast((err as Error).message, "error");
+      toast(err instanceof Error ? err.message : "Something went wrong", "error");
     } finally {
       setPaying(false);
     }
@@ -52,7 +52,7 @@ function PaymentForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <PaymentElement />
-      <button className="btn-primary w-full" type="submit" disabled={paying || !stripe}>
+      <button className="btn-primary w-full" type="submit" disabled={paying || !stripe || !elements}>
         {paying ? "Processing…" : "Pay now"}
       </button>
       <p className="text-center text-xs text-gray-400">
@@ -96,16 +96,16 @@ export default function Checkout() {
       });
       setStep("payment");
     } catch (err) {
-      toast((err as Error).message, "error");
+      toast(err instanceof Error ? err.message : "Something went wrong", "error");
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePaid = () => {
+  const handlePaid = (orderId: string) => {
     qc.invalidateQueries({ queryKey: ["cart"] });
     qc.invalidateQueries({ queryKey: ["orders"] });
-    nav(`/order/${intentState!.orderId}`);
+    nav(`/order/${orderId}`);
   };
 
   if (!cart || cart.items.length === 0) {

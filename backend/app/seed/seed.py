@@ -185,14 +185,31 @@ def run() -> None:
         from app.seed.seed_kb import ingest_knowledge_base
         n_chunks = ingest_knowledge_base(db)
 
-        from app.ai.embeddings.provider import get_embedding_provider
-        from app.ai.embeddings.indexer import embed_products, embed_documents
-        provider = get_embedding_provider()
-        n_prod_embs = embed_products(db, provider)
-        n_chunk_embs = embed_documents(db, provider)
+        # Embeddings power the vector arm of hybrid retrieval. If the embedding
+        # backend can't load (e.g. onnxruntime missing its native runtime on this
+        # host), log loudly and continue: the catalog + KB are already committed and
+        # retrieval degrades to the lexical arm. Set EMBEDDING_PROVIDER=hash for a
+        # download-free deterministic fallback.
+        n_prod_embs = n_chunk_embs = 0
+        try:
+            from app.ai.embeddings.provider import get_embedding_provider
+            from app.ai.embeddings.indexer import embed_products, embed_documents
+            provider = get_embedding_provider()
+            n_prod_embs = embed_products(db, provider)
+            n_chunk_embs = embed_documents(db, provider)
+        except Exception:
+            logger.exception(
+                "embedding step failed — catalog/KB seeded WITHOUT vectors; "
+                "hybrid search will run lexical-only until embeddings are built"
+            )
+            print(
+                "WARNING: embeddings could not be generated (see logs). The catalog "
+                "and knowledge base were seeded; semantic/vector search is disabled "
+                "until the embedding backend works (try EMBEDDING_PROVIDER=hash)."
+            )
 
         logger.info(
-            '"seed complete: %d items, %d KB chunks, %d product embs, %d chunk embs, admin=%s"',
+            "seed complete: %d items, %d KB chunks, %d product embs, %d chunk embs, admin=%s",
             n, n_chunks, n_prod_embs, n_chunk_embs, made_admin,
         )
         print(

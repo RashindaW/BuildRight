@@ -20,15 +20,38 @@ def create_pending_order(db: Session, user_id: str, notes: str | None = None) ->
     """Create an Order in pending_payment/pending state without converting the cart.
 
     Cart is only converted once payment succeeds (in payment_service._mark_paid).
+    The order is linked to the originating cart (cart_id) so the *right* cart is
+    converted on success. If an unpaid pending order already exists for this exact
+    cart and the contents are unchanged, it is reused (so a double-click or retry
+    does not spawn duplicate orders + PaymentIntents).
     """
     cart = cart_service.get_or_create_cart(db, user_id)
     if not cart.items:
         raise AppError("Cart is empty", "empty_cart", 400)
 
-    subtotal = 0
+    subtotal = sum(cart_service._line_unit_cents(ci) * ci.quantity for ci in cart.items)
+
+    # Reuse / void any in-flight pending order for this same cart.
+    existing = db.execute(
+        select(Order)
+        .where(
+            Order.user_id == user_id,
+            Order.cart_id == cart.id,
+            Order.status == "pending_payment",
+            Order.payment_status == "pending",
+        )
+        .order_by(Order.created_at.desc())
+    ).scalars().first()
+    if existing is not None:
+        if existing.total_cents == subtotal:
+            return existing  # unchanged cart — reuse the order + its PaymentIntent
+        existing.status = "cancelled"  # cart changed — void the stale pending order
+        db.flush()
+
     order = Order(
         order_number=_generate_order_number(),
         user_id=user_id,
+        cart_id=cart.id,
         status="pending_payment",
         payment_status="pending",
         subtotal_cents=0,
@@ -41,7 +64,6 @@ def create_pending_order(db: Session, user_id: str, notes: str | None = None) ->
     for ci in cart.items:
         unit = cart_service._line_unit_cents(ci)
         line = unit * ci.quantity
-        subtotal += line
         oi = OrderItem(
             order_id=order.id,
             menu_item_id=ci.menu_item.id,

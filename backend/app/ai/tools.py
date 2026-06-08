@@ -13,10 +13,24 @@ execute_* functions return (tool_result_json, payload):
 from __future__ import annotations
 
 import json
+import re
 
 from app.ai.retrieval import _score_item, _tokenize
 
 MAX_RESULTS = 12
+MAX_QTY = 99  # matches schemas/cart.py CartItemIn (le=99)
+
+
+def _as_int(v, default: int) -> int:
+    """Coerce a model-supplied value to int, falling back to default on garbage.
+
+    Tool inputs are whatever the model emits and are not re-validated by the schema,
+    so '5 orders', 1.5, or 'all' must not raise out of an executor.
+    """
+    try:
+        return int(v)
+    except (TypeError, ValueError):
+        return default
 
 
 # ---- Legacy cafe tool (backward compat for golden tests) ------------------
@@ -295,7 +309,7 @@ def execute_get_order_history(tool_input: dict, ctx) -> tuple[str, list]:
 
     inp = tool_input or {}
     days = _PERIOD_DAYS.get(inp.get("period", "last_month"), 30)
-    limit = min(int(inp.get("limit") or 5), 20)
+    limit = min(_as_int(inp.get("limit"), 5), 20)
     since = datetime.now(tz=timezone.utc) - timedelta(days=days)
     orders = list_orders_since(ctx.db, ctx.user_id, since)[:limit]
 
@@ -321,17 +335,31 @@ def execute_get_order_history(tool_input: dict, ctx) -> tuple[str, list]:
 def execute_reorder(tool_input: dict, ctx) -> tuple[str, dict]:
     if not ctx.user_id:
         return _LOGIN_REQUIRED, {"added": False}
-    from app.services.cart_service import add_item
+    from datetime import datetime, timedelta, timezone
+    from app.services.cart_service import _resolve_item, add_item
+    from app.services.order_service import list_orders_since
     from app.core.errors import AppError, NotFoundError
 
     inp = tool_input or {}
-    slug = (inp.get("menu_item_id") or "").strip()
-    quantity = max(1, int(inp.get("quantity") or 1))
-    if not slug:
+    raw = (inp.get("menu_item_id") or "").strip()
+    quantity = max(1, min(_as_int(inp.get("quantity"), 1), MAX_QTY))
+    if not raw:
         return json.dumps({"error": "menu_item_id is required"}), {"added": False}
+
     try:
-        add_item(ctx.db, ctx.user_id, slug, quantity, [])
-        return json.dumps({"added": True, "quantity": quantity, "item": slug}), {"added": True}
+        # Resolve the model-supplied id/slug to a concrete catalog item.
+        item = _resolve_item(ctx.db, raw)
+        # Bind reorder to the user's OWN purchase history: the model must have
+        # surfaced this item via get_order_history, not pick an arbitrary catalog id.
+        since = datetime.now(tz=timezone.utc) - timedelta(days=365)
+        orders = list_orders_since(ctx.db, ctx.user_id, since)
+        ordered_ids = {oi.menu_item_id for o in orders for oi in o.items if oi.menu_item_id}
+        if item.id not in ordered_ids:
+            return json.dumps({"error": "not_in_history",
+                               "message": "That item isn't in your recent order history."}), {"added": False}
+
+        add_item(ctx.db, ctx.user_id, item.id, quantity, [])
+        return json.dumps({"added": True, "quantity": quantity, "item": item.slug}), {"added": True}
     except (AppError, NotFoundError) as e:
         return json.dumps({"error": str(e)}), {"added": False}
 
@@ -344,15 +372,31 @@ def execute_get_preferences(tool_input: dict, ctx) -> tuple[str, dict]:
     return json.dumps({"preferences": prefs}), prefs
 
 
+_CONTROL_CHARS_RE = re.compile(r"[\r\n\t\x00-\x1f\x7f]+")
+
+
+def _sanitize_pref(text: str, limit: int) -> str:
+    """Collapse control/newline chars to spaces and truncate. Prevents a stored
+    preference from injecting new lines/instructions into the prompt preamble."""
+    return _CONTROL_CHARS_RE.sub(" ", str(text or "")).strip()[:limit]
+
+
 def execute_set_preference(tool_input: dict, ctx) -> tuple[str, dict]:
     if not ctx.user_id:
         return _LOGIN_REQUIRED, {}
     from app.services.memory_service import set_preference
+    from app.safety.injection import looks_like_injection
+
     inp = tool_input or {}
-    key = (inp.get("key") or "").strip()[:80]
-    value = (inp.get("value") or "").strip()[:200]
+    key = _sanitize_pref(inp.get("key"), 80)
+    value = _sanitize_pref(inp.get("value"), 200)
     if not key:
         return json.dumps({"error": "key is required"}), {}
+    # Stored prefs are injected into future prompts — reject anything that reads
+    # like an injection attempt so it can never become persistent instruction text.
+    if looks_like_injection(key) or looks_like_injection(value):
+        return json.dumps({"error": "preference_rejected",
+                           "message": "That preference couldn't be saved."}), {}
     set_preference(ctx.db, ctx.user_id, key, value)
     return json.dumps({"saved": True, "key": key, "value": value}), {key: value}
 
@@ -365,7 +409,7 @@ def execute_search_kb(tool_input: dict, ctx) -> tuple[str, list]:
     topic = inp.get("topic")
     doc_types = [_TOPIC_TO_DOC_TYPE[topic]] if topic and topic in _TOPIC_TO_DOC_TYPE else None
 
-    chunks = hybrid_search_kb(ctx.db, inp.get("query", ""), k=4, doc_types=doc_types)
+    chunks = hybrid_search_kb(ctx.db, inp.get("query", ""), doc_types=doc_types)
     if not chunks:
         return json.dumps({"results": [], "note": "No matching policy found. Suggest contacting customer service."}), []
 

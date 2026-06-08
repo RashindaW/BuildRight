@@ -21,6 +21,9 @@ class Order(TimestampMixin, Base):
     subtotal_cents: Mapped[int] = mapped_column(Integer, nullable=False)
     total_cents: Mapped[int] = mapped_column(Integer, nullable=False)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    cart_id: Mapped[str | None] = mapped_column(
+        String, ForeignKey("carts.id"), nullable=True, index=True
+    )
     stripe_payment_intent_id: Mapped[str | None] = mapped_column(
         String(255), nullable=True, index=True
     )

@@ -13,7 +13,9 @@ from pathlib import Path
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))  # repo root for menu_data
-from menu_data import MENU_DATA  # noqa: E402
+# Frozen cafe corpus — keyless retrieval-golden regression baseline. Proves the
+# retrieval pipeline still behaves identically to the PoC on the original menu.
+from menu_data_legacy_cafe import MENU_DATA  # noqa: E402
 
 from app.ai.retrieval import retrieve_relevant_items  # noqa: E402
 

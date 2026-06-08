@@ -7,6 +7,7 @@
 
 from __future__ import annotations
 
+import json
 import logging
 from collections.abc import AsyncIterator
 
@@ -132,6 +133,7 @@ async def stream_chat(
     grounded_chunks: list = []
     cart_dirty = False
     final_text = ""
+    completed = False
     input_tokens = output_tokens = 0
 
     try:
@@ -156,10 +158,16 @@ async def stream_chat(
                     executor = executors.get(block.name)
                     if executor is None:
                         continue
-                    result_json, payload = executor(block.input, ctx)
-                    if block.name in ("search_menu", "search_products"):
+                    # A malformed tool_input must not abort the whole stream — return
+                    # an error tool_result instead so the model can recover.
+                    try:
+                        result_json, payload = executor(block.input, ctx)
+                    except Exception as e:
+                        logger.warning('"tool_exec_error: %s %s"', block.name, type(e).__name__)
+                        result_json, payload = json.dumps({"error": "tool_failed"}), None
+                    if payload is not None and block.name in ("search_menu", "search_products"):
                         grounded_items.extend(payload)
-                    elif block.name == "search_knowledge_base":
+                    elif payload is not None and block.name == "search_knowledge_base":
                         grounded_chunks.extend(payload)
                     elif block.name == "reorder" and isinstance(payload, dict) and payload.get("added"):
                         cart_dirty = True
@@ -172,12 +180,19 @@ async def stream_chat(
                 continue
 
             final_text = "".join(b.text for b in resp.content if b.type == "text").strip()
+            completed = True
             break
 
     except (anthropic.APIConnectionError, anthropic.RateLimitError, anthropic.APIError) as e:
         logger.warning('"llm_chat_error: %s"', type(e).__name__)
         yield {"event": "error", "data": {"message": models.API_ERROR_MESSAGE}}
         return
+
+    # If the model never stopped calling tools (rounds exhausted) or produced no text,
+    # substitute a fallback rather than emitting/persisting a silent blank turn.
+    if not completed or not final_text:
+        logger.warning('"llm_chat_tool_rounds_exhausted_or_empty: completed=%s"', completed)
+        final_text = SAFE_FALLBACK
 
     # Deduplicate grounded items by id for the price validator
     seen_ids, grounded_unique = set(), []

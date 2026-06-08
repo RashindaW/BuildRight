@@ -204,13 +204,12 @@ def _menu_item_to_dict(item, category) -> dict:
 def _row_to_item_dict(row, db: Session) -> dict:
     """Convert a raw SQL row (from PgVectorIndex) to item dict."""
     from sqlalchemy import select
-    from app.models.menu import MenuItem, DietaryTag, Allergen
+    from app.models.menu import MenuItem, Category
     item = db.get(MenuItem, row.id)
     if item is None:
         return {"id": row.id, "name": row.name, "price": row.price_cents / 100,
                 "description": row.description or "", "category": row.category,
                 "dietary_tags": [], "allergens": [], "keywords": list(row.keywords or [])}
-    from app.models.menu import Category
     cat = db.execute(select(Category).where(Category.id == item.category_id)).scalar_one()
     return _menu_item_to_dict(item, cat)
 

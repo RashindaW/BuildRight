@@ -10,25 +10,32 @@ k=60 is the standard constant (Cormack et al. 2009).
 
 from __future__ import annotations
 
+import logging
 from typing import Any, Callable
 
 from sqlalchemy.orm import Session
 
 from app.ai.retrieval import _score_item, _tokenize
 from app.ai.embeddings.vector_index import ChunkHit, get_vector_index
+from app.core.config import settings
+
+logger = logging.getLogger("app.ai.hybrid")
 
 
 def reciprocal_rank_fusion(
     ranked_lists: list[list[Any]],
     key_fn: Callable[[Any], Any],
-    k: int = 60,
+    k: int | None = None,
 ) -> list[tuple[Any, float]]:
     """Fuse ranked lists via RRF.
 
     ranked_lists: each sub-list ordered best-first.
     key_fn: extracts a hashable deduplication key from each item.
+    k: RRF constant (defaults to settings.rrf_k).
     Returns: [(item, rrf_score)] sorted descending by score.
     """
+    if k is None:
+        k = settings.rrf_k
     scores: dict[Any, float] = {}
     first_seen: dict[Any, Any] = {}
 
@@ -55,20 +62,24 @@ def hybrid_search_products(
     db: Session,
     query: str,
     filters: dict | None = None,
-    k: int = 12,
+    k: int | None = None,
 ) -> list[dict]:
     """Hybrid product search: lexical + vector → RRF → top-k item dicts.
 
     filters keys (all optional):
         category (str), tags (list[str]), max_price (float), in_stock_only (bool)
+    k defaults to settings.rag_top_k.
 
     Returns items in menu_adapter shape so they flow into _serialize + validate_response.
     """
     from app.ai.menu_adapter import get_menu_for_assistant
     from app.ai.embeddings.provider import get_embedding_provider
 
+    if k is None:
+        k = settings.rag_top_k
     filters = filters or {}
-    pool = get_menu_for_assistant(db, available_only=filters.get("in_stock_only", True))
+    available_only = filters.get("in_stock_only", True)
+    pool = get_menu_for_assistant(db, available_only=available_only)
 
     if filters.get("category"):
         pool = [i for i in pool if i["category"] == filters["category"]]
@@ -95,13 +106,15 @@ def hybrid_search_products(
     if query.strip():
         try:
             qvec = get_embedding_provider().embed_query(query)
-            hits = get_vector_index().search_products(db, qvec, k=min(k * 2, 40))
+            hits = get_vector_index().search_products(
+                db, qvec, k=min(k * 2, 40), available_only=available_only
+            )
             for hit in hits:
                 slug = _item_slug(hit.item_dict)
                 if slug in slug_lookup:
                     vector_ranked.append(slug_lookup[slug])
         except Exception:
-            pass
+            logger.exception("product vector arm failed for query=%r; lexical-only", query)
 
     if not lexical_ranked and not vector_ranked:
         return []
@@ -131,17 +144,21 @@ def _score_chunk(hit: ChunkHit, tokens: list[str]) -> int:
 def hybrid_search_kb(
     db: Session,
     query: str,
-    k: int = 4,
+    k: int | None = None,
     doc_types: list[str] | None = None,
 ) -> list[ChunkHit]:
     """Hybrid KB search: lexical + vector → RRF → top-k ChunkHits.
 
     doc_types: filter by Document.source_type (e.g. ["policy", "warranty"]).
+    k defaults to settings.kb_top_k.
     ChunkHits carry doc_slug, doc_title, heading, content for citations.
     """
     from sqlalchemy import select
     from app.models.knowledge import Document, DocumentChunk
     from app.ai.embeddings.provider import get_embedding_provider
+
+    if k is None:
+        k = settings.kb_top_k
 
     stmt = (
         select(DocumentChunk, Document)
@@ -188,7 +205,7 @@ def hybrid_search_kb(
                 if hit.chunk_id in chunk_map:
                     vector_ranked.append(chunk_map[hit.chunk_id])
         except Exception:
-            pass
+            logger.exception("KB vector arm failed for query=%r; lexical-only", query)
 
     if not lexical_ranked and not vector_ranked:
         return []

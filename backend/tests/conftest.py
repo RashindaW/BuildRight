@@ -46,6 +46,28 @@ def client():
     return TestClient(app)
 
 
+@pytest.fixture(scope="session")
+def menu_items():
+    """All seeded menu items via the public API — catalog-agnostic, so the
+    integration suite survives catalog changes (cafe -> retail and beyond)."""
+    c = TestClient(app)
+    r = c.get("/api/v1/menu", params={"page_size": "100"})
+    assert r.status_code == 200, r.text
+    items = r.json()["items"]
+    assert items, "seed produced no menu items"
+    return items
+
+
+@pytest.fixture(scope="session")
+def seeded_item(menu_items):
+    """A single real seeded item (first available) for cart/order/menu assertions.
+
+    Cart unit price is the item's base price_cents (no options selected), so the
+    expected totals are deterministic regardless of which catalog is loaded.
+    """
+    return menu_items[0]
+
+
 def _register(client: TestClient, email: str, password: str = "Password123!") -> dict:
     r = client.post("/api/v1/auth/register", json={"email": email, "password": password})
     assert r.status_code == 201, r.text

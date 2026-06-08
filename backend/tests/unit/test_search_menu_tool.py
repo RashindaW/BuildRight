@@ -7,7 +7,9 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
-from menu_data import MENU_DATA  # noqa: E402
+# Legacy cafe corpus: this suite is the frozen lexical-retrieval regression
+# baseline (caesar/pizza/vegan), decoupled from the live retail catalog.
+from menu_data_legacy_cafe import MENU_DATA  # noqa: E402
 
 from app.ai.tools import execute_search_menu  # noqa: E402
 
