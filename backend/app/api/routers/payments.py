@@ -34,6 +34,10 @@ def create_intent(
 ):
     from app.core.config import settings
 
+    # Fail fast if Stripe isn't configured, BEFORE creating a pending order —
+    # otherwise a misconfigured deployment accrues orphan pending_payment orders.
+    payment_service.ensure_configured()
+
     order = create_pending_order(db, user.id, body.notes)
     intent = payment_service.create_payment_intent(db, order)
     return {

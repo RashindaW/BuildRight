@@ -26,12 +26,17 @@ logger = logging.getLogger("app.services.payment")
 _TERMINAL_PAID = ("paid", "refunded")
 
 
+def ensure_configured() -> None:
+    """Raise 503 if Stripe isn't configured. Call this BEFORE creating a pending
+    order so a misconfigured deployment doesn't leave orphan pending_payment orders."""
+    if not settings.stripe_secret_key.get_secret_value():
+        raise AppError("Stripe is not configured — set STRIPE_SECRET_KEY", "stripe_not_configured", 503)
+
+
 def _stripe():
     import stripe as _stripe_module
-    key = settings.stripe_secret_key.get_secret_value()
-    if not key:
-        raise AppError("Stripe is not configured — set STRIPE_SECRET_KEY", "stripe_not_configured", 503)
-    _stripe_module.api_key = key
+    ensure_configured()
+    _stripe_module.api_key = settings.stripe_secret_key.get_secret_value()
     return _stripe_module
 
 
