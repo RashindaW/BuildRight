@@ -58,6 +58,30 @@ def _item_slug(d: dict) -> str:
     return str(d.get("slug") or d.get("id") or "")
 
 
+def _normalize_sku(text: str) -> str:
+    """Uppercase, keep only alphanumerics — so 'br-pwr-04821', 'BR PWR 04821', and
+    'BRPWR04821' all normalize to the same comparable token."""
+    return "".join(ch for ch in text.upper() if ch.isalnum())
+
+
+def _exact_sku_match(query: str, pool: list[dict]) -> dict | None:
+    """If the query is (or contains) an exact product SKU, return that product.
+
+    Matches the whole query ('BR-PWR-04821', 'brpwr04821') or a SKU embedded in a
+    sentence ('what's the price of BR-HND-09999?')."""
+    q = _normalize_sku(query)
+    if len(q) < 5:  # too short to be a SKU
+        return None
+    for item in pool:
+        sku = item.get("sku")
+        if not sku:
+            continue
+        ns = _normalize_sku(sku)
+        if len(ns) >= 8 and (ns == q or ns in q):
+            return item
+    return None
+
+
 def hybrid_search_products(
     db: Session,
     query: str,
@@ -90,6 +114,9 @@ def hybrid_search_products(
 
     slug_lookup = {_item_slug(i): i for i in pool}
 
+    # Exact-SKU fast path: a SKU lookup should return that product first, deterministically.
+    sku_hit = _exact_sku_match(query, pool) if query.strip() else None
+
     tokens = _tokenize(query) if query.strip() else []
     if tokens:
         lexical_scored = [(i, _score_item(i, tokens)) for i in pool]
@@ -117,13 +144,19 @@ def hybrid_search_products(
             logger.exception("product vector arm failed for query=%r; lexical-only", query)
 
     if not lexical_ranked and not vector_ranked:
-        return []
+        return [sku_hit] if sku_hit else []
 
     fused = reciprocal_rank_fusion(
         [lexical_ranked, vector_ranked],
         key_fn=_item_slug,
     )
-    return [item for item, _ in fused[:k]]
+    ranked = [item for item, _ in fused[:k]]
+
+    # Force an exact-SKU hit to the front (dedup if already present).
+    if sku_hit is not None:
+        ranked = [sku_hit] + [r for r in ranked if _item_slug(r) != _item_slug(sku_hit)]
+        ranked = ranked[:k]
+    return ranked
 
 
 def _score_chunk(hit: ChunkHit, tokens: list[str]) -> int:

@@ -25,12 +25,14 @@ class OptionGroupOut(ORMBase):
 class MenuItemOut(BaseModel):
     id: str
     slug: str
+    sku: str | None = None
     name: str
     description: str
     price: float
     price_cents: int
     category: str
     is_available: bool
+    stock_qty: int = 0
     featured: bool
     image_url: str | None
     dietary_tags: list[str]
@@ -46,12 +48,14 @@ class MenuItemOut(BaseModel):
         return cls(
             id=item.id,
             slug=item.slug,
+            sku=item.sku,
             name=item.name,
             description=item.description,
             price=item.price_cents / 100,
             price_cents=item.price_cents,
             category=item.category.slug,
             is_available=item.is_available,
+            stock_qty=item.stock_qty,
             featured=item.featured,
             image_url=item.image_url,
             dietary_tags=sorted(t.slug for t in item.dietary_tags),

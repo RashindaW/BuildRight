@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 import pytest
 
-from app.ai.hybrid import reciprocal_rank_fusion, _score_chunk
+from app.ai.hybrid import reciprocal_rank_fusion, _score_chunk, _normalize_sku, _exact_sku_match
 from app.ai.embeddings.chunking import chunk_document
 from app.ai.embeddings.provider import HashEmbeddingProvider
 from app.ai.embeddings.vector_index import ChunkHit
@@ -242,3 +242,28 @@ def test_score_chunk_zero_for_no_match():
         similarity=0.0,
     )
     assert _score_chunk(chunk, ["warranty"]) == 0
+
+
+# ---- SKU matching (exact-lookup fast path) -------------------------------
+
+def test_normalize_sku_variants_collapse():
+    # hyphenated, spaced, and bare forms normalize to the same token
+    assert _normalize_sku("BR-PWR-04821") == "BRPWR04821"
+    assert _normalize_sku("br pwr 04821") == "BRPWR04821"
+    assert _normalize_sku("brpwr04821") == "BRPWR04821"
+
+
+def test_exact_sku_match_finds_product():
+    pool = [
+        {"slug": "a", "sku": "BR-PWR-04821", "name": "Drill"},
+        {"slug": "b", "sku": "BR-HND-09999", "name": "Hammer"},
+    ]
+    assert _exact_sku_match("BR-PWR-04821", pool)["slug"] == "a"
+    assert _exact_sku_match("brpwr04821", pool)["slug"] == "a"  # hyphenless
+    assert _exact_sku_match("what is BR-HND-09999", pool)["slug"] == "b"
+
+
+def test_exact_sku_match_none_for_non_sku():
+    pool = [{"slug": "a", "sku": "BR-PWR-04821", "name": "Drill"}]
+    assert _exact_sku_match("cordless drill", pool) is None
+    assert _exact_sku_match("abc", pool) is None  # too short

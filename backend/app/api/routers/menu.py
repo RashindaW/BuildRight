@@ -41,7 +41,9 @@ def list_menu(
     if q:
         like = f"%{q.lower()}%"
         stmt = stmt.where(
-            func.lower(MenuItem.name).like(like) | func.lower(MenuItem.description).like(like)
+            func.lower(MenuItem.name).like(like)
+            | func.lower(MenuItem.description).like(like)
+            | func.lower(MenuItem.sku).like(like)
         )
     if dietary:
         for tag in dietary:

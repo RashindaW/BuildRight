@@ -145,11 +145,13 @@ def upgrade() -> None:
     op.create_table('menu_items',
     sa.Column('id', sa.String(), nullable=False),
     sa.Column('slug', sa.String(length=100), nullable=False),
+    sa.Column('sku', sa.String(length=32), nullable=True),
     sa.Column('name', sa.String(length=200), nullable=False),
     sa.Column('description', sa.Text(), nullable=False),
     sa.Column('price_cents', sa.Integer(), nullable=False),
     sa.Column('category_id', sa.String(), nullable=False),
     sa.Column('is_available', sa.Boolean(), nullable=False),
+    sa.Column('stock_qty', sa.Integer(), nullable=False),
     sa.Column('featured', sa.Boolean(), nullable=False),
     sa.Column('image_url', sa.String(length=500), nullable=True),
     sa.Column('keywords', sa.JSON(), nullable=False),
@@ -164,6 +166,7 @@ def upgrade() -> None:
     )
     with op.batch_alter_table('menu_items', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_menu_items_category_id'), ['category_id'], unique=False)
+        batch_op.create_index(batch_op.f('ix_menu_items_sku'), ['sku'], unique=True)
 
     op.create_table('orders',
     sa.Column('id', sa.String(), nullable=False),

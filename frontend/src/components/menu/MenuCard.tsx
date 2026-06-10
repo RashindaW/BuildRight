@@ -11,6 +11,8 @@ export function MenuCard({ item }: { item: MenuItem }) {
   const { user } = useAuth();
   const toast = useToast();
   const hasOptions = item.option_groups.length > 0;
+  const outOfStock = !item.is_available || item.stock_qty <= 0;
+  const lowStock = !outOfStock && item.stock_qty <= 15;
 
   const onAdd = () => {
     if (!user) return toast("Please log in to add items.", "info");
@@ -42,6 +44,24 @@ export function MenuCard({ item }: { item: MenuItem }) {
             {formatPrice(item.price_cents)}
           </span>
         </div>
+        {item.sku && (
+          <div className="mt-1 flex items-center gap-2">
+            <span className="font-mono text-xs text-gray-400">SKU {item.sku}</span>
+            {outOfStock ? (
+              <span className="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-500">
+                Out of stock
+              </span>
+            ) : lowStock ? (
+              <span className="rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-700">
+                Only {item.stock_qty} left
+              </span>
+            ) : (
+              <span className="rounded bg-green-100 px-1.5 py-0.5 text-xs font-medium text-green-700">
+                In stock
+              </span>
+            )}
+          </div>
+        )}
         <p className="mt-1 line-clamp-2 text-sm text-gray-600">{item.description}</p>
         <div className="mt-2 flex flex-wrap gap-1">
           {item.dietary_tags.map((t) => (
@@ -54,8 +74,12 @@ export function MenuCard({ item }: { item: MenuItem }) {
               Choose options
             </Link>
           ) : (
-            <button className="btn-primary w-full" onClick={onAdd} disabled={add.isPending}>
-              Add to cart
+            <button
+              className="btn-primary w-full"
+              onClick={onAdd}
+              disabled={add.isPending || outOfStock}
+            >
+              {outOfStock ? "Out of stock" : "Add to cart"}
             </button>
           )}
         </div>

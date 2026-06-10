@@ -72,16 +72,18 @@ SEARCH_MENU_TOOL = {
 SEARCH_PRODUCTS_TOOL = {
     "name": "search_products",
     "description": (
-        "Search BuildRight Hardware's product catalog. Call this BEFORE mentioning "
-        "any product or price. Combine a free-text 'query' with optional filters. "
-        "Returns matching products with their exact prices."
+        "Search BuildRight Hardware's product catalog (1000+ items). Call this BEFORE "
+        "mentioning any product, price, SKU, or stock level. Combine a free-text 'query' "
+        "with optional filters. You can search by product SKU (e.g. 'BR-PWR-04821'), by "
+        "keywords ('cordless drill'), or by need ('something to cut plywood'). Returns "
+        "matching products with their SKU, exact price, and availability."
     ),
     "input_schema": {
         "type": "object",
         "properties": {
             "query": {
                 "type": "string",
-                "description": "Keywords or intent, e.g. 'cordless drill', 'outdoor lighting'.",
+                "description": "A SKU (e.g. 'BR-PWR-04821'), keywords ('cordless drill'), or an intent ('cut plywood').",
             },
             "category": {
                 "type": "string",
@@ -238,13 +240,22 @@ def _filter(menu: list[dict], inp: dict) -> list[dict]:
     return items[:MAX_RESULTS]
 
 
+def _stock_label(i: dict) -> str:
+    if not i.get("is_available", True) or i.get("stock_qty", 0) <= 0:
+        return "out of stock"
+    qty = i.get("stock_qty", 0)
+    return f"{qty} in stock" if qty <= 15 else "in stock"
+
+
 def _serialize(items: list[dict]) -> str:
     payload = [
         {
+            "sku": i.get("sku"),
             "name": i["name"],
             "price": f"${i['price']:.2f}",
             "category": i["category"],
-            "dietary_tags": i.get("dietary_tags", []),
+            "availability": _stock_label(i),
+            "tags": i.get("dietary_tags", []),
             "description": i["description"],
         }
         for i in items
@@ -317,11 +328,22 @@ def execute_get_order_history(tool_input: dict, ctx) -> tuple[str, list]:
         return json.dumps({"orders": [], "note": "No orders found in that period."}), []
 
     result = []
+    grounded: list[dict] = []
     for o in orders:
-        items = [
-            {"name": i.name_snapshot, "slug": i.menu_item_id, "quantity": i.quantity}
-            for i in o.items
-        ]
+        items = []
+        for i in o.items:
+            items.append({
+                "name": i.name_snapshot,
+                "slug": i.menu_item_id,
+                "quantity": i.quantity,
+                "unit_price": f"${i.unit_price_cents / 100:.2f}",
+            })
+            # Ground past-purchase prices so the price validator accepts them when
+            # the assistant restates what the customer paid.
+            grounded.append({"id": i.menu_item_id or i.name_snapshot,
+                             "name": i.name_snapshot, "price": i.unit_price_cents / 100})
+        grounded.append({"id": o.order_number, "name": o.order_number,
+                         "price": o.total_cents / 100})
         result.append({
             "order_number": o.order_number,
             "date": o.created_at.strftime("%Y-%m-%d"),
@@ -329,7 +351,7 @@ def execute_get_order_history(tool_input: dict, ctx) -> tuple[str, list]:
             "total": f"${o.total_cents / 100:.2f}",
             "items": items,
         })
-    return json.dumps({"orders": result}), orders
+    return json.dumps({"orders": result}), grounded
 
 
 def execute_reorder(tool_input: dict, ctx) -> tuple[str, dict]:

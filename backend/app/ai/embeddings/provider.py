@@ -57,42 +57,84 @@ class FastEmbedProvider:
 
 
 class HashEmbeddingProvider:
-    """Deterministic unit-vector embeddings from content hash — no downloads.
+    """Deterministic, download-free embeddings via signed feature hashing of tokens
+    (a hashing bag-of-words / hashing-vectorizer).
 
-    Not useful for semantic search, but produces reproducible vectors that
-    exercise the full retrieval pipeline in tests without fastembed.
+    Unlike a whole-string hash, this places each token into a dimension by hash, so
+    documents that share words get similar vectors — the vector arm becomes a real
+    (lexical-semantic) signal rather than noise. It does not capture neural semantics
+    (synonyms/intent) like fastembed, but it is reproducible and needs no model
+    download, making it a sensible offline fallback when onnxruntime is unavailable.
     """
 
-    model_id = "hash-v1"
+    model_id = "hash-bow-v1"
     dim = 384
 
-    def _hash_to_unit_vector(self, text: str) -> list[float]:
-        digest = hashlib.sha256(text.encode()).digest()
-        raw = [b / 255.0 - 0.5 for b in digest]
-        # pad / truncate to self.dim
-        while len(raw) < self.dim:
-            raw = raw + raw
-        raw = raw[:self.dim]
-        magnitude = math.sqrt(sum(x * x for x in raw)) or 1.0
-        return [x / magnitude for x in raw]
+    @staticmethod
+    def _tokens(text: str) -> list[str]:
+        out, cur = [], []
+        for ch in text.lower():
+            if ch.isalnum():
+                cur.append(ch)
+            elif cur:
+                out.append("".join(cur))
+                cur = []
+        if cur:
+            out.append("".join(cur))
+        return [t for t in out if len(t) >= 2]
+
+    def _bow_vector(self, text: str) -> list[float]:
+        vec = [0.0] * self.dim
+        for tok in self._tokens(text):
+            h = int(hashlib.md5(tok.encode()).hexdigest(), 16)
+            idx = h % self.dim
+            sign = 1.0 if ((h >> 9) & 1) else -1.0
+            vec[idx] += sign
+        magnitude = math.sqrt(sum(x * x for x in vec)) or 1.0
+        return [x / magnitude for x in vec]
 
     def embed_documents(self, texts: list[str]) -> list[list[float]]:
-        return [self._hash_to_unit_vector(t) for t in texts]
+        return [self._bow_vector(t) for t in texts]
 
     def embed_query(self, text: str) -> list[float]:
-        return self._hash_to_unit_vector(text)
+        return self._bow_vector(text)
 
 
 _provider_instance: EmbeddingProvider | None = None
 
 
+import logging
+
+logger = logging.getLogger("app.ai.embeddings.provider")
+
+
+def _fastembed_loadable() -> bool:
+    """True if fastembed (and its onnxruntime backend) can actually import on this host."""
+    try:
+        import fastembed  # noqa: F401
+        return True
+    except Exception as e:  # ImportError, or onnxruntime DLL init failure
+        logger.warning(
+            "fastembed unavailable (%s: %s) — falling back to the deterministic 'hash' "
+            "embedding provider. Semantic vector search is reduced until a host where "
+            "fastembed/onnxruntime loads is used (no code change needed there).",
+            type(e).__name__, e,
+        )
+        return False
+
+
 def get_embedding_provider() -> EmbeddingProvider:
-    """Return a singleton embedding provider selected by settings.embedding_provider."""
+    """Return a singleton embedding provider selected by settings.embedding_provider.
+
+    The default 'fastembed' gracefully falls back to 'hash' if fastembed/onnxruntime
+    can't load on this host, so the RAG pipeline always has a populated vector arm and
+    the app runs anywhere. Set EMBEDDING_PROVIDER=hash to force the offline fallback.
+    """
     global _provider_instance
     if _provider_instance is None:
         name = settings.embedding_provider
         if name == "fastembed":
-            _provider_instance = FastEmbedProvider()
+            _provider_instance = FastEmbedProvider() if _fastembed_loadable() else HashEmbeddingProvider()
         elif name == "hash":
             _provider_instance = HashEmbeddingProvider()
         else:

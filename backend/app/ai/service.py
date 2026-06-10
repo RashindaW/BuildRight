@@ -165,7 +165,7 @@ async def stream_chat(
                     except Exception as e:
                         logger.warning('"tool_exec_error: %s %s"', block.name, type(e).__name__)
                         result_json, payload = json.dumps({"error": "tool_failed"}), None
-                    if payload is not None and block.name in ("search_menu", "search_products"):
+                    if payload is not None and block.name in ("search_menu", "search_products", "get_order_history"):
                         grounded_items.extend(payload)
                     elif payload is not None and block.name == "search_knowledge_base":
                         grounded_chunks.extend(payload)

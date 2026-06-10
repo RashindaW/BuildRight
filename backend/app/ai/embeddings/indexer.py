@@ -43,7 +43,8 @@ def embed_products(db: Session, provider: EmbeddingProvider) -> int:
     for row in items:
         item, cat = row.MenuItem, row.Category
         keywords_str = " ".join(item.keywords or [])
-        canonical = f"{item.name}. {item.description or ''}. {keywords_str}".strip()
+        sku_str = f"SKU {item.sku}. " if item.sku else ""
+        canonical = f"{sku_str}{item.name}. {cat.name}. {item.description or ''}. {keywords_str}".strip()
         h = _content_hash(canonical)
 
         existing = db.execute(

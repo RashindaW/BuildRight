@@ -68,6 +68,7 @@ class MenuItem(TimestampMixin, Base):
 
     id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)
     slug: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    sku: Mapped[str | None] = mapped_column(String(32), unique=True, nullable=True, index=True)
     name: Mapped[str] = mapped_column(String(200), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False, default="")
     price_cents: Mapped[int] = mapped_column(Integer, nullable=False)  # integer cents
@@ -75,6 +76,7 @@ class MenuItem(TimestampMixin, Base):
         String, ForeignKey("categories.id"), nullable=False, index=True
     )
     is_available: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    stock_qty: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     featured: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     keywords: Mapped[list] = mapped_column(JSON, default=list, nullable=False)

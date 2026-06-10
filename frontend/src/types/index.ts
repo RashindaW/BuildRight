@@ -18,12 +18,14 @@ export interface OptionGroup {
 export interface MenuItem {
   id: string;
   slug: string;
+  sku: string | null;
   name: string;
   description: string;
   price: number;
   price_cents: number;
   category: string;
   is_available: boolean;
+  stock_qty: number;
   featured: boolean;
   image_url: string | null;
   dietary_tags: string[];

@@ -24,6 +24,8 @@ export default function ItemDetail() {
   if (isLoading) return <div className="p-8 text-center text-gray-500">Loading…</div>;
   if (!item) return <div className="p-8 text-center">Item not found.</div>;
 
+  const outOfStock = !item.is_available || item.stock_qty <= 0;
+
   const choose = (groupId: string, choiceId: string) =>
     setSelected((s) => ({ ...s, [groupId]: choiceId }));
 
@@ -58,6 +60,17 @@ export default function ItemDetail() {
           <div className="flex items-start justify-between">
             <h1 className="text-2xl font-bold">{item.name}</h1>
             <span className="text-xl font-semibold text-brand-700">{formatPrice(item.price_cents + extraCents)}</span>
+          </div>
+          <div className="mt-1 flex items-center gap-3">
+            {item.sku && <span className="font-mono text-xs text-gray-400">SKU {item.sku}</span>}
+            <span className="text-xs font-medium text-gray-500">{item.category}</span>
+            {outOfStock ? (
+              <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500">Out of stock</span>
+            ) : item.stock_qty <= 15 ? (
+              <span className="rounded bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">Only {item.stock_qty} left in stock</span>
+            ) : (
+              <span className="rounded bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">{item.stock_qty} in stock</span>
+            )}
           </div>
           <p className="mt-2 text-gray-600">{item.description}</p>
 
@@ -96,8 +109,8 @@ export default function ItemDetail() {
             </fieldset>
           ))}
 
-          <button className="btn-primary mt-6 w-full" onClick={onAdd} disabled={add.isPending}>
-            Add to cart · {formatPrice(item.price_cents + extraCents)}
+          <button className="btn-primary mt-6 w-full" onClick={onAdd} disabled={add.isPending || outOfStock}>
+            {outOfStock ? "Out of stock" : `Add to cart · ${formatPrice(item.price_cents + extraCents)}`}
           </button>
         </div>
       </div>
