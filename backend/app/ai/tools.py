@@ -165,12 +165,12 @@ GET_ORDER_HISTORY_TOOL = {
 REORDER_TOOL = {
     "name": "reorder",
     "description": (
-        "Add a previously ordered item to the user's current cart. When the customer "
-        "asks to reorder, re-buy, or 'add that again', call get_order_history first to "
-        "find the exact item, then call THIS tool immediately with quantity 1 — do NOT "
-        "ask the customer how many they want first; add it to the cart and let them know "
-        "they can change the quantity in their cart. Only ask for clarification if it is "
-        "genuinely ambiguous WHICH past item they mean."
+        "Add a previously ordered item back to the user's current cart. When the customer "
+        "asks to reorder, re-buy, or 'add that again', call get_order_history first to find "
+        "the exact item, then call THIS tool immediately. By default it adds the SAME "
+        "quantity the customer originally ordered — do NOT ask how many they want, and do "
+        "NOT pass 'quantity' unless the customer explicitly states a different amount. Only "
+        "ask for clarification if it is genuinely ambiguous WHICH past item they mean."
     ),
     "input_schema": {
         "type": "object",
@@ -181,7 +181,8 @@ REORDER_TOOL = {
             },
             "quantity": {
                 "type": "integer",
-                "description": "How many to add. Defaults to 1 — do not ask the customer; just use 1.",
+                "description": "Optional. Only set this if the customer explicitly asks for a specific "
+                               "amount; otherwise omit it and the original order quantity is used.",
             },
         },
         "required": ["menu_item_id"],
@@ -368,21 +369,35 @@ def execute_reorder(tool_input: dict, ctx) -> tuple[str, dict]:
 
     inp = tool_input or {}
     raw = (inp.get("menu_item_id") or "").strip()
-    quantity = max(1, min(_as_int(inp.get("quantity"), 1), MAX_QTY))
     if not raw:
         return json.dumps({"error": "menu_item_id is required"}), {"added": False}
 
     try:
         # Resolve the model-supplied id/slug to a concrete catalog item.
         item = _resolve_item(ctx.db, raw)
-        # Bind reorder to the user's OWN purchase history: the model must have
-        # surfaced this item via get_order_history, not pick an arbitrary catalog id.
+        # Bind reorder to the user's OWN purchase history (orders are newest-first):
+        # find the quantity they originally ordered so "reorder" replays it.
         since = datetime.now(tz=timezone.utc) - timedelta(days=365)
         orders = list_orders_since(ctx.db, ctx.user_id, since)
-        ordered_ids = {oi.menu_item_id for o in orders for oi in o.items if oi.menu_item_id}
-        if item.id not in ordered_ids:
+        original_qty = None
+        for o in orders:
+            for oi in o.items:
+                if oi.menu_item_id == item.id:
+                    original_qty = oi.quantity
+                    break
+            if original_qty is not None:
+                break
+        if original_qty is None:
             return json.dumps({"error": "not_in_history",
                                "message": "That item isn't in your recent order history."}), {"added": False}
+
+        # Quantity: honour an explicit amount the customer asked for; otherwise default
+        # to the quantity they originally ordered (not 1).
+        qty_arg = inp.get("quantity")
+        if qty_arg is not None:
+            quantity = max(1, min(_as_int(qty_arg, original_qty), MAX_QTY))
+        else:
+            quantity = max(1, min(original_qty, MAX_QTY))
 
         add_item(ctx.db, ctx.user_id, item.id, quantity, [])
         return json.dumps({"added": True, "quantity": quantity, "item": item.slug}), {"added": True}
