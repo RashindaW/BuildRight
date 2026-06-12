@@ -165,19 +165,23 @@ GET_ORDER_HISTORY_TOOL = {
 REORDER_TOOL = {
     "name": "reorder",
     "description": (
-        "Add a previously ordered item to the user's current cart. "
-        "Call get_order_history first to find the item slug, then call this tool."
+        "Add a previously ordered item to the user's current cart. When the customer "
+        "asks to reorder, re-buy, or 'add that again', call get_order_history first to "
+        "find the exact item, then call THIS tool immediately with quantity 1 — do NOT "
+        "ask the customer how many they want first; add it to the cart and let them know "
+        "they can change the quantity in their cart. Only ask for clarification if it is "
+        "genuinely ambiguous WHICH past item they mean."
     ),
     "input_schema": {
         "type": "object",
         "properties": {
             "menu_item_id": {
                 "type": "string",
-                "description": "The item slug or id from order history.",
+                "description": "The item slug from order history (the 'slug' field of an order item).",
             },
             "quantity": {
                 "type": "integer",
-                "description": "How many to add (default 1).",
+                "description": "How many to add. Defaults to 1 — do not ask the customer; just use 1.",
             },
         },
         "required": ["menu_item_id"],
