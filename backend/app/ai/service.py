@@ -19,6 +19,7 @@ from app.ai.guardrails import (
     SAFE_FALLBACK,
     SYSTEM_PROMPT,
     SYSTEM_PROMPT_RETAIL,
+    extract_prices,
     validate_citations,
     validate_response,
 )
@@ -169,8 +170,11 @@ async def stream_chat(
                         grounded_items.extend(payload)
                     elif payload is not None and block.name == "search_knowledge_base":
                         grounded_chunks.extend(payload)
-                    elif block.name == "reorder" and isinstance(payload, dict) and payload.get("added"):
-                        cart_dirty = True
+                    elif block.name == "reorder" and isinstance(payload, dict):
+                        if payload.get("added"):
+                            cart_dirty = True
+                        # Ground the reordered item's unit + line-total prices.
+                        grounded_items.extend(payload.get("grounded", []))
                     tool_results.append({
                         "type": "tool_result",
                         "tool_use_id": block.id,
@@ -202,8 +206,18 @@ async def stream_chat(
             seen_ids.add(key)
             grounded_unique.append(it)
 
+    # Prices the assistant already stated (and that passed validation) earlier in this
+    # conversation are still trusted now — carry them forward so multi-turn references
+    # and computed line totals don't trip the guardrail.
+    carried_prices: set[str] = set()
+    for m in prior_messages:
+        if isinstance(m, dict) and m.get("role") == "assistant" and isinstance(m.get("content"), str):
+            carried_prices |= extract_prices(m["content"])
+
     # Hard price guard
-    result = validate_response(final_text, grounded_unique)
+    result = validate_response(
+        final_text, grounded_unique, extra_allowed=carried_prices, allow_multiples=True
+    )
     if not result.ok:
         logger.warning('"guardrail_price_violation: %s"', result.reason)
         final_text = SAFE_FALLBACK

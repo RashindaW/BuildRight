@@ -165,19 +165,23 @@ GET_ORDER_HISTORY_TOOL = {
 REORDER_TOOL = {
     "name": "reorder",
     "description": (
-        "Add a previously ordered item back to the user's current cart. When the customer "
-        "asks to reorder, re-buy, or 'add that again', call get_order_history first to find "
-        "the exact item, then call THIS tool immediately. By default it adds the SAME "
-        "quantity the customer originally ordered — do NOT ask how many they want, and do "
-        "NOT pass 'quantity' unless the customer explicitly states a different amount. Only "
-        "ask for clarification if it is genuinely ambiguous WHICH past item they mean."
+        "Add a previously ordered item back to the customer's cart. When the customer asks "
+        "to reorder, re-buy, or 'add that again', call THIS tool DIRECTLY — you do NOT need "
+        "to call get_order_history or search_products first. Pass whatever the customer "
+        "named the item as 'menu_item_id' (a plain product name like 'exterior paint' works, "
+        "as do a SKU, slug, or id); reorder looks it up in the customer's own order history. "
+        "By default it adds the SAME quantity they originally ordered; if the customer states "
+        "a quantity (e.g. 'reorder 10 paints'), pass that as 'quantity'. NEVER ask the "
+        "customer to confirm a quantity they already gave — just reorder it. Never say an "
+        "item was added unless this tool returned added=true."
     ),
     "input_schema": {
         "type": "object",
         "properties": {
             "menu_item_id": {
                 "type": "string",
-                "description": "The item slug from order history (the 'slug' field of an order item).",
+                "description": "What the customer called the item: a product name ('exterior paint'), "
+                               "SKU, slug, or id. reorder matches it against their order history.",
             },
             "quantity": {
                 "type": "integer",
@@ -363,46 +367,72 @@ def execute_reorder(tool_input: dict, ctx) -> tuple[str, dict]:
     if not ctx.user_id:
         return _LOGIN_REQUIRED, {"added": False}
     from datetime import datetime, timedelta, timezone
+    from sqlalchemy import select, func
     from app.services.cart_service import _resolve_item, add_item
     from app.services.order_service import list_orders_since
     from app.core.errors import AppError, NotFoundError
+    from app.models.menu import MenuItem
 
     inp = tool_input or {}
     raw = (inp.get("menu_item_id") or "").strip()
     if not raw:
         return json.dumps({"error": "menu_item_id is required"}), {"added": False}
 
+    # Bind reorder to the user's OWN purchase history (orders are newest-first).
+    since = datetime.now(tz=timezone.utc) - timedelta(days=365)
+    orders = list_orders_since(ctx.db, ctx.user_id, since)
+    hist = [(oi.menu_item_id, oi.name_snapshot, oi.quantity)
+            for o in orders for oi in o.items if oi.menu_item_id]
+    if not hist:
+        return json.dumps({"error": "not_in_history",
+                           "message": "You have no recent orders to reorder from."}), {"added": False}
+
+    # Resolve the requested identifier (id, slug, SKU, or product name) to a past item.
+    target_id = None
     try:
-        # Resolve the model-supplied id/slug to a concrete catalog item.
-        item = _resolve_item(ctx.db, raw)
-        # Bind reorder to the user's OWN purchase history (orders are newest-first):
-        # find the quantity they originally ordered so "reorder" replays it.
-        since = datetime.now(tz=timezone.utc) - timedelta(days=365)
-        orders = list_orders_since(ctx.db, ctx.user_id, since)
-        original_qty = None
-        for o in orders:
-            for oi in o.items:
-                if oi.menu_item_id == item.id:
-                    original_qty = oi.quantity
-                    break
-            if original_qty is not None:
-                break
-        if original_qty is None:
-            return json.dumps({"error": "not_in_history",
-                               "message": "That item isn't in your recent order history."}), {"added": False}
+        target_id = _resolve_item(ctx.db, raw).id  # exact id/slug, if still available
+    except (AppError, NotFoundError):
+        target_id = None
+    if target_id is None:
+        # SKU, or the id/slug of an out-of-stock item (which _resolve_item rejects)
+        mi = ctx.db.execute(
+            select(MenuItem).where(
+                (func.lower(MenuItem.sku) == raw.lower())
+                | (MenuItem.id == raw)
+                | (MenuItem.slug == raw.lower())
+            )
+        ).scalar_one_or_none()
+        target_id = mi.id if mi else None
+    match = next((h for h in hist if h[0] == target_id), None) if target_id else None
+    if match is None:
+        rl = raw.lower()
+        match = next((h for h in hist if rl in h[1].lower() or h[1].lower() in rl), None)
+    if match is None:
+        return json.dumps({"error": "not_in_history",
+                           "message": "That item isn't in your recent order history."}), {"added": False}
 
-        # Quantity: honour an explicit amount the customer asked for; otherwise default
-        # to the quantity they originally ordered (not 1).
-        qty_arg = inp.get("quantity")
-        if qty_arg is not None:
-            quantity = max(1, min(_as_int(qty_arg, original_qty), MAX_QTY))
-        else:
-            quantity = max(1, min(original_qty, MAX_QTY))
+    menu_item_id, name, original_qty = match
+    # Quantity: honour an explicit amount; otherwise replay the original order quantity.
+    qty_arg = inp.get("quantity")
+    if qty_arg is not None:
+        quantity = max(1, min(_as_int(qty_arg, original_qty), MAX_QTY))
+    else:
+        quantity = max(1, min(original_qty, MAX_QTY))
 
-        add_item(ctx.db, ctx.user_id, item.id, quantity, [])
-        return json.dumps({"added": True, "quantity": quantity, "item": item.slug}), {"added": True}
+    try:
+        add_item(ctx.db, ctx.user_id, menu_item_id, quantity, [])
     except (AppError, NotFoundError) as e:
-        return json.dumps({"error": str(e)}), {"added": False}
+        return json.dumps({"error": "unavailable", "message": str(e)}), {"added": False}
+
+    # Ground the item's current unit + line-total price so the assistant can state them.
+    mi = ctx.db.execute(select(MenuItem).where(MenuItem.id == menu_item_id)).scalar_one_or_none()
+    grounded = []
+    if mi:
+        grounded = [
+            {"id": mi.slug, "name": mi.name, "price": mi.price_cents / 100},
+            {"id": f"{mi.slug}:line", "name": mi.name, "price": (mi.price_cents * quantity) / 100},
+        ]
+    return json.dumps({"added": True, "quantity": quantity, "item": name}), {"added": True, "grounded": grounded}
 
 
 def execute_get_preferences(tool_input: dict, ctx) -> tuple[str, dict]:

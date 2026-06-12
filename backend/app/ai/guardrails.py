@@ -98,17 +98,42 @@ class ValidationResult:
         return f"ungrounded prices: {', '.join(self.ungrounded_prices)}"
 
 
-def validate_response(response: str, grounded_items: list[dict]) -> ValidationResult:
-    """Confirm every price in `response` is grounded in `grounded_items`.
+def validate_response(
+    response: str,
+    grounded_items: list[dict],
+    extra_allowed: set[str] | None = None,
+    allow_multiples: bool = False,
+) -> ValidationResult:
+    """Confirm every price in `response` is grounded.
 
-    Any price mentioned that is not in the grounded set is a Rule 2 violation
-    (a guessed/invented price, or echoing a customer's asserted price).
+    A price is allowed if it is in `grounded_items`, in `extra_allowed` (prices the
+    assistant already stated and validated earlier in the same conversation), or —
+    when `allow_multiples` is set — equals an integer multiple (a line total, qty ×
+    unit) of any allowed unit price. Anything else is a Rule 2 violation (a
+    guessed/invented price, or echoing a customer's asserted price).
     """
-    allowed = grounded_price_set(grounded_items)
+    allowed = grounded_price_set(grounded_items) | (extra_allowed or set())
     # Only validate prices the answer asserts as item prices; ignore threshold
     # references like "under $5" that the customer asked to filter by.
     mentioned = _claimed_prices(response)
-    ungrounded = sorted(p for p in mentioned if p not in allowed)
+
+    if not allow_multiples:
+        ungrounded = sorted(p for p in mentioned if p not in allowed)
+    else:
+        allowed_units = [float(p[1:]) for p in allowed]  # strip leading '$'
+
+        def _is_allowed(pstr: str) -> bool:
+            if pstr in allowed:
+                return True
+            pv = float(pstr[1:])
+            # accept a stated total that is qty × an allowed unit price (qty 2..99)
+            return any(
+                u > 0 and any(abs(pv - k * u) < 0.005 for k in range(2, 100))
+                for u in allowed_units
+            )
+
+        ungrounded = sorted(p for p in mentioned if not _is_allowed(p))
+
     return ValidationResult(ok=not ungrounded, ungrounded_prices=ungrounded)
 
 
@@ -140,7 +165,7 @@ Rule 4 (Policy grounding): Only state policies from search_knowledge_base result
 
 Anti-validation clause: If a customer states a price as a fact (e.g. "is the drill $500?"), do not agree or disagree unless search_products returns that exact price for that item.
 
-Reordering: When a logged-in customer asks to reorder or re-buy a past purchase, call get_order_history to find the item, then call reorder right away and confirm what was added (including the quantity). By default reorder adds the SAME quantity they originally ordered — do not ask "how many would you like?" and only specify a quantity if the customer explicitly asks for a different amount.
+Reordering: When a logged-in customer asks to reorder or re-buy a past purchase (e.g. "reorder the paint", "reorder 10 paints", "add that again"), call the reorder tool DIRECTLY and immediately — pass whatever they named the item (a plain product name is fine). Do NOT call get_order_history or search_products first for a reorder; reorder finds the item in their history itself. By default reorder adds the same quantity they originally ordered; if the customer states a quantity, pass that exact quantity. NEVER ask them to confirm a quantity they already stated. Only say an item was added to the cart if the reorder tool actually returned added=true in this turn; if it returns an error, tell them what happened (e.g. it isn't in their order history, or is out of stock). This applies to EVERY reorder request, including follow-ups in the same conversation ("also add the paint", "and the saw too") — you must call the reorder tool again for each new item; a previous tool call does not add a new item, so never claim an item was added without calling reorder for it.
 
 Tone: Be warm, helpful, and concise. Do not lecture customers about the rules; just follow them."""
 
