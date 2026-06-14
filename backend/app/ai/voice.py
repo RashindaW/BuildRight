@@ -44,26 +44,39 @@ def validate_audio(data: bytes, media_type: str | None) -> str:
     return mt
 
 
+# Provider → (OpenAI-compatible endpoint, default model). Groq is free-tier.
+_PROVIDERS = {
+    "openai": ("https://api.openai.com/v1/audio/transcriptions", "whisper-1"),
+    "groq": ("https://api.groq.com/openai/v1/audio/transcriptions", "whisper-large-v3"),
+}
+
+
 def transcribe(data: bytes, media_type: str | None, *, filename: str = "audio.webm") -> str:
     """Transcribe audio to text. Raises STTNotConfigured when no provider is set."""
     validate_audio(data, media_type)
     if not is_configured():
         raise STTNotConfigured("No speech-to-text provider configured.")
 
-    if settings.stt_provider == "openai":
-        return _transcribe_openai(data, filename)
-    raise STTNotConfigured(f"Unknown STT provider '{settings.stt_provider}'.")
+    endpoint = _PROVIDERS.get(settings.stt_provider)
+    if endpoint is None:
+        raise STTNotConfigured(f"Unknown STT provider '{settings.stt_provider}'.")
+    url, default_model = endpoint
+    model = settings.stt_model or default_model
+    return _transcribe_openai_compatible(url, model, data, filename)
 
 
-def _transcribe_openai(data: bytes, filename: str) -> str:  # pragma: no cover - needs a key
+def _transcribe_openai_compatible(  # pragma: no cover - needs a real key
+    url: str, model: str, data: bytes, filename: str
+) -> str:
+    """OpenAI Whisper API + Groq share the same multipart contract."""
     import httpx
 
     key = settings.stt_api_key.get_secret_value()
     with httpx.Client(timeout=60.0) as client:
         r = client.post(
-            "https://api.openai.com/v1/audio/transcriptions",
+            url,
             headers={"Authorization": f"Bearer {key}"},
-            data={"model": "whisper-1"},
+            data={"model": model},
             files={"file": (filename, data)},
         )
         r.raise_for_status()

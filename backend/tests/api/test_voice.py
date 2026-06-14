@@ -27,6 +27,29 @@ def test_not_configured_by_default():
     assert voice.is_configured() is False
 
 
+def test_groq_provider_routes_to_groq_endpoint(monkeypatch):
+    from pydantic import SecretStr
+    from app.core.config import settings
+
+    monkeypatch.setattr(settings, "stt_provider", "groq")
+    monkeypatch.setattr(settings, "stt_api_key", SecretStr("gsk_test"))
+    monkeypatch.setattr(settings, "stt_model", "")  # use the per-provider default
+
+    captured = {}
+
+    def fake_upload(url, model, data, filename):
+        captured["url"] = url
+        captured["model"] = model
+        return "two cordless drills please"
+
+    monkeypatch.setattr(voice, "_transcribe_openai_compatible", fake_upload)
+
+    text = voice.transcribe(b"audio", "audio/webm")
+    assert text == "two cordless drills please"
+    assert captured["url"] == "https://api.groq.com/openai/v1/audio/transcriptions"
+    assert captured["model"] == "whisper-large-v3"
+
+
 def test_transcribe_endpoint_503_without_provider(client):
     r = client.post("/api/v1/media/transcribe", files={"file": _AUDIO})
     assert r.status_code == 503

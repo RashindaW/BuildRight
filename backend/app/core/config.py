@@ -62,8 +62,9 @@ class Settings(BaseSettings):
     unsplash_access_key: SecretStr | None = None
     pexels_api_key: SecretStr | None = None
     # Voice: optional speech-to-text provider for /media/transcribe
-    stt_provider: Literal["", "openai"] = ""
+    stt_provider: Literal["", "openai", "groq"] = ""
     stt_api_key: SecretStr | None = None
+    stt_model: str = ""  # blank = per-provider default (groq: whisper-large-v3)
     llm_temperature: float = 0.0
     max_tokens_per_conversation: int = 50_000
     max_messages_per_conversation: int = 100
