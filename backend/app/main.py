@@ -80,9 +80,10 @@ def create_app() -> FastAPI:
     app.add_exception_handler(RateLimitExceeded, _rate_limit_handler)
 
     # Routers
-    from app.api.routers import admin, auth, cart, chat, menu, orders, payments
+    from app.api.routers import admin, analytics, auth, cart, chat, menu, orders, payments
     api_prefix = "/api/v1"
-    for r in (auth.router, menu.router, cart.router, orders.router, chat.router, admin.router, payments.router):
+    for r in (auth.router, menu.router, cart.router, orders.router, chat.router,
+              admin.router, payments.router, analytics.router):
         app.include_router(r, prefix=api_prefix)
 
     @app.get("/health/live")

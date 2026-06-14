@@ -79,6 +79,50 @@ export const paymentsApi = {
     api<PaymentStatusResponse>(`/payments/status/${orderId}`),
 };
 
+// ---- Manager analytics ----
+export interface InventorySummary {
+  total_products: number;
+  in_stock: number;
+  out_of_stock: number;
+  low_stock_count: number;
+  low_stock_threshold: number;
+  inventory_value_cost_cents: number;
+  inventory_value_retail_cents: number;
+  low_stock: { sku: string | null; name: string; category: string; stock_qty: number }[];
+  by_category: { category: string; products: number; units: number }[];
+}
+
+export interface MarginRow {
+  revenue_cents: number;
+  cogs_cents: number;
+  gross_profit_cents: number;
+  margin_pct: number;
+}
+
+export interface MarginSummary {
+  period_days: number;
+  order_count: number;
+  overall: MarginRow;
+  by_category: ({ category: string } & MarginRow)[];
+}
+
+export interface AiAttribution {
+  period_days: number;
+  total_orders: number;
+  total_revenue_cents: number;
+  chat_orders: number;
+  chat_revenue_cents: number;
+  order_share_pct: number;
+  revenue_share_pct: number;
+  top_chat_products: { name: string; units: number; revenue_cents: number }[];
+}
+
+export const analyticsApi = {
+  inventory: () => api<InventorySummary>("/analytics/inventory"),
+  margins: (days = 30) => api<MarginSummary>(`/analytics/margins?days=${days}`),
+  aiAttribution: (days = 30) => api<AiAttribution>(`/analytics/ai-attribution?days=${days}`),
+};
+
 // ---- Admin ----
 export const adminApi = {
   createItem: (body: Record<string, unknown>) =>

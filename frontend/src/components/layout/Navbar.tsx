@@ -23,6 +23,11 @@ export function Navbar() {
             My Orders
           </Link>
         )}
+        {(user?.role === "manager" || user?.role === "admin") && (
+          <Link to="/manager" className="text-sm text-gray-600 hover:text-gray-900">
+            Dashboard
+          </Link>
+        )}
         {user?.role === "admin" && (
           <Link to="/admin" className="text-sm text-gray-600 hover:text-gray-900">
             Admin

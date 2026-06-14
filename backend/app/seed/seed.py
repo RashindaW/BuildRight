@@ -273,9 +273,9 @@ _DEMO_USERS = [
         "name": "Dana Demo",
         "prefs": {"preferred_brand": "Mastercraft", "favourite_category": "power-tools"},
         "orders": [
-            {"days_ago": 6, "status": "placed", "picks": [("paint", 2), ("cleaning", 1)]},
+            {"days_ago": 6, "status": "placed", "source": "chat", "picks": [("paint", 2), ("cleaning", 1)]},
             {"days_ago": 24, "status": "completed", "picks": [("power-tools", 1), ("fasteners", 2)]},
-            {"days_ago": 72, "status": "completed", "picks": [("hand-tools", 1), ("electrical", 1)]},
+            {"days_ago": 72, "status": "completed", "source": "chat", "picks": [("hand-tools", 1), ("electrical", 1)]},
         ],
     },
     {
@@ -284,7 +284,7 @@ _DEMO_USERS = [
         "name": "Pat Pro",
         "prefs": {"preferred_brand": "ProBuilt", "account_type": "contractor"},
         "orders": [
-            {"days_ago": 9, "status": "placed", "picks": [("power-tools", 1), ("safety", 3)]},
+            {"days_ago": 9, "status": "placed", "source": "chat", "picks": [("power-tools", 1), ("safety", 3)]},
             {"days_ago": 38, "status": "completed", "picks": [("building-materials", 10), ("fasteners", 4)]},
         ],
     },
@@ -319,6 +319,7 @@ def _pick_item(db: Session, category: str) -> MenuItem | None:
 def seed_demo_accounts(db: Session) -> int:
     """Create demo customers with preferences + backdated paid orders."""
     from datetime import datetime, timedelta, timezone
+    from app.models.chat import Conversation
     from app.models.order import Order, OrderItem
     from app.models.user_memory import UserPreference
 
@@ -344,9 +345,19 @@ def seed_demo_accounts(db: Session) -> int:
 
         for o in spec["orders"]:
             when = now - timedelta(days=o["days_ago"])
+            order_source = o.get("source", "web")
+            conv_id = None
+            if order_source == "chat":
+                # a chat conversation drove this order (for the AI-attribution dashboard)
+                conv = Conversation(user_id=user.id, created_at=when, updated_at=when)
+                db.add(conv)
+                db.flush()
+                conv_id = conv.id
             order = Order(
                 order_number=f"CD-{uuid.uuid4().hex[:10].upper()}",
                 user_id=user.id,
+                source=order_source,
+                conversation_id=conv_id,
                 status=o["status"],
                 payment_status="paid",
                 subtotal_cents=0,
