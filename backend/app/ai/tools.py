@@ -215,6 +215,93 @@ SET_PREFERENCE_TOOL = {
     },
 }
 
+COMPUTE_MATERIALS_TOOL = {
+    "name": "compute_materials",
+    "description": (
+        "Plan a home-improvement project: turn room measurements into a costed materials "
+        "list of real in-stock products. Use this when a shopper describes a project — e.g. "
+        "'I want to repair/paint my room', 'tile my bathroom floor', 'install laminate'. "
+        "First collect the project type and the room's length and width in feet (and height "
+        "for wall projects, default 8 ft); then call this. It returns each material with a "
+        "matched product, SKU, exact unit price, quantity and line total, plus a subtotal "
+        "and the assumptions used. Present the list and offer to add it with "
+        "add_materials_to_cart. Do NOT invent quantities or prices — they come from here."
+    ),
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "project_type": {
+                "type": "string",
+                "description": "The kind of project.",
+                "enum": ["paint_room", "tile_floor", "laminate_floor", "drywall_room"],
+            },
+            "length_ft": {"type": "number", "description": "Room length in feet."},
+            "width_ft": {"type": "number", "description": "Room width in feet."},
+            "height_ft": {
+                "type": "number",
+                "description": "Wall height in feet (wall projects). Defaults to 8.",
+            },
+            "coats": {
+                "type": "integer",
+                "description": "Paint coats (paint_room only). Defaults to 2.",
+            },
+        },
+        "required": ["project_type", "length_ft", "width_ft"],
+    },
+}
+
+ADD_MATERIALS_TO_CART_TOOL = {
+    "name": "add_materials_to_cart",
+    "description": (
+        "Add a list of products to the cart in one call — used after compute_materials when "
+        "the shopper confirms they want the materials. Pass the SKU (preferred) or product "
+        "name and a quantity for each line. Never say items were added unless this tool "
+        "returned them in 'added'."
+    ),
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "items": {
+                "type": "array",
+                "description": "Products to add.",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "item": {"type": "string", "description": "SKU, slug, id, or product name."},
+                        "quantity": {"type": "integer", "description": "How many (>=1)."},
+                    },
+                    "required": ["item", "quantity"],
+                },
+            },
+        },
+        "required": ["items"],
+    },
+}
+
+SUGGEST_COMPLEMENTARY_TOOL = {
+    "name": "suggest_complementary",
+    "description": (
+        "Suggest complementary add-on products for a project or a product the shopper is "
+        "considering (an upsell). Returns a few in-stock items with their SKU and exact price. "
+        "Use after presenting a materials list, or when a shopper adds an item, to recommend "
+        "the tools/accessories that go with it."
+    ),
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "project_type": {
+                "type": "string",
+                "description": "Optional project context.",
+                "enum": ["paint_room", "tile_floor", "laminate_floor", "drywall_room"],
+            },
+            "query": {
+                "type": "string",
+                "description": "Optional free-text need to anchor suggestions, e.g. 'painting a wall'.",
+            },
+        },
+    },
+}
+
 # Exposed to the model in the live retail app
 TOOLS = [
     SEARCH_PRODUCTS_TOOL,
@@ -223,6 +310,9 @@ TOOLS = [
     REORDER_TOOL,
     GET_PREFERENCES_TOOL,
     SET_PREFERENCE_TOOL,
+    COMPUTE_MATERIALS_TOOL,
+    ADD_MATERIALS_TO_CART_TOOL,
+    SUGGEST_COMPLEMENTARY_TOOL,
 ]
 
 
@@ -436,6 +526,186 @@ def execute_reorder(tool_input: dict, ctx) -> tuple[str, dict]:
             {"id": f"{mi.slug}:line", "name": mi.name, "price": (mi.price_cents * quantity) / 100},
         ]
     return json.dumps({"added": True, "quantity": quantity, "item": name}), {"added": True, "grounded": grounded}
+
+
+# ---- Project planning (Phase 2.1) -----------------------------------------
+
+def _resolve_menu_item(db, raw: str):
+    """Resolve a SKU / slug / id / exact-ish name to a MenuItem, or None."""
+    from sqlalchemy import select, func
+    from app.models.menu import MenuItem
+
+    raw = (raw or "").strip()
+    if not raw:
+        return None
+    mi = db.execute(
+        select(MenuItem).where(
+            (func.lower(MenuItem.sku) == raw.lower())
+            | (MenuItem.id == raw)
+            | (MenuItem.slug == raw.lower())
+        )
+    ).scalar_one_or_none()
+    if mi:
+        return mi
+    # Fall back to a name contains-match (first available).
+    return db.execute(
+        select(MenuItem).where(func.lower(MenuItem.name).contains(raw.lower()))
+        .where(MenuItem.is_available.is_(True))
+    ).scalars().first()
+
+
+def execute_compute_materials(tool_input: dict, ctx) -> tuple[str, list[dict] | None]:
+    """Compute a project's bill of materials and resolve each role to a real SKU."""
+    from app.ai.projects import plan_materials, ProjectPlanError, PROJECT_TYPES
+    from app.ai.hybrid import hybrid_search_products
+
+    inp = tool_input or {}
+    project_type = (inp.get("project_type") or "").strip()
+    params = {
+        "length_ft": inp.get("length_ft"),
+        "width_ft": inp.get("width_ft"),
+        "height_ft": inp.get("height_ft"),
+        "coats": inp.get("coats"),
+    }
+    try:
+        plan = plan_materials(project_type, params)
+    except ProjectPlanError as e:
+        return json.dumps({
+            "error": "invalid_project", "message": str(e),
+            "supported": list(PROJECT_TYPES),
+        }), None
+
+    lines: list[dict] = []
+    grounded: list[dict] = []
+    subtotal_cents = 0
+    for m in plan["materials"]:
+        filters = {"in_stock_only": True}
+        if m["category"]:
+            filters["category"] = m["category"]
+        hits = hybrid_search_products(ctx.db, m["query"], filters=filters, k=3)
+        if not hits:  # retry without the category constraint
+            hits = hybrid_search_products(ctx.db, m["query"], filters={"in_stock_only": True}, k=3)
+        if not hits:
+            lines.append({
+                "role": m["role"], "label": m["label"], "unit": m["unit"],
+                "quantity": m["quantity"], "available": False,
+                "note": "No in-stock match — substitute manually.",
+            })
+            continue
+        pick = hits[0]
+        slug = pick.get("slug") or pick.get("id")
+        unit_price = float(pick["price"])
+        qty = int(m["quantity"])
+        line_total = round(unit_price * qty, 2)
+        subtotal_cents += round(line_total * 100)
+        lines.append({
+            "role": m["role"], "label": m["label"], "unit": m["unit"],
+            "product": pick["name"], "sku": pick.get("sku"), "slug": slug,
+            "quantity": qty, "unit_price": f"${unit_price:.2f}",
+            "line_total": f"${line_total:.2f}", "optional": m["optional"],
+        })
+        # Ground unit + line-total so the assistant can quote them past the guardrail.
+        grounded.append({"id": slug, "name": pick["name"], "price": unit_price})
+        grounded.append({"id": f"{slug}:line", "name": pick["name"], "price": line_total})
+
+    subtotal = subtotal_cents / 100
+    grounded.append({"id": "project_subtotal", "name": "Project subtotal", "price": subtotal})
+    return json.dumps({
+        "project": plan["label"], "project_type": plan["project_type"],
+        "dimensions": plan["dimensions"], "derived": plan["derived"],
+        "assumptions": plan["assumptions"], "materials": lines,
+        "subtotal": f"${subtotal:.2f}",
+        "next_step": "Offer to add these with add_materials_to_cart, then suggest_complementary.",
+    }), grounded
+
+
+def execute_add_materials_to_cart(tool_input: dict, ctx) -> tuple[str, dict]:
+    """Add a list of {item, quantity} to the cart (user or guest)."""
+    from app.services.cart_service import add_item, mark_cart_source
+    from app.core.errors import AppError, NotFoundError
+
+    if not ctx.user_id and not ctx.session_id:
+        return _LOGIN_REQUIRED, {"added": False}
+
+    inp = tool_input or {}
+    raw_items = inp.get("items") or []
+    if not isinstance(raw_items, list) or not raw_items:
+        return json.dumps({"error": "no_items", "message": "Provide items to add."}), {"added": False}
+
+    added, failed, grounded = [], [], []
+    for entry in raw_items[:30]:
+        if not isinstance(entry, dict):
+            continue
+        mi = _resolve_menu_item(ctx.db, entry.get("item", ""))
+        qty = max(1, min(_as_int(entry.get("quantity"), 1), MAX_QTY))
+        if mi is None or not mi.is_available:
+            failed.append({"item": entry.get("item"), "reason": "unavailable"})
+            continue
+        try:
+            add_item(ctx.db, ctx.user_id, mi.id, qty, [], session_id=ctx.session_id)
+        except (AppError, NotFoundError) as e:
+            failed.append({"item": mi.name, "reason": str(e)})
+            continue
+        line_total = round(mi.price_cents * qty / 100, 2)
+        added.append({"product": mi.name, "sku": mi.sku, "quantity": qty,
+                      "unit_price": f"${mi.price_cents / 100:.2f}",
+                      "line_total": f"${line_total:.2f}"})
+        grounded.append({"id": mi.slug, "name": mi.name, "price": mi.price_cents / 100})
+        grounded.append({"id": f"{mi.slug}:line", "name": mi.name, "price": line_total})
+
+    if added:
+        mark_cart_source(ctx.db, ctx.user_id, "chat",
+                         getattr(ctx, "conversation_id", None), session_id=ctx.session_id)
+    return json.dumps({"added": added, "failed": failed}), {
+        "added": bool(added), "grounded": grounded,
+    }
+
+
+# Curated upsell anchors per project (resolved to live SKUs at call time).
+_COMPLEMENTARY = {
+    "paint_room": [("sandpaper assortment", "building-materials"),
+                   ("safety glasses", "safety"), ("work gloves", "safety")],
+    "tile_floor": [("tile cutter", "flooring"), ("knee pads", "safety"),
+                   ("safety glasses", "safety")],
+    "laminate_floor": [("utility knife", "hand-tools"), ("knee pads", "safety"),
+                       ("floor trim baseboard", "flooring")],
+    "drywall_room": [("utility knife", "hand-tools"), ("dust masks respirator", "safety"),
+                     ("sandpaper assortment", "building-materials")],
+}
+
+
+def execute_suggest_complementary(tool_input: dict, ctx) -> tuple[str, list[dict]]:
+    """Return a few complementary in-stock add-ons (an upsell)."""
+    from app.ai.hybrid import hybrid_search_products
+
+    inp = tool_input or {}
+    anchors = list(_COMPLEMENTARY.get((inp.get("project_type") or "").strip(), []))
+    if inp.get("query"):
+        anchors.append((inp["query"], None))
+    if not anchors:
+        anchors = [("safety glasses", "safety"), ("work gloves", "safety")]
+
+    seen, suggestions, grounded = set(), [], []
+    for query, category in anchors:
+        filters = {"in_stock_only": True}
+        if category:
+            filters["category"] = category
+        hits = hybrid_search_products(ctx.db, query, filters=filters, k=2)
+        if not hits:  # category may be absent in a given catalog — retry unconstrained
+            hits = hybrid_search_products(ctx.db, query, filters={"in_stock_only": True}, k=2)
+        for pick in hits:
+            slug = pick.get("slug") or pick.get("id")
+            if slug in seen:
+                continue
+            seen.add(slug)
+            unit_price = float(pick["price"])
+            suggestions.append({"product": pick["name"], "sku": pick.get("sku"),
+                                "price": f"${unit_price:.2f}", "category": pick["category"]})
+            grounded.append({"id": slug, "name": pick["name"], "price": unit_price})
+            break  # one pick per anchor keeps the list tight
+    if not suggestions:
+        return json.dumps({"suggestions": [], "note": "No complementary items found."}), []
+    return json.dumps({"suggestions": suggestions}), grounded
 
 
 def execute_get_preferences(tool_input: dict, ctx) -> tuple[str, dict]:

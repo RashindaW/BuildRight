@@ -100,6 +100,9 @@ def _build_executors():
         "reorder": lambda inp, ctx: tools.execute_reorder(inp, ctx),
         "get_preferences": lambda inp, ctx: tools.execute_get_preferences(inp, ctx),
         "set_preference": lambda inp, ctx: tools.execute_set_preference(inp, ctx),
+        "compute_materials": lambda inp, ctx: tools.execute_compute_materials(inp, ctx),
+        "add_materials_to_cart": lambda inp, ctx: tools.execute_add_materials_to_cart(inp, ctx),
+        "suggest_complementary": lambda inp, ctx: tools.execute_suggest_complementary(inp, ctx),
     }
 
 
@@ -177,14 +180,17 @@ async def stream_chat(
                     except Exception as e:
                         logger.warning('"tool_exec_error: %s %s"', block.name, type(e).__name__)
                         result_json, payload = json.dumps({"error": "tool_failed"}), None
-                    if payload is not None and block.name in ("search_menu", "search_products", "get_order_history"):
+                    if payload is not None and block.name in (
+                        "search_menu", "search_products", "get_order_history",
+                        "compute_materials", "suggest_complementary",
+                    ):
                         grounded_items.extend(payload)
                     elif payload is not None and block.name == "search_knowledge_base":
                         grounded_chunks.extend(payload)
-                    elif block.name == "reorder" and isinstance(payload, dict):
+                    elif block.name in ("reorder", "add_materials_to_cart") and isinstance(payload, dict):
                         if payload.get("added"):
                             cart_dirty = True
-                        # Ground the reordered item's unit + line-total prices.
+                        # Ground the added items' unit + line-total prices.
                         grounded_items.extend(payload.get("grounded", []))
                     tool_results.append({
                         "type": "tool_result",
