@@ -50,6 +50,18 @@ def add_item(db: Session, user_id: str, menu_item_id: str, quantity: int,
     return get_or_create_cart(db, user_id)
 
 
+def mark_cart_source(db: Session, user_id: str, source: str, conversation_id: str | None = None) -> Cart:
+    """Tag the user's active cart with the channel that last touched it (for sales
+    attribution). Called when a chat/voice tool adds items so the resulting order can
+    be traced back to the AI conversation."""
+    cart = get_or_create_cart(db, user_id)
+    cart.source = source
+    if conversation_id:
+        cart.conversation_id = conversation_id
+    db.commit()
+    return cart
+
+
 def update_quantity(db: Session, user_id: str, cart_item_id: str, quantity: int) -> Cart:
     cart = get_or_create_cart(db, user_id)
     ci = db.get(CartItem, cart_item_id)

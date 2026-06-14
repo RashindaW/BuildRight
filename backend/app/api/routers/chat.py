@@ -96,6 +96,7 @@ def chat_stream(
         db=db,
         user_id=user.id if user else None,
         session_id=session_id,
+        conversation_id=conv.id,
         preferences=preferences,
     )
 

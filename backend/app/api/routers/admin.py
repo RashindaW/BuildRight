@@ -58,9 +58,10 @@ def create_item(body: MenuItemCreate, request: Request, admin=Depends(require_ad
         raise AppError("Slug already exists", "slug_taken", 409)
     item = MenuItem(
         slug=body.slug, name=body.name, description=body.description,
-        price_cents=body.price_cents, category_id=cat.id, keywords=body.keywords,
-        calories=body.calories, spice_level=body.spice_level, prep_time_min=body.prep_time_min,
-        is_available=body.is_available, featured=body.featured, image_url=body.image_url,
+        price_cents=body.price_cents, cost_cents=body.cost_cents, category_id=cat.id,
+        keywords=body.keywords, calories=body.calories, spice_level=body.spice_level,
+        prep_time_min=body.prep_time_min, is_available=body.is_available,
+        featured=body.featured, image_url=body.image_url,
     )
     db.add(item)
     db.flush()
@@ -80,7 +81,7 @@ def update_item(item_id: str, body: MenuItemUpdate, admin=Depends(require_admin)
         if not cat:
             raise AppError(f"Unknown category '{data['category']}'", "bad_category", 400)
         item.category_id = cat.id
-    for f in ("name", "description", "price_cents", "keywords", "calories",
+    for f in ("name", "description", "price_cents", "cost_cents", "keywords", "calories",
               "spice_level", "prep_time_min", "is_available", "featured", "image_url"):
         if f in data:
             setattr(item, f, data[f])

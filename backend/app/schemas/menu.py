@@ -74,6 +74,7 @@ class MenuItemCreate(BaseModel):
     name: str = Field(min_length=1, max_length=200)
     description: str = ""
     price_cents: int = Field(ge=0)
+    cost_cents: int | None = Field(default=None, ge=0)
     category: str
     dietary_tags: list[str] = []
     allergens: list[str] = []
@@ -91,6 +92,7 @@ class MenuItemUpdate(BaseModel):
     name: str | None = None
     description: str | None = None
     price_cents: int | None = Field(default=None, ge=0)
+    cost_cents: int | None = Field(default=None, ge=0)
     category: str | None = None
     dietary_tags: list[str] | None = None
     allergens: list[str] | None = None

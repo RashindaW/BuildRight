@@ -19,6 +19,12 @@ class Cart(TimestampMixin, Base):
         default="active",
         nullable=False,
     )
+    # Attribution: which chat conversation (if any) drove items into this cart, and the
+    # channel the cart was last touched through ("web" | "chat" | "voice").
+    conversation_id: Mapped[str | None] = mapped_column(
+        String, ForeignKey("conversations.id"), nullable=True, index=True
+    )
+    source: Mapped[str | None] = mapped_column(String(16), nullable=True, default="web")
 
     user = relationship("User", back_populates="carts")
     items: Mapped[list["CartItem"]] = relationship(

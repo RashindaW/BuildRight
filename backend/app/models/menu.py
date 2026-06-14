@@ -72,6 +72,7 @@ class MenuItem(TimestampMixin, Base):
     name: Mapped[str] = mapped_column(String(200), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False, default="")
     price_cents: Mapped[int] = mapped_column(Integer, nullable=False)  # integer cents
+    cost_cents: Mapped[int | None] = mapped_column(Integer, nullable=True)  # COGS; manager/admin only
     category_id: Mapped[str] = mapped_column(
         String, ForeignKey("categories.id"), nullable=False, index=True
     )

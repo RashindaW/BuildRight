@@ -11,4 +11,5 @@ class ToolContext:
     db: object         # sqlalchemy.orm.Session — typed as object to avoid circular imports
     user_id: str | None = None
     session_id: str | None = None
+    conversation_id: str | None = None  # for chat→cart→order sales attribution
     preferences: dict[str, str] = field(default_factory=dict)

@@ -353,6 +353,8 @@ def generate_products(seed: int = 1337) -> list[dict]:
                     if rng.random() < 0.10:
                         tags.append("new-arrival")
 
+                    # Modelled cost of goods (55-70% of price) for margin dashboards.
+                    cost = round(price * rng.uniform(0.55, 0.70), 2)
                     products.append({
                         "id": slug,
                         "sku": sku,
@@ -360,6 +362,7 @@ def generate_products(seed: int = 1337) -> list[dict]:
                         "category": cat["slug"],
                         "description": desc,
                         "price": price,
+                        "cost": cost,
                         "stock": stock,
                         "is_available": available,
                         "keywords": sorted(set(kw)),

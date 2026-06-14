@@ -24,6 +24,12 @@ class Order(TimestampMixin, Base):
     cart_id: Mapped[str | None] = mapped_column(
         String, ForeignKey("carts.id"), nullable=True, index=True
     )
+    # Attribution: copied from the originating cart at checkout so a sale can be traced
+    # back to the AI chat that drove it.
+    conversation_id: Mapped[str | None] = mapped_column(
+        String, ForeignKey("conversations.id"), nullable=True, index=True
+    )
+    source: Mapped[str | None] = mapped_column(String(16), nullable=True, default="web", index=True)
     stripe_payment_intent_id: Mapped[str | None] = mapped_column(
         String(255), nullable=True, index=True
     )
