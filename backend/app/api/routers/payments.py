@@ -1,9 +1,9 @@
-"""Stripe payment endpoints.
+"""Stripe payment endpoints (work for logged-in users and guest sessions).
 
-  POST /payments/create-intent  — auth+CSRF: create Order in pending_payment, make PI
+  POST /payments/create-intent  — CSRF: create Order in pending_payment, make PI
   POST /payments/webhook         — no auth, raw body, Stripe-signature-verified
-  POST /payments/confirm/{id}    — auth+CSRF: re-fetch PI from Stripe, trust its status
-  GET  /payments/status/{id}     — auth: return Order payment_status + order_status
+  POST /payments/confirm/{id}    — CSRF: re-fetch PI from Stripe, trust its status
+  GET  /payments/status/{id}     — return Order payment_status + order_status
 """
 
 from __future__ import annotations
@@ -13,7 +13,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.core.db import get_db
-from app.core.deps import get_current_user
+from app.core.deps import Actor, get_actor
 from app.core.errors import NotFoundError
 from app.core.security import verify_csrf
 from app.services import payment_service
@@ -24,21 +24,26 @@ router = APIRouter(prefix="/payments", tags=["payments"])
 
 class CreateIntentBody(BaseModel):
     notes: str | None = None
+    guest_email: str | None = None
+
+
+def _own_order_or_404(db: Session, order_id: str, actor: Actor):
+    order = get_order(db, order_id)
+    if not actor.owns(user_id=order.user_id, session_id=order.session_id):
+        raise NotFoundError("Order")
+    return order
 
 
 @router.post("/create-intent", dependencies=[Depends(verify_csrf)])
-def create_intent(
-    body: CreateIntentBody,
-    db: Session = Depends(get_db),
-    user=Depends(get_current_user),
-):
+def create_intent(body: CreateIntentBody, actor: Actor = Depends(get_actor),
+                  db: Session = Depends(get_db)):
     from app.core.config import settings
 
-    # Fail fast if Stripe isn't configured, BEFORE creating a pending order —
-    # otherwise a misconfigured deployment accrues orphan pending_payment orders.
+    # Fail fast if Stripe isn't configured, BEFORE creating a pending order.
     payment_service.ensure_configured()
 
-    order = create_pending_order(db, user.id, body.notes)
+    order = create_pending_order(db, actor.user_id, body.notes,
+                                 session_id=actor.session_id, guest_email=body.guest_email)
     intent = payment_service.create_payment_intent(db, order)
     return {
         "client_secret": intent.client_secret,
@@ -59,34 +64,14 @@ async def stripe_webhook(
 
 
 @router.post("/confirm/{order_id}", dependencies=[Depends(verify_csrf)])
-def confirm_payment(
-    order_id: str,
-    db: Session = Depends(get_db),
-    user=Depends(get_current_user),
-):
-    order = get_order(db, order_id)
-    if order.user_id != user.id:
-        raise NotFoundError("Order")
+def confirm_payment(order_id: str, actor: Actor = Depends(get_actor), db: Session = Depends(get_db)):
+    order = _own_order_or_404(db, order_id, actor)
     pi_status = payment_service.confirm_by_order(db, order)
     db.refresh(order)
-    return {
-        "payment_status": order.payment_status,
-        "order_status": order.status,
-        "pi_status": pi_status,
-    }
+    return {"payment_status": order.payment_status, "order_status": order.status, "pi_status": pi_status}
 
 
 @router.get("/status/{order_id}")
-def payment_status(
-    order_id: str,
-    db: Session = Depends(get_db),
-    user=Depends(get_current_user),
-):
-    order = get_order(db, order_id)
-    if order.user_id != user.id:
-        raise NotFoundError("Order")
-    return {
-        "payment_status": order.payment_status,
-        "order_status": order.status,
-        "order_id": order.id,
-    }
+def payment_status(order_id: str, actor: Actor = Depends(get_actor), db: Session = Depends(get_db)):
+    order = _own_order_or_404(db, order_id, actor)
+    return {"payment_status": order.payment_status, "order_status": order.status, "order_id": order.id}

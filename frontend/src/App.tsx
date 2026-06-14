@@ -24,8 +24,10 @@ export default function App() {
           <Route path="/item/:slug" element={<ItemDetail />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
-          <Route path="/order/:id" element={<ProtectedRoute><OrderConfirmation /></ProtectedRoute>} />
+          {/* checkout + order confirmation work for guests (session-based) */}
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/order/:id" element={<OrderConfirmation />} />
+          {/* order history is a logged-in feature */}
           <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
           <Route path="/manager" element={<ProtectedRoute roles={["manager", "admin"]}><ManagerDashboard /></ProtectedRoute>} />
           <Route path="/admin" element={<ProtectedRoute roles={["admin"]}><AdminDashboard /></ProtectedRoute>} />

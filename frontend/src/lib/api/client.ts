@@ -7,6 +7,17 @@ function getCookie(name: string): string | null {
   return m ? decodeURIComponent(m[2]) : null;
 }
 
+/** Stable per-browser id so anonymous guests get a persistent cart/order owner. */
+function getSessionId(): string {
+  const key = "cutdry_session";
+  let id = localStorage.getItem(key);
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem(key, id);
+  }
+  return id;
+}
+
 export class ApiError extends Error {
   status: number;
   code: string;
@@ -44,7 +55,10 @@ export async function api<T>(path: string, opts: RequestOpts = {}): Promise<T> {
   const method = opts.method ?? "GET";
   const headers: Record<string, string> = {};
   if (opts.body !== undefined) headers["Content-Type"] = "application/json";
+  // Guest identity for cart/order ownership (the server ignores it when authenticated).
+  headers["x-session-id"] = getSessionId();
   if (method !== "GET") {
+    if (!getCookie("csrf_token")) await ensureCsrf();
     const csrf = getCookie("csrf_token");
     if (csrf) headers["x-csrf-token"] = csrf;
   }

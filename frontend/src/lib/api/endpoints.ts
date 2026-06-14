@@ -47,7 +47,8 @@ export const cartApi = {
 
 // ---- Orders ----
 export const ordersApi = {
-  create: (notes?: string) => api<Order>("/orders", { method: "POST", body: { notes: notes ?? null } }),
+  create: (notes?: string, guestEmail?: string) =>
+    api<Order>("/orders", { method: "POST", body: { notes: notes ?? null, guest_email: guestEmail ?? null } }),
   list: () => api<Order[]>("/orders"),
   get: (id: string) => api<Order>(`/orders/${id}`),
 };
@@ -66,10 +67,10 @@ export interface PaymentStatusResponse {
 }
 
 export const paymentsApi = {
-  createIntent: (notes?: string) =>
+  createIntent: (notes?: string, guestEmail?: string) =>
     api<CreateIntentResponse>("/payments/create-intent", {
       method: "POST",
-      body: { notes: notes ?? null },
+      body: { notes: notes ?? null, guest_email: guestEmail ?? null },
     }),
   confirm: (orderId: string) =>
     api<{ payment_status: string; order_status: string; pi_status: string }>(

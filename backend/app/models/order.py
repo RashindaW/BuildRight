@@ -14,7 +14,10 @@ class Order(TimestampMixin, Base):
 
     id: Mapped[str] = mapped_column(String, primary_key=True, default=new_id)
     order_number: Mapped[str] = mapped_column(String(40), unique=True, nullable=False, index=True)
-    user_id: Mapped[str] = mapped_column(String, ForeignKey("users.id"), nullable=False, index=True)
+    # Either user_id (logged-in) or session_id (guest checkout) identifies the owner.
+    user_id: Mapped[str | None] = mapped_column(String, ForeignKey("users.id"), nullable=True, index=True)
+    session_id: Mapped[str | None] = mapped_column(String, nullable=True, index=True)
+    guest_email: Mapped[str | None] = mapped_column(String(255), nullable=True)
     status: Mapped[str] = mapped_column(
         Enum(*ORDER_STATUSES, name="order_status"), default="placed", nullable=False
     )

@@ -4,9 +4,11 @@ import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-
 import type { Stripe } from "@stripe/stripe-js";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCart } from "../hooks/useCart";
-import { paymentsApi } from "../lib/api/endpoints";
+import { ordersApi, paymentsApi } from "../lib/api/endpoints";
+import { ApiError } from "../lib/api/client";
 import { formatPrice } from "../lib/format";
 import { useToast } from "../context/ToastProvider";
+import { useAuth } from "../context/AuthProvider";
 
 // ---- Inner payment form (must be inside <Elements>) ---------------------
 
@@ -74,19 +76,34 @@ interface IntentState {
 
 export default function Checkout() {
   const { data: cart } = useCart();
+  const { user } = useAuth();
   const nav = useNavigate();
   const toast = useToast();
   const qc = useQueryClient();
   const [notes, setNotes] = useState("");
+  const [guestEmail, setGuestEmail] = useState("");
   const [step, setStep] = useState<Step>("cart");
   const [intentState, setIntentState] = useState<IntentState | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const placeWithoutPayment = async () => {
+    // Fallback used when Stripe isn't configured: complete the order without payment.
+    const order = await ordersApi.create(notes || undefined, guestEmail || undefined);
+    qc.invalidateQueries({ queryKey: ["cart"] });
+    qc.invalidateQueries({ queryKey: ["orders"] });
+    nav(`/order/${order.id}`);
+  };
+
   const proceedToPayment = async () => {
+    if (!user && !guestEmail.trim()) {
+      toast("Please enter your email to continue as a guest.", "error");
+      return;
+    }
     setLoading(true);
     try {
       const { client_secret, order_id, publishable_key } = await paymentsApi.createIntent(
-        notes || undefined
+        notes || undefined,
+        guestEmail || undefined
       );
       const { loadStripe } = await import("@stripe/stripe-js");
       setIntentState({
@@ -96,7 +113,16 @@ export default function Checkout() {
       });
       setStep("payment");
     } catch (err) {
-      toast(err instanceof Error ? err.message : "Something went wrong", "error");
+      if (err instanceof ApiError && err.code === "stripe_not_configured") {
+        try {
+          await placeWithoutPayment();
+          return;
+        } catch (e2) {
+          toast(e2 instanceof Error ? e2.message : "Could not place order", "error");
+        }
+      } else {
+        toast(err instanceof Error ? err.message : "Something went wrong", "error");
+      }
     } finally {
       setLoading(false);
     }
@@ -143,6 +169,22 @@ export default function Checkout() {
 
       {step === "cart" && (
         <>
+          {!user && (
+            <label className="block text-sm font-medium">
+              Email <span className="text-red-600">*</span>
+              <input
+                type="email"
+                className="mt-1 w-full rounded-lg border border-gray-300 p-2"
+                placeholder="you@example.com"
+                value={guestEmail}
+                onChange={(e) => setGuestEmail(e.target.value)}
+                required
+              />
+              <span className="mt-1 block text-xs text-gray-500">
+                Checking out as a guest. <a href="/login" className="text-brand-600">Log in</a> to save your order history.
+              </span>
+            </label>
+          )}
           <label className="mt-4 block text-sm font-medium">
             Order notes (optional)
             <textarea

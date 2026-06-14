@@ -9,14 +9,24 @@ from app.models.menu import MenuItem, OptionChoice
 from app.schemas.cart import CartItemOut, CartOut
 
 
-def get_or_create_cart(db: Session, user_id: str) -> Cart:
+def get_or_create_cart(db: Session, user_id: str | None = None, session_id: str | None = None) -> Cart:
+    """Return the active cart for a logged-in user OR an anonymous guest session.
+
+    A guest cart is keyed on session_id (with user_id NULL); a user cart on user_id.
+    """
+    if user_id:
+        where = (Cart.user_id == user_id, Cart.status == "active")
+    elif session_id:
+        where = (Cart.session_id == session_id, Cart.user_id.is_(None), Cart.status == "active")
+    else:
+        raise AppError("No cart owner (user or session) provided", "no_cart_owner", 400)
+
     cart = db.execute(
-        select(Cart)
-        .where(Cart.user_id == user_id, Cart.status == "active")
+        select(Cart).where(*where)
         .options(selectinload(Cart.items).selectinload(CartItem.menu_item))
     ).scalars().first()
     if cart is None:
-        cart = Cart(user_id=user_id, status="active")
+        cart = Cart(user_id=user_id, session_id=None if user_id else session_id, status="active")
         db.add(cart)
         db.commit()
         db.refresh(cart)
@@ -34,12 +44,12 @@ def _resolve_item(db: Session, menu_item_id: str) -> MenuItem:
     return item
 
 
-def add_item(db: Session, user_id: str, menu_item_id: str, quantity: int,
-             option_choice_ids: list[str]) -> Cart:
-    cart = get_or_create_cart(db, user_id)
+def add_item(db: Session, user_id: str | None, menu_item_id: str, quantity: int,
+             option_choice_ids: list[str], session_id: str | None = None) -> Cart:
+    cart = get_or_create_cart(db, user_id, session_id)
     item = _resolve_item(db, menu_item_id)
 
-    cart_item = CartItem(cart_id=cart.id, menu_item_id=item.id, quantity=quantity)
+    cart_item = CartItem(cart_id=cart.id, menu_item_id=item.id, quantity=max(1, min(quantity, 99)))
     db.add(cart_item)
     db.flush()
     for choice_id in option_choice_ids:
@@ -47,14 +57,15 @@ def add_item(db: Session, user_id: str, menu_item_id: str, quantity: int,
         if choice:
             db.add(CartItemOption(cart_item_id=cart_item.id, option_choice_id=choice.id))
     db.commit()
-    return get_or_create_cart(db, user_id)
+    return get_or_create_cart(db, user_id, session_id)
 
 
-def mark_cart_source(db: Session, user_id: str, source: str, conversation_id: str | None = None) -> Cart:
-    """Tag the user's active cart with the channel that last touched it (for sales
-    attribution). Called when a chat/voice tool adds items so the resulting order can
-    be traced back to the AI conversation."""
-    cart = get_or_create_cart(db, user_id)
+def mark_cart_source(db: Session, user_id: str | None, source: str,
+                     conversation_id: str | None = None, session_id: str | None = None) -> Cart:
+    """Tag the active cart with the channel that last touched it (for sales attribution).
+    Called when a chat/voice tool adds items so the resulting order can be traced back
+    to the AI conversation."""
+    cart = get_or_create_cart(db, user_id, session_id)
     cart.source = source
     if conversation_id:
         cart.conversation_id = conversation_id
@@ -62,35 +73,37 @@ def mark_cart_source(db: Session, user_id: str, source: str, conversation_id: st
     return cart
 
 
-def update_quantity(db: Session, user_id: str, cart_item_id: str, quantity: int) -> Cart:
-    cart = get_or_create_cart(db, user_id)
+def update_quantity(db: Session, user_id: str | None, cart_item_id: str, quantity: int,
+                    session_id: str | None = None) -> Cart:
+    cart = get_or_create_cart(db, user_id, session_id)
     ci = db.get(CartItem, cart_item_id)
     if not ci or ci.cart_id != cart.id:
         raise NotFoundError("Cart item")
     if quantity <= 0:
         db.delete(ci)
     else:
-        ci.quantity = quantity
+        ci.quantity = min(quantity, 99)
     db.commit()
-    return get_or_create_cart(db, user_id)
+    return get_or_create_cart(db, user_id, session_id)
 
 
-def remove_item(db: Session, user_id: str, cart_item_id: str) -> Cart:
-    cart = get_or_create_cart(db, user_id)
+def remove_item(db: Session, user_id: str | None, cart_item_id: str,
+                session_id: str | None = None) -> Cart:
+    cart = get_or_create_cart(db, user_id, session_id)
     ci = db.get(CartItem, cart_item_id)
     if not ci or ci.cart_id != cart.id:
         raise NotFoundError("Cart item")
     db.delete(ci)
     db.commit()
-    return get_or_create_cart(db, user_id)
+    return get_or_create_cart(db, user_id, session_id)
 
 
-def clear_cart(db: Session, user_id: str) -> Cart:
-    cart = get_or_create_cart(db, user_id)
+def clear_cart(db: Session, user_id: str | None, session_id: str | None = None) -> Cart:
+    cart = get_or_create_cart(db, user_id, session_id)
     for ci in list(cart.items):
         db.delete(ci)
     db.commit()
-    return get_or_create_cart(db, user_id)
+    return get_or_create_cart(db, user_id, session_id)
 
 
 def _line_unit_cents(ci: CartItem) -> int:

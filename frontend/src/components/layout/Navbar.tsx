@@ -35,16 +35,15 @@ export function Navbar() {
         )}
 
         <div className="ml-auto flex items-center gap-3">
-          {user && (
-            <button className="relative" onClick={() => setCartOpen(true)} aria-label="Open cart">
-              🛒
-              {cart && cart.item_count > 0 && (
-                <span className="absolute -right-2 -top-2 rounded-full bg-brand-600 px-1.5 text-xs text-white">
-                  {cart.item_count}
-                </span>
-              )}
-            </button>
-          )}
+          {/* cart is available to guests + users */}
+          <button className="relative" onClick={() => setCartOpen(true)} aria-label="Open cart">
+            🛒
+            {cart && cart.item_count > 0 && (
+              <span className="absolute -right-2 -top-2 rounded-full bg-brand-600 px-1.5 text-xs text-white">
+                {cart.item_count}
+              </span>
+            )}
+          </button>
           {user ? (
             <>
               <span className="hidden text-sm text-gray-600 sm:inline">{user.email}</span>

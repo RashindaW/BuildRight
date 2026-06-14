@@ -3,19 +3,16 @@ import type { MenuItem } from "../../types";
 import { formatPrice, imageSrc } from "../../lib/format";
 import { DietaryBadge } from "./DietaryBadge";
 import { useCartMutations } from "../../hooks/useCart";
-import { useAuth } from "../../context/AuthProvider";
 import { useToast } from "../../context/ToastProvider";
 
 export function MenuCard({ item }: { item: MenuItem }) {
   const { add } = useCartMutations();
-  const { user } = useAuth();
   const toast = useToast();
   const hasOptions = item.option_groups.length > 0;
   const outOfStock = !item.is_available || item.stock_qty <= 0;
   const lowStock = !outOfStock && item.stock_qty <= 15;
 
   const onAdd = () => {
-    if (!user) return toast("Please log in to add items.", "info");
     add.mutate(
       { id: item.slug },
       {

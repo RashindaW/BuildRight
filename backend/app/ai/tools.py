@@ -421,6 +421,9 @@ def execute_reorder(tool_input: dict, ctx) -> tuple[str, dict]:
 
     try:
         add_item(ctx.db, ctx.user_id, menu_item_id, quantity, [])
+        # Attribute this cart to the chat conversation that drove the add.
+        from app.services.cart_service import mark_cart_source
+        mark_cart_source(ctx.db, ctx.user_id, "chat", getattr(ctx, "conversation_id", None))
     except (AppError, NotFoundError) as e:
         return json.dumps({"error": "unavailable", "message": str(e)}), {"added": False}
 

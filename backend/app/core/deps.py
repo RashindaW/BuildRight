@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from fastapi import Cookie, Depends, HTTPException, status
+from dataclasses import dataclass
+
+from fastapi import Cookie, Depends, Header, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.db import get_db
@@ -62,6 +64,39 @@ def get_owned_or_404(resource_user_id: str, current_user) -> None:
         return
     if str(current_user.id) != str(resource_user_id):
         raise NotFoundError()
+
+
+@dataclass
+class Actor:
+    """The owner of a cart/order: a logged-in user OR an anonymous guest session."""
+    user_id: str | None = None
+    session_id: str | None = None
+
+    @property
+    def is_guest(self) -> bool:
+        return self.user_id is None
+
+    def owns(self, *, user_id: str | None, session_id: str | None) -> bool:
+        """True if this actor owns a resource carrying the given user_id/session_id."""
+        if self.user_id is not None:
+            return user_id is not None and str(user_id) == str(self.user_id)
+        return session_id is not None and session_id == self.session_id
+
+
+def get_actor(
+    x_session_id: str | None = Header(default=None),
+    access_token: str | None = Cookie(default=None),
+    db: Session = Depends(get_db),
+) -> Actor:
+    """Resolve the cart/order owner: the authenticated user if logged in, else the
+    guest identified by the x-session-id header. Used by cart/order/payment routes so
+    guests can shop and check out without an account."""
+    user = get_optional_user(access_token, db)
+    if user:
+        return Actor(user_id=user.id, session_id=None)
+    if not x_session_id:
+        raise AuthError("A session is required to use the cart. Please reload the page.")
+    return Actor(user_id=None, session_id=x_session_id)
 
 
 class Pagination:

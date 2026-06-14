@@ -5,14 +5,12 @@ import { menuApi } from "../lib/api/endpoints";
 import { formatPrice, imageSrc, ALLERGEN_LABELS } from "../lib/format";
 import { DietaryBadge } from "../components/menu/DietaryBadge";
 import { useCartMutations } from "../hooks/useCart";
-import { useAuth } from "../context/AuthProvider";
 import { useToast } from "../context/ToastProvider";
 
 export default function ItemDetail() {
   const { slug } = useParams();
   const nav = useNavigate();
   const toast = useToast();
-  const { user } = useAuth();
   const { add } = useCartMutations();
   const { data: item, isLoading } = useQuery({
     queryKey: ["menu-item", slug],
@@ -36,7 +34,6 @@ export default function ItemDetail() {
   }, 0);
 
   const onAdd = () => {
-    if (!user) return toast("Please log in to add items.", "info");
     const missing = item.option_groups.filter((g) => g.required && !selected[g.id]);
     if (missing.length) return toast(`Please choose: ${missing.map((m) => m.name).join(", ")}`, "error");
     add.mutate(

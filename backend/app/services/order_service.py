@@ -16,26 +16,24 @@ def _generate_order_number() -> str:
     return f"CD-{uuid.uuid4().hex[:10].upper()}"
 
 
-def create_pending_order(db: Session, user_id: str, notes: str | None = None) -> Order:
+def create_pending_order(db: Session, user_id: str | None = None, notes: str | None = None,
+                         session_id: str | None = None, guest_email: str | None = None) -> Order:
     """Create an Order in pending_payment/pending state without converting the cart.
 
-    Cart is only converted once payment succeeds (in payment_service._mark_paid).
-    The order is linked to the originating cart (cart_id) so the *right* cart is
-    converted on success. If an unpaid pending order already exists for this exact
-    cart and the contents are unchanged, it is reused (so a double-click or retry
-    does not spawn duplicate orders + PaymentIntents).
+    Works for a logged-in user OR an anonymous guest session. The order is linked to
+    the originating cart (cart_id) so the *right* cart is converted on success, and
+    reuse is keyed on cart_id so a double-click does not spawn duplicate orders/PIs.
     """
-    cart = cart_service.get_or_create_cart(db, user_id)
+    cart = cart_service.get_or_create_cart(db, user_id, session_id)
     if not cart.items:
         raise AppError("Cart is empty", "empty_cart", 400)
 
     subtotal = sum(cart_service._line_unit_cents(ci) * ci.quantity for ci in cart.items)
 
-    # Reuse / void any in-flight pending order for this same cart.
+    # Reuse / void any in-flight pending order for this same cart (cart_id is owner-specific).
     existing = db.execute(
         select(Order)
         .where(
-            Order.user_id == user_id,
             Order.cart_id == cart.id,
             Order.status == "pending_payment",
             Order.payment_status == "pending",
@@ -51,6 +49,8 @@ def create_pending_order(db: Session, user_id: str, notes: str | None = None) ->
     order = Order(
         order_number=_generate_order_number(),
         user_id=user_id,
+        session_id=None if user_id else session_id,
+        guest_email=guest_email,
         cart_id=cart.id,
         conversation_id=cart.conversation_id,  # attribution: chat→cart→order
         source=cart.source or "web",
@@ -90,8 +90,9 @@ def create_pending_order(db: Session, user_id: str, notes: str | None = None) ->
     return order
 
 
-def place_order(db: Session, user_id: str, notes: str | None = None) -> Order:
-    cart = cart_service.get_or_create_cart(db, user_id)
+def place_order(db: Session, user_id: str | None = None, notes: str | None = None,
+                session_id: str | None = None, guest_email: str | None = None) -> Order:
+    cart = cart_service.get_or_create_cart(db, user_id, session_id)
     if not cart.items:
         raise AppError("Cart is empty", "empty_cart", 400)
 
@@ -99,6 +100,8 @@ def place_order(db: Session, user_id: str, notes: str | None = None) -> Order:
     order = Order(
         order_number=_generate_order_number(),
         user_id=user_id,
+        session_id=None if user_id else session_id,
+        guest_email=guest_email,
         cart_id=cart.id,
         conversation_id=cart.conversation_id,  # attribution: chat→cart→order
         source=cart.source or "web",

@@ -1,13 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { cartApi } from "../lib/api/endpoints";
-import { useAuth } from "../context/AuthProvider";
 
 export function useCart() {
-  const { user } = useAuth();
+  // Works for logged-in users AND anonymous guests (session-based cart).
   return useQuery({
     queryKey: ["cart"],
     queryFn: cartApi.get,
-    enabled: !!user,
   });
 }
 

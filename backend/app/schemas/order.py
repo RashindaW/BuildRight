@@ -26,6 +26,7 @@ class OrderOut(BaseModel):
     subtotal_cents: int
     total_cents: int
     notes: str | None
+    guest_email: str | None = None
     created_at: datetime
     items: list[OrderItemOut]
 
@@ -33,6 +34,7 @@ class OrderOut(BaseModel):
 class OrderCreateIn(BaseModel):
     model_config = {"extra": "forbid"}
     notes: str | None = Field(default=None, max_length=500)
+    guest_email: str | None = Field(default=None, max_length=255)
 
 
 class OrderStatusUpdate(BaseModel):
