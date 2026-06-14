@@ -38,10 +38,23 @@ def get_optional_user(
         return None
 
 
-def require_admin(user=Depends(get_current_user)):
-    if user.role != "admin":
-        raise ForbiddenError("Admin access required")
-    return user
+def require_min_role(min_role: str):
+    """Dependency factory enforcing a minimum access tier (hierarchy:
+    customer < store_helper < manager < admin)."""
+    from app.models.user import ROLE_RANK
+
+    def _dep(user=Depends(get_current_user)):
+        if ROLE_RANK.get(user.role, -1) < ROLE_RANK[min_role]:
+            raise ForbiddenError(f"{min_role.replace('_', ' ')} access or higher required")
+        return user
+
+    return _dep
+
+
+# Role-tier guards (admin ⊇ manager ⊇ store_helper ⊇ customer).
+require_staff = require_min_role("store_helper")   # store_helper, manager, admin
+require_manager = require_min_role("manager")      # manager, admin
+require_admin = require_min_role("admin")          # admin only
 
 
 def get_owned_or_404(resource_user_id: str, current_user) -> None:

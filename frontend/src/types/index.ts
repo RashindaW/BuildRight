@@ -51,11 +51,13 @@ export interface Category {
   display_order: number;
 }
 
+export type Role = "customer" | "store_helper" | "manager" | "admin";
+
 export interface User {
   id: string;
   email: string;
   full_name: string;
-  role: "customer" | "admin";
+  role: Role;
   is_active: boolean;
 }
 

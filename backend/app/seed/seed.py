@@ -288,6 +288,22 @@ _DEMO_USERS = [
             {"days_ago": 38, "status": "completed", "picks": [("building-materials", 10), ("fasteners", 4)]},
         ],
     },
+    {
+        "email": "staff@buildright.com",
+        "password": "StaffDemo1234!",
+        "name": "Sam Staff",
+        "role": "store_helper",
+        "prefs": {},
+        "orders": [],
+    },
+    {
+        "email": "manager@buildright.com",
+        "password": "ManagerDemo1234!",
+        "name": "Morgan Manager",
+        "role": "manager",
+        "prefs": {},
+        "orders": [],
+    },
 ]
 
 
@@ -317,7 +333,7 @@ def seed_demo_accounts(db: Session) -> int:
             email=email,
             hashed_password=hash_password(spec["password"]),
             full_name=spec["name"],
-            role="customer",
+            role=spec.get("role", "customer"),
             is_active=True,
         )
         db.add(user)

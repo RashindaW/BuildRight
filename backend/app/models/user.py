@@ -7,6 +7,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, new_id
 
+# Access tiers, lowest → highest privilege. "guest" is unauthenticated (no row).
+USER_ROLES = ("customer", "store_helper", "manager", "admin")
+ROLE_RANK = {role: i for i, role in enumerate(USER_ROLES)}
+
 
 class User(TimestampMixin, Base):
     __tablename__ = "users"
@@ -16,7 +20,7 @@ class User(TimestampMixin, Base):
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     full_name: Mapped[str] = mapped_column(String(255), nullable=False, default="")
     role: Mapped[str] = mapped_column(
-        Enum("customer", "admin", name="user_role"), nullable=False, default="customer"
+        Enum(*USER_ROLES, name="user_role"), nullable=False, default="customer"
     )
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
