@@ -6,10 +6,13 @@ from fastapi import APIRouter, Cookie, Depends, Request, Response, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from datetime import datetime, timezone
+
 from app.core.config import settings
 from app.core.db import get_db
 from app.core.deps import get_current_user
-from app.core.errors import AuthError
+from app.core.errors import AppError, AuthError
+from app.core import lockout
 from app.core.rate_limit import limiter
 from app.core.security import (
     CSRF_COOKIE,
@@ -27,9 +30,20 @@ from app.services import audit_service
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
+def _purge_expired_refresh_tokens(db: Session) -> None:
+    """Opportunistic cleanup so revoked/expired refresh tokens don't accumulate."""
+    from sqlalchemy import delete, or_
+    db.execute(
+        delete(RefreshToken).where(
+            or_(RefreshToken.expires_at < datetime.now(tz=timezone.utc), RefreshToken.revoked.is_(True))
+        )
+    )
+
+
 def _set_auth_cookies(response: Response, user: User, db: Session) -> str:
     access = create_access_token(user.id, user.role)
     raw_refresh, jti, expires_at = create_refresh_token()
+    _purge_expired_refresh_tokens(db)
     db.add(RefreshToken(
         user_id=user.id, jti=jti,
         token_hash=hashlib.sha256(raw_refresh.encode()).hexdigest(),
@@ -72,11 +86,22 @@ def register(request: Request, body: RegisterIn, response: Response, db: Session
 @limiter.limit(settings.auth_rate_limit)
 def login(request: Request, body: LoginIn, response: Response, db: Session = Depends(get_db)):
     email = body.email.lower()
+    locked = lockout.is_locked(email)
+    if locked:
+        raise AppError(
+            f"Too many failed login attempts. Try again in {int(locked // 60) + 1} minute(s).",
+            "account_locked", 429,
+        )
     user = db.execute(select(User).where(User.email == email)).scalar_one_or_none()
     if not user or not verify_password(body.password, user.hashed_password):
+        lockout.record_failure(email)
+        if user is not None:
+            audit_service.log(db, "user.login_failed", actor_id=user.id, target=email,
+                              ip=request.client.host if request.client else None)
         raise AuthError("Invalid email or password")
     if not user.is_active:
         raise AuthError("Account disabled")
+    lockout.record_success(email)
     _set_auth_cookies(response, user, db)
     audit_service.log(db, "user.login", actor_id=user.id, target=email,
                       ip=request.client.host if request.client else None)

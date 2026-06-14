@@ -3,10 +3,16 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Literal
 
-from pydantic import SecretStr
+from pydantic import SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+# Known placeholder/default secrets that must never be used in production.
+_WEAK_SECRETS = {
+    "changeme", "change-me", "secret", "secret_key", "dev",
+    "change-me-in-prod-0123456789abcdef", "test-secret-key-for-testing-only-0123456789",
+}
 
 
 class Settings(BaseSettings):
@@ -66,6 +72,18 @@ class Settings(BaseSettings):
     stripe_publishable_key: str = ""
     stripe_webhook_secret: SecretStr = SecretStr("")
     stripe_currency: str = "cad"
+
+    @model_validator(mode="after")
+    def _validate_production_secret(self):
+        """Refuse to boot in production with a weak or default SECRET_KEY."""
+        if self.environment == "production":
+            sk = self.secret_key.get_secret_value()
+            if len(sk) < 32 or sk.lower() in _WEAK_SECRETS:
+                raise ValueError(
+                    "SECRET_KEY must be at least 32 characters and not a default/placeholder "
+                    "value when ENVIRONMENT=production."
+                )
+        return self
 
     @property
     def cors_origins_list(self) -> list[str]:
