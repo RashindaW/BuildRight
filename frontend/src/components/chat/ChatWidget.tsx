@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { streamChat } from "../../lib/api/chatStream";
+import { mediaApi } from "../../lib/api/endpoints";
+import { ApiError } from "../../lib/api/client";
 import { queryClient } from "../../lib/queryClient";
 import { useUiStore } from "../../store/uiStore";
 import type { ChatMessage } from "../../types";
@@ -12,6 +14,11 @@ export function ChatWidget() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  const [recording, setRecording] = useState(false);
+  const [transcribing, setTranscribing] = useState(false);
+  const [voiceErr, setVoiceErr] = useState<string | null>(null);
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
   const convId = useRef<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -53,6 +60,49 @@ export function ChatWidget() {
       });
       setBusy(false);
     }
+  }
+
+  async function startRecording() {
+    setVoiceErr(null);
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+      setVoiceErr("Voice isn't supported in this browser.");
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const rec = new MediaRecorder(stream);
+      chunksRef.current = [];
+      rec.ondataavailable = (e) => e.data.size && chunksRef.current.push(e.data);
+      rec.onstop = async () => {
+        stream.getTracks().forEach((t) => t.stop());
+        const blob = new Blob(chunksRef.current, { type: rec.mimeType || "audio/webm" });
+        if (!blob.size) return;
+        setTranscribing(true);
+        try {
+          const { text } = await mediaApi.transcribe(blob);
+          if (text.trim()) await send(text.trim());
+          else setVoiceErr("Didn't catch that — try again.");
+        } catch (e) {
+          setVoiceErr(
+            e instanceof ApiError && e.code === "stt_not_configured"
+              ? "Voice transcription isn't configured."
+              : "Couldn't transcribe that. Please try again.",
+          );
+        } finally {
+          setTranscribing(false);
+        }
+      };
+      recorderRef.current = rec;
+      rec.start();
+      setRecording(true);
+    } catch {
+      setVoiceErr("Microphone access was blocked.");
+    }
+  }
+
+  function stopRecording() {
+    recorderRef.current?.stop();
+    setRecording(false);
   }
 
   if (!chatOpen) {
@@ -105,6 +155,9 @@ export function ChatWidget() {
         ))}
       </div>
 
+      {voiceErr && (
+        <div className="border-t bg-amber-50 px-3 py-1.5 text-xs text-amber-700">{voiceErr}</div>
+      )}
       <form
         className="flex gap-2 border-t p-3"
         onSubmit={(e) => {
@@ -112,12 +165,27 @@ export function ChatWidget() {
           send(input);
         }}
       >
+        <button
+          type="button"
+          onClick={recording ? stopRecording : startRecording}
+          disabled={busy || transcribing}
+          aria-label={recording ? "Stop recording" : "Record a voice message"}
+          title={recording ? "Stop recording" : "Speak your question"}
+          className={`rounded-lg px-3 py-2 text-sm ${
+            recording
+              ? "animate-pulse bg-red-600 text-white"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+          }`}
+        >
+          {transcribing ? "…" : recording ? "⏹" : "🎤"}
+        </button>
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Type your question…"
+          placeholder={recording ? "Listening…" : transcribing ? "Transcribing…" : "Type your question…"}
           className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm"
           aria-label="Chat message"
+          disabled={recording || transcribing}
         />
         <button className="btn-primary" disabled={busy}>
           Send

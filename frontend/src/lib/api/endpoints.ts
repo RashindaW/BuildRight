@@ -1,5 +1,14 @@
-import { api } from "./client";
+import { api, postForm } from "./client";
 import type { Cart, Category, MenuItem, Order, Page, User } from "../../types";
+
+// ---- Media (voice / image) ----
+export const mediaApi = {
+  transcribe: (audio: Blob, filename = "voice.webm") => {
+    const form = new FormData();
+    form.append("file", audio, filename);
+    return postForm<{ text: string }>("/media/transcribe", form);
+  },
+};
 
 // ---- Auth ----
 export const authApi = {

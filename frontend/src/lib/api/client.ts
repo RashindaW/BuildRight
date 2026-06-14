@@ -93,6 +93,30 @@ export async function api<T>(path: string, opts: RequestOpts = {}): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+/** Multipart POST (file uploads). No JSON Content-Type so the browser sets the
+ *  multipart boundary; carries the guest session id like api(). */
+export async function postForm<T>(path: string, form: FormData): Promise<T> {
+  const res = await fetch(`${BASE}${path}`, {
+    method: "POST",
+    headers: { "x-session-id": getSessionId() },
+    credentials: "include",
+    body: form,
+  });
+  if (!res.ok) {
+    let code = "error";
+    let message = res.statusText;
+    try {
+      const data = await res.json();
+      code = data?.error?.code ?? code;
+      message = data?.error?.message ?? message;
+    } catch {
+      /* ignore */
+    }
+    throw new ApiError(res.status, code, message);
+  }
+  return res.json() as Promise<T>;
+}
+
 /** Fetch a CSRF token (sets the csrf_token cookie) for anonymous flows. */
 export async function ensureCsrf(): Promise<void> {
   if (!getCookie("csrf_token")) {
