@@ -29,6 +29,10 @@ AXES = {
     "WATT": [("40W", 0.8), ("60W", 1.0), ("100W", 1.4), ("150W", 1.9)],
 }
 
+# Secondary "edition" dimension. Only used when scaling to a large target catalog;
+# multiplies the SKU count while keeping names plausible across every category.
+SERIES = [("", 1.0), ("Series 2", 1.05), ("Contractor", 1.20), ("Pro Series", 1.45)]
+
 # ---- House + general brands by category flavour ---------------------------
 
 TOOL_BRANDS = ["Mastercraft", "ProBuilt", "IronClad", "VoltEdge"]
@@ -294,8 +298,17 @@ def _round_price(value: float, rng: random.Random) -> float:
     return round(whole - 1 + ending, 2) if value >= 2 else round(value, 2)
 
 
-def generate_products(seed: int = 1337) -> list[dict]:
+def generate_products(seed: int = 1337, target: int | None = None) -> list[dict]:
+    """Generate the catalog.
+
+    target=None  → the curated ~1.2k catalog (3 variants × 2 brands).
+    target=N     → scale up (all variants × up to 3 brands × edition series),
+                   deterministically truncated to N SKUs. Reaches 10k+.
+    """
+    from app.seed.image_provider import image_url_for
+
     rng = random.Random(seed)
+    scaled = target is not None
     products: list[dict] = []
     used_slugs: set[str] = set()
     used_skus: set[str] = set()
@@ -304,73 +317,87 @@ def generate_products(seed: int = 1337) -> list[dict]:
         counter = 10000 + rng.randint(0, 500)
         for ptype in cat["types"]:
             axis_vals = AXES[ptype["axis"]]
-            # 3 variant values x up to 2 brands -> ~6 products per type
-            variants = axis_vals[:3] if len(axis_vals) >= 3 else axis_vals
-            brands = cat["brands"][:2]
+            if scaled:
+                variants = axis_vals                       # all axis values (up to 5)
+                brands = cat["brands"][:3]
+                series_list = SERIES                        # 4 editions
+            else:
+                variants = axis_vals[:3] if len(axis_vals) >= 3 else axis_vals
+                brands = cat["brands"][:2]
+                series_list = [("", 1.0)]
             for brand in brands:
                 for vlabel, vmult in variants:
-                    counter += rng.randint(7, 23)
-                    sku = f"BR-{cat['code']}-{counter:05d}"
-                    if sku in used_skus:
-                        continue
-                    used_skus.add(sku)
+                    for slabel, smult in series_list:
+                        counter += rng.randint(7, 23)
+                        sku = f"BR-{cat['code']}-{counter:05d}"
+                        if sku in used_skus:
+                            continue
+                        used_skus.add(sku)
 
-                    vl = f"{vlabel} " if vlabel else ""
-                    name = f"{brand} {vl}{ptype['name']}".replace("  ", " ").strip()
-                    slug = _slugify(name)
-                    base_slug = slug
-                    n = 2
-                    while slug in used_slugs:
-                        slug = f"{base_slug}-{n}"
-                        n += 1
-                    used_slugs.add(slug)
+                        vl = f"{vlabel} " if vlabel else ""
+                        sfx = f" {slabel}" if slabel else ""
+                        name = f"{brand} {vl}{ptype['name']}{sfx}".replace("  ", " ").strip()
+                        slug = _slugify(name)
+                        base_slug = slug
+                        n = 2
+                        while slug in used_slugs:
+                            slug = f"{base_slug}-{n}"
+                            n += 1
+                        used_slugs.add(slug)
 
-                    price = _round_price(ptype["base"] * vmult * rng.uniform(0.95, 1.12), rng)
+                        price = _round_price(
+                            ptype["base"] * vmult * smult * rng.uniform(0.95, 1.12), rng
+                        )
 
-                    desc = ptype["spec"]
-                    if vlabel:
-                        desc = f"{vlabel} model. {desc}"
-                    desc = f"{desc} {brand} quality, backed by the BuildRight warranty."
+                        desc = ptype["spec"]
+                        if vlabel:
+                            desc = f"{vlabel} model. {desc}"
+                        if slabel:
+                            desc = f"{slabel} edition. {desc}"
+                        desc = f"{desc} {brand} quality, backed by the BuildRight warranty."
 
-                    kw = list(ptype["kw"]) + [brand.lower(), cat["slug"]]
-                    if vlabel:
-                        kw.append(vlabel.lower().replace('"', "").replace(" ", ""))
+                        kw = list(ptype["kw"]) + [brand.lower(), cat["slug"]]
+                        if vlabel:
+                            kw.append(vlabel.lower().replace('"', "").replace(" ", ""))
 
-                    # stock distribution: ~8% out, ~17% low, rest healthy
-                    roll = rng.random()
-                    if roll < 0.08:
-                        stock, available = 0, False
-                    elif roll < 0.25:
-                        stock, available = rng.randint(1, 15), True
-                    else:
-                        stock, available = rng.randint(16, 480), True
+                        # stock distribution: ~8% out, ~17% low, rest healthy
+                        roll = rng.random()
+                        if roll < 0.08:
+                            stock, available = 0, False
+                        elif roll < 0.25:
+                            stock, available = rng.randint(1, 15), True
+                        else:
+                            stock, available = rng.randint(16, 480), True
 
-                    tags = list(ptype["tags"])
-                    if "Pro" in vlabel or "Heavy-Duty" in vlabel:
-                        tags.append("professional")
-                    if rng.random() < 0.14:
-                        tags.append("sale")
-                    if rng.random() < 0.10:
-                        tags.append("new-arrival")
+                        tags = list(ptype["tags"])
+                        if "Pro" in vlabel or "Heavy-Duty" in vlabel or "Pro" in slabel:
+                            tags.append("professional")
+                        if rng.random() < 0.14:
+                            tags.append("sale")
+                        if rng.random() < 0.10:
+                            tags.append("new-arrival")
 
-                    # Modelled cost of goods (55-70% of price) for margin dashboards.
-                    cost = round(price * rng.uniform(0.55, 0.70), 2)
-                    products.append({
-                        "id": slug,
-                        "sku": sku,
-                        "name": name,
-                        "category": cat["slug"],
-                        "description": desc,
-                        "price": price,
-                        "cost": cost,
-                        "stock": stock,
-                        "is_available": available,
-                        "keywords": sorted(set(kw)),
-                        "dietary_tags": sorted(set(tags)),
-                        "allergens": sorted(set(ptype["flags"])),
-                        "featured": rng.random() < 0.03,
-                    })
+                        # Modelled cost of goods (55-70% of price) for margin dashboards.
+                        cost = round(price * rng.uniform(0.55, 0.70), 2)
+                        products.append({
+                            "id": slug,
+                            "sku": sku,
+                            "name": name,
+                            "category": cat["slug"],
+                            "description": desc,
+                            "price": price,
+                            "cost": cost,
+                            "stock": stock,
+                            "is_available": available,
+                            "keywords": sorted(set(kw)),
+                            "dietary_tags": sorted(set(tags)),
+                            "allergens": sorted(set(ptype["flags"])),
+                            "featured": rng.random() < 0.03,
+                            "image_url": image_url_for(cat["slug"], name, slug),
+                        })
 
+    if target is not None and len(products) > target:
+        products = products[:target]
     return products
 
 

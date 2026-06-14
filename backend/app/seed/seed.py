@@ -200,7 +200,9 @@ def seed_catalog(db: Session, products: list[dict] | None = None) -> int:
 
     Idempotent: skips products whose slug or SKU already exists. One commit.
     """
-    products = products if products is not None else generate_products()
+    if products is None:
+        from app.core.config import settings
+        products = generate_products(target=settings.catalog_target)
 
     cat_by_slug = {
         slug: _get_or_create(db, Category, slug, name=label, display_order=0)
@@ -234,6 +236,7 @@ def seed_catalog(db: Session, products: list[dict] | None = None) -> int:
             is_available=p.get("is_available", True),
             stock_qty=int(p.get("stock", 0)),
             featured=p.get("featured", False),
+            image_url=p.get("image_url"),
         )
         item.dietary_tags = [tag_by[t] for t in p.get("dietary_tags", [])]
         item.allergens = [alg_by[a] for a in p.get("allergens", [])]
