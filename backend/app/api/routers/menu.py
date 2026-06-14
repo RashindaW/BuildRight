@@ -96,6 +96,26 @@ def list_categories(db: Session = Depends(get_db)):
     return [CategoryOut.model_validate(c) for c in cats]
 
 
+@router.get("/{slug}/recommendations", response_model=list[MenuItemOut])
+def item_recommendations(slug: str, db: Session = Depends(get_db), limit: int = Query(6, ge=1, le=12)):
+    """Product-page recommendations: real co-purchases first (collaborative
+    filtering), topped up with content-similar items. Order-preserving + deduped."""
+    from app.services.recommender_service import frequently_bought_with, recommend_similar
+
+    ranked = frequently_bought_with(db, slug, k=limit) + recommend_similar(db, slug, k=limit)
+    ids, seen = [], set()
+    for r in ranked:
+        if r["slug"] not in seen:
+            seen.add(r["slug"])
+            ids.append(r["slug"])
+    ids = ids[:limit]
+    if not ids:
+        return []
+    items = db.execute(_base_query().where(MenuItem.slug.in_(ids))).scalars().unique().all()
+    by_slug = {it.slug: it for it in items}
+    return [MenuItemOut.from_model(by_slug[s]) for s in ids if s in by_slug]
+
+
 @router.get("/{slug}", response_model=MenuItemOut)
 def get_item(slug: str, db: Session = Depends(get_db)):
     item = db.execute(_base_query().where(MenuItem.slug == slug)).scalars().first()

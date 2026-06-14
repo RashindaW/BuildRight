@@ -298,7 +298,46 @@ SUGGEST_COMPLEMENTARY_TOOL = {
                 "type": "string",
                 "description": "Optional free-text need to anchor suggestions, e.g. 'painting a wall'.",
             },
+            "item": {
+                "type": "string",
+                "description": "Optional SKU/slug/name of an item the shopper picked — uses "
+                               "real co-purchase data to cross-sell.",
+            },
         },
+    },
+}
+
+RECOMMEND_SIMILAR_TOOL = {
+    "name": "recommend_similar",
+    "description": (
+        "Find products similar to a given item (same category, similar use, similar price). "
+        "Use when a shopper asks 'what's like this?', 'show me alternatives', or 'anything "
+        "cheaper than this'. Pass the item's SKU, slug, or name. Returns items with SKU + price."
+    ),
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "item": {"type": "string", "description": "SKU, slug, id, or product name to match."},
+            "limit": {"type": "integer", "description": "Max results (default 5)."},
+        },
+        "required": ["item"],
+    },
+}
+
+FREQUENTLY_BOUGHT_WITH_TOOL = {
+    "name": "frequently_bought_with",
+    "description": (
+        "Find products commonly bought together with a given item, based on real order "
+        "history (collaborative filtering). Use for 'what goes with this?' or to cross-sell "
+        "at the cart/product page. Pass the item's SKU, slug, or name. Returns items + price."
+    ),
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "item": {"type": "string", "description": "SKU, slug, id, or product name to anchor on."},
+            "limit": {"type": "integer", "description": "Max results (default 5)."},
+        },
+        "required": ["item"],
     },
 }
 
@@ -313,6 +352,8 @@ TOOLS = [
     COMPUTE_MATERIALS_TOOL,
     ADD_MATERIALS_TO_CART_TOOL,
     SUGGEST_COMPLEMENTARY_TOOL,
+    RECOMMEND_SIMILAR_TOOL,
+    FREQUENTLY_BOUGHT_WITH_TOOL,
 ]
 
 
@@ -679,13 +720,23 @@ def execute_suggest_complementary(tool_input: dict, ctx) -> tuple[str, list[dict
     from app.ai.hybrid import hybrid_search_products
 
     inp = tool_input or {}
+    seen, suggestions, grounded = set(), [], []
+
+    # Real co-purchase data first when the shopper named a specific item.
+    if inp.get("item"):
+        from app.services.recommender_service import frequently_bought_with
+        for r in frequently_bought_with(ctx.db, inp["item"], k=3):
+            seen.add(r["slug"])
+            suggestions.append({"product": r["name"], "sku": r["sku"],
+                                "price": f"${r['price']:.2f}", "category": r["category"]})
+            grounded.append({"id": r["slug"], "name": r["name"], "price": r["price"]})
+
     anchors = list(_COMPLEMENTARY.get((inp.get("project_type") or "").strip(), []))
     if inp.get("query"):
         anchors.append((inp["query"], None))
-    if not anchors:
+    if not anchors and not suggestions:
         anchors = [("safety glasses", "safety"), ("work gloves", "safety")]
 
-    seen, suggestions, grounded = set(), [], []
     for query, category in anchors:
         filters = {"in_stock_only": True}
         if category:
@@ -706,6 +757,37 @@ def execute_suggest_complementary(tool_input: dict, ctx) -> tuple[str, list[dict
     if not suggestions:
         return json.dumps({"suggestions": [], "note": "No complementary items found."}), []
     return json.dumps({"suggestions": suggestions}), grounded
+
+
+# ---- Recommender (Phase 4.2) ----------------------------------------------
+
+def _serialize_recs(recs: list[dict]) -> tuple[str, list[dict]]:
+    if not recs:
+        return json.dumps({"recommendations": [], "note": "No recommendations found."}), []
+    results = [{"product": r["name"], "sku": r["sku"],
+                "price": f"${r['price']:.2f}", "reason": r["reason"]} for r in recs]
+    grounded = [{"id": r["slug"], "name": r["name"], "price": r["price"]} for r in recs]
+    return json.dumps({"recommendations": results}), grounded
+
+
+def execute_recommend_similar(tool_input: dict, ctx) -> tuple[str, list[dict]]:
+    from app.services.recommender_service import recommend_similar
+    inp = tool_input or {}
+    ref = (inp.get("item") or "").strip()
+    if not ref:
+        return json.dumps({"error": "item is required"}), []
+    recs = recommend_similar(ctx.db, ref, k=min(_as_int(inp.get("limit"), 5), 10))
+    return _serialize_recs(recs)
+
+
+def execute_frequently_bought_with(tool_input: dict, ctx) -> tuple[str, list[dict]]:
+    from app.services.recommender_service import frequently_bought_with
+    inp = tool_input or {}
+    ref = (inp.get("item") or "").strip()
+    if not ref:
+        return json.dumps({"error": "item is required"}), []
+    recs = frequently_bought_with(ctx.db, ref, k=min(_as_int(inp.get("limit"), 5), 10))
+    return _serialize_recs(recs)
 
 
 def execute_get_preferences(tool_input: dict, ctx) -> tuple[str, dict]:

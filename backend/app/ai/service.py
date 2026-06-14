@@ -103,6 +103,8 @@ def _build_executors():
         "compute_materials": lambda inp, ctx: tools.execute_compute_materials(inp, ctx),
         "add_materials_to_cart": lambda inp, ctx: tools.execute_add_materials_to_cart(inp, ctx),
         "suggest_complementary": lambda inp, ctx: tools.execute_suggest_complementary(inp, ctx),
+        "recommend_similar": lambda inp, ctx: tools.execute_recommend_similar(inp, ctx),
+        "frequently_bought_with": lambda inp, ctx: tools.execute_frequently_bought_with(inp, ctx),
     }
 
 
@@ -183,6 +185,7 @@ async def stream_chat(
                     if payload is not None and block.name in (
                         "search_menu", "search_products", "get_order_history",
                         "compute_materials", "suggest_complementary",
+                        "recommend_similar", "frequently_bought_with",
                     ):
                         grounded_items.extend(payload)
                     elif payload is not None and block.name == "search_knowledge_base":
