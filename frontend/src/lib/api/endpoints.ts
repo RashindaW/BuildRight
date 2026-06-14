@@ -141,10 +141,33 @@ export interface AiAttribution {
   top_chat_products: { name: string; units: number; revenue_cents: number }[];
 }
 
+export interface AiOps {
+  period_days: number;
+  turns: number;
+  total_input_tokens: number;
+  total_output_tokens: number;
+  total_cost_usd: number;
+  avg_cost_usd: number;
+  avg_tool_calls: number;
+  escalation_rate_pct: number;
+  guardrail_violations: number;
+  guardrail_rate_pct: number;
+  by_model: { model: string; turns: number; input_tokens: number; output_tokens: number; cost_usd: number }[];
+  route_distribution: { route: string; count: number; pct: number }[];
+  tool_usage: { tool: string; count: number }[];
+  quality: { price_faithfulness?: number; answer_relevance?: number; context_utilization?: number; overall?: number };
+  recent: {
+    created_at: string; route: string | null; model: string | null;
+    tools_used: string[]; input_tokens: number; output_tokens: number;
+    cost_usd: number; guardrail_violation: boolean;
+  }[];
+}
+
 export const analyticsApi = {
   inventory: () => api<InventorySummary>("/analytics/inventory"),
   margins: (days = 30) => api<MarginSummary>(`/analytics/margins?days=${days}`),
   aiAttribution: (days = 30) => api<AiAttribution>(`/analytics/ai-attribution?days=${days}`),
+  aiOps: (days = 30) => api<AiOps>(`/analytics/ai-ops?days=${days}`),
 };
 
 // ---- Admin ----

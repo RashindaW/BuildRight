@@ -12,11 +12,13 @@ from datetime import datetime, timedelta, timezone
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
+from app.models.chat import Message
 from app.models.menu import Category, MenuItem
 from app.models.order import Order, OrderItem
 
 LOW_STOCK_THRESHOLD = 15
 _SALE_STATUSES = ("placed", "preparing", "ready", "completed")
+_HEAVY_ROUTES = ("complex", "multimodal")
 
 
 def _since(days: int) -> datetime:
@@ -172,4 +174,88 @@ def ai_attribution(db: Session, days: int = 30) -> dict:
             {"name": name, "units": int(units), "revenue_cents": int(rev)}
             for name, units, rev in top
         ],
+    }
+
+
+def ai_operations(db: Session, days: int = 30, recent_limit: int = 20) -> dict:
+    """Agent observability: cost, routing/tool 'thinking pattern', safety, and a
+    recent-turns trace over assistant messages in the window."""
+    from app.ai.pricing import cost_usd
+    from app.services.eval_service import evaluate_recent
+
+    since = _since(days)
+    msgs = db.execute(
+        select(Message)
+        .where(Message.role == "assistant", Message.created_at >= since)
+        .order_by(Message.created_at.desc())
+    ).scalars().all()
+
+    turns = len(msgs)
+    total_in = total_out = guardrail_hits = tool_calls = 0
+    total_cost = 0.0
+    by_model: dict[str, dict] = {}
+    route_counts: dict[str, int] = {}
+    tool_counts: dict[str, int] = {}
+
+    for m in msgs:
+        it, ot = int(m.input_tokens or 0), int(m.output_tokens or 0)
+        c = cost_usd(m.model, it, ot)
+        total_in += it
+        total_out += ot
+        total_cost += c
+        bm = by_model.setdefault(m.model or "unknown",
+                                 {"turns": 0, "input_tokens": 0, "output_tokens": 0, "cost_usd": 0.0})
+        bm["turns"] += 1
+        bm["input_tokens"] += it
+        bm["output_tokens"] += ot
+        bm["cost_usd"] = round(bm["cost_usd"] + c, 6)
+        route_counts[m.route or "unknown"] = route_counts.get(m.route or "unknown", 0) + 1
+        used = m.tools_used or []
+        tool_calls += len(used)
+        for t in used:
+            tool_counts[t] = tool_counts.get(t, 0) + 1
+        if m.guardrail_violation:
+            guardrail_hits += 1
+
+    heavy = sum(route_counts.get(r, 0) for r in _HEAVY_ROUTES)
+    pct = lambda n: round(100 * n / turns, 1) if turns else 0.0  # noqa: E731
+
+    recent = [
+        {
+            "created_at": m.created_at.isoformat(),
+            "route": m.route, "model": m.model,
+            "tools_used": m.tools_used or [],
+            "input_tokens": int(m.input_tokens or 0),
+            "output_tokens": int(m.output_tokens or 0),
+            "cost_usd": cost_usd(m.model, int(m.input_tokens or 0), int(m.output_tokens or 0)),
+            "guardrail_violation": bool(m.guardrail_violation),
+        }
+        for m in msgs[:recent_limit]
+    ]
+
+    return {
+        "period_days": days,
+        "turns": turns,
+        "total_input_tokens": total_in,
+        "total_output_tokens": total_out,
+        "total_cost_usd": round(total_cost, 4),
+        "avg_cost_usd": round(total_cost / turns, 6) if turns else 0.0,
+        "avg_tool_calls": round(tool_calls / turns, 2) if turns else 0.0,
+        "escalation_rate_pct": pct(heavy),       # % routed to the heavy model
+        "guardrail_violations": guardrail_hits,
+        "guardrail_rate_pct": pct(guardrail_hits),
+        "by_model": [
+            {"model": k, **v}
+            for k, v in sorted(by_model.items(), key=lambda kv: -kv[1]["cost_usd"])
+        ],
+        "route_distribution": [
+            {"route": k, "count": v, "pct": pct(v)}
+            for k, v in sorted(route_counts.items(), key=lambda kv: -kv[1])
+        ],
+        "tool_usage": [
+            {"tool": k, "count": v}
+            for k, v in sorted(tool_counts.items(), key=lambda kv: -kv[1])
+        ],
+        "quality": evaluate_recent(db, recent_limit).get("aggregate", {}),
+        "recent": recent,
     }

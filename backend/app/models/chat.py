@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import ForeignKey, Integer, JSON, String, Text
+from sqlalchemy import Boolean, ForeignKey, Integer, JSON, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, new_id
@@ -37,5 +37,12 @@ class Message(TimestampMixin, Base):
     tool_payload: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     grounded_item_ids: Mapped[list | None] = mapped_column(JSON, nullable=True)
     grounded_doc_ids: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    # Per-turn observability telemetry (assistant turns only)
+    model: Mapped[str | None] = mapped_column(String(60), nullable=True)
+    route: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    input_tokens: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    output_tokens: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    tools_used: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    guardrail_violation: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     conversation: Mapped[Conversation] = relationship(back_populates="messages")

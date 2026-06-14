@@ -32,3 +32,12 @@ def chat_eval(limit: int = Query(default=50, ge=1, le=500), db: Session = Depend
     """Offline chat-quality scores (faithfulness / relevance / context use) over
     recent assistant turns, plus an aggregate. Deterministic; never blocks chat."""
     return eval_service.evaluate_recent(db, limit)
+
+
+@router.get("/ai-ops")
+def ai_ops(days: int = Query(default=30, ge=1, le=365),
+           recent: int = Query(default=20, ge=1, le=100),
+           db: Session = Depends(get_db)):
+    """AI observability: agent cost, routing/tool 'thinking pattern', guardrail +
+    quality, and a recent-turns trace. Manager/admin only."""
+    return analytics_service.ai_operations(db, days, recent)

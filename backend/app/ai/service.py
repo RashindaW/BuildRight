@@ -152,6 +152,8 @@ async def stream_chat(
     final_text = ""
     completed = False
     input_tokens = output_tokens = 0
+    tools_used: list[str] = []   # tool-use trace for observability
+    tool_rounds = 0
 
     try:
         for _ in range(_MAX_TOOL_ROUNDS):
@@ -167,11 +169,13 @@ async def stream_chat(
             output_tokens += resp.usage.output_tokens
 
             if resp.stop_reason == "tool_use":
+                tool_rounds += 1
                 messages.append({"role": "assistant", "content": resp.content})
                 tool_results = []
                 for block in resp.content:
                     if block.type != "tool_use":
                         continue
+                    tools_used.append(block.name)
                     executor = executors.get(block.name)
                     if executor is None:
                         continue
@@ -266,5 +270,7 @@ async def stream_chat(
             "cart_dirty": cart_dirty,
             "model": route_model,
             "route": route_label,
+            "tools_used": tools_used,
+            "tool_rounds": tool_rounds,
         },
     }

@@ -18,8 +18,13 @@ export default function ManagerDashboard() {
   const inv = useQuery({ queryKey: ["inventory"], queryFn: analyticsApi.inventory });
   const margins = useQuery({ queryKey: ["margins", days], queryFn: () => analyticsApi.margins(days) });
   const attr = useQuery({ queryKey: ["attr", days], queryFn: () => analyticsApi.aiAttribution(days) });
+  const ops = useQuery({ queryKey: ["aiOps", days], queryFn: () => analyticsApi.aiOps(days) });
 
   const m = margins.data?.overall;
+  const o = ops.data;
+  const usd = (v: number) => `$${(v ?? 0).toFixed(v < 1 ? 4 : 2)}`;
+  const maxRoute = Math.max(1, ...(o?.route_distribution ?? []).map((r) => r.count));
+  const maxTool = Math.max(1, ...(o?.tool_usage ?? []).map((t) => t.count));
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
@@ -147,6 +152,117 @@ export default function ManagerDashboard() {
               ))}
               {(attr.data?.top_chat_products?.length ?? 0) === 0 && (
                 <tr><td colSpan={3} className="px-4 py-3 text-gray-400">No chat-attributed sales yet — try reordering via the chat assistant.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* AI Operations — agent cost, thinking pattern, full visibility */}
+      <section className="mt-8">
+        <h2 className="mb-1 text-lg font-semibold">AI Operations</h2>
+        <p className="mb-3 text-sm text-gray-500">
+          What the assistant costs, how it routes &amp; reasons, and whether it stays grounded.
+          {o && <> {o.turns} turns in the last {o.period_days} days.</>}
+        </p>
+
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <Kpi label="Agent cost" value={usd(o?.total_cost_usd ?? 0)} sub={`${o?.turns ?? 0} turns`} />
+          <Kpi label="Avg cost / turn" value={usd(o?.avg_cost_usd ?? 0)} sub={`${o?.avg_tool_calls ?? 0} tool calls/turn`} />
+          <Kpi label="Sonnet escalation" value={`${o?.escalation_rate_pct ?? 0}%`} sub="routed to the heavy model" />
+          <Kpi
+            label="Guardrail blocks"
+            value={`${o?.guardrail_rate_pct ?? 0}%`}
+            sub={`${o?.guardrail_violations ?? 0} blocked · quality ${o?.quality?.overall ?? "—"}`}
+          />
+        </div>
+
+        <div className="mt-4 grid gap-4 md:grid-cols-3">
+          {/* Cost by model */}
+          <div className="card overflow-hidden">
+            <div className="border-b bg-gray-50 px-4 py-2 text-sm font-medium">Cost by model</div>
+            <table className="w-full text-sm">
+              <tbody className="divide-y">
+                {(o?.by_model ?? []).map((r) => (
+                  <tr key={r.model}>
+                    <td className="px-4 py-2">{r.model}</td>
+                    <td className="px-4 py-2 text-right text-gray-500">{r.turns} turns</td>
+                    <td className="px-4 py-2 text-right font-medium">{usd(r.cost_usd)}</td>
+                  </tr>
+                ))}
+                {(o?.by_model?.length ?? 0) === 0 && (
+                  <tr><td className="px-4 py-3 text-gray-400">No AI turns yet.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Route distribution (thinking pattern) */}
+          <div className="card p-4">
+            <div className="mb-2 text-sm font-medium">Route mix (thinking pattern)</div>
+            <div className="space-y-2">
+              {(o?.route_distribution ?? []).map((r) => (
+                <div key={r.route}>
+                  <div className="flex justify-between text-xs text-gray-600">
+                    <span className="capitalize">{r.route}</span><span>{r.count} · {r.pct}%</span>
+                  </div>
+                  <div className="mt-0.5 h-2 rounded bg-gray-100">
+                    <div className="h-2 rounded bg-brand-500" style={{ width: `${(r.count / maxRoute) * 100}%` }} />
+                  </div>
+                </div>
+              ))}
+              {(o?.route_distribution?.length ?? 0) === 0 && <div className="text-sm text-gray-400">No data.</div>}
+            </div>
+          </div>
+
+          {/* Tool usage */}
+          <div className="card p-4">
+            <div className="mb-2 text-sm font-medium">Tool usage</div>
+            <div className="space-y-2">
+              {(o?.tool_usage ?? []).slice(0, 8).map((t) => (
+                <div key={t.tool}>
+                  <div className="flex justify-between text-xs text-gray-600">
+                    <span className="font-mono">{t.tool}</span><span>{t.count}</span>
+                  </div>
+                  <div className="mt-0.5 h-2 rounded bg-gray-100">
+                    <div className="h-2 rounded bg-green-500" style={{ width: `${(t.count / maxTool) * 100}%` }} />
+                  </div>
+                </div>
+              ))}
+              {(o?.tool_usage?.length ?? 0) === 0 && <div className="text-sm text-gray-400">No tool calls yet.</div>}
+            </div>
+          </div>
+        </div>
+
+        {/* Recent turns — full visibility */}
+        <div className="card mt-4 overflow-x-auto">
+          <div className="border-b bg-gray-50 px-4 py-2 text-sm font-medium">Recent turns</div>
+          <table className="w-full text-sm">
+            <thead className="text-left text-gray-500">
+              <tr>
+                <th className="px-4 py-2">When</th>
+                <th className="px-4 py-2">Route</th>
+                <th className="px-4 py-2">Model</th>
+                <th className="px-4 py-2">Tools</th>
+                <th className="px-4 py-2 text-right">Tokens</th>
+                <th className="px-4 py-2 text-right">Cost</th>
+                <th className="px-4 py-2 text-center">Guard</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y">
+              {(o?.recent ?? []).map((r, i) => (
+                <tr key={i}>
+                  <td className="px-4 py-2 text-gray-500">{new Date(r.created_at).toLocaleString()}</td>
+                  <td className="px-4 py-2 capitalize">{r.route ?? "—"}</td>
+                  <td className="px-4 py-2 text-xs">{r.model ?? "—"}</td>
+                  <td className="px-4 py-2 font-mono text-xs text-gray-600">{r.tools_used.join(", ") || "—"}</td>
+                  <td className="px-4 py-2 text-right text-gray-500">{r.input_tokens + r.output_tokens}</td>
+                  <td className="px-4 py-2 text-right font-medium">{usd(r.cost_usd)}</td>
+                  <td className="px-4 py-2 text-center">{r.guardrail_violation ? "🛑" : "✓"}</td>
+                </tr>
+              ))}
+              {(o?.recent?.length ?? 0) === 0 && (
+                <tr><td colSpan={7} className="px-4 py-3 text-gray-400">No AI turns yet — chat with the assistant to populate this.</td></tr>
               )}
             </tbody>
           </table>

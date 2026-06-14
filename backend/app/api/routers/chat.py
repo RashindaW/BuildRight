@@ -112,29 +112,39 @@ def chat_stream(
     async def event_gen():
         yield _sse("meta", {"conversation_id": conv_id, "session_id": session_id})
         assistant_text = ""
-        out_tokens = 0
+        meta: dict = {}
         grounded_ids: list[str] = []
         grounded_doc_ids: list[str] = []
         async for ev in service.stream_chat(history, ctx, body.message,
                                             max_tokens=settings.llm_max_tokens):
             if ev["event"] == "done":
                 assistant_text = ev["data"]["text"]
-                out_tokens = ev["data"].get("output_tokens", 0)
+                meta = ev["data"]
                 grounded_ids = ev["data"].get("grounded_item_ids", [])
                 grounded_doc_ids = ev["data"].get("grounded_doc_ids", [])
             yield _sse(ev["event"], ev["data"])
         from app.core.db import SessionLocal
         s = SessionLocal()
         try:
+            in_tokens = int(meta.get("input_tokens", 0) or 0)
+            out_tokens = int(meta.get("output_tokens", 0) or 0)
             s.add(Message(
                 conversation_id=conv_id,
                 role="assistant",
                 content=assistant_text,
                 grounded_item_ids=grounded_ids,
                 grounded_doc_ids=grounded_doc_ids,
+                # Per-turn observability telemetry
+                model=meta.get("model"),
+                route=meta.get("route"),
+                input_tokens=in_tokens,
+                output_tokens=out_tokens,
+                tools_used=meta.get("tools_used") or [],
+                guardrail_violation=bool(meta.get("guardrail_violation", False)),
             ))
             c = s.get(Conversation, conv_id)
             if c:
+                c.total_input_tokens += in_tokens
                 c.total_output_tokens += out_tokens
             s.commit()
         finally:
