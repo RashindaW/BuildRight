@@ -1,3 +1,14 @@
+<!-- Hugging Face Spaces metadata (Docker SDK). Harmless on GitHub. See HF-DEPLOY.md. -->
+---
+title: BuildRight Hardware
+emoji: 🔧
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 8000
+pinned: false
+---
+
 # BuildRight Hardware — Conversational Retail Store with Hybrid RAG
 
 A professional, secure, full-stack online store for a Canadian-Tire-style hardware retailer,
