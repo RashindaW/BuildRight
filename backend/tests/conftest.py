@@ -17,6 +17,10 @@ os.environ["AUTH_RATE_LIMIT"] = "1000/minute"
 os.environ["CHAT_RATE_LIMIT"] = "1000/minute"
 os.environ["ADMIN_EMAIL"] = "admin@example.com"
 os.environ["ADMIN_PASSWORD"] = "AdminTestPass123!"
+# Keep the suite offline + deterministic regardless of the developer's .env
+# (which may enable a licensed image provider / STT key).
+os.environ["IMAGE_PROVIDER"] = "placeholder"
+os.environ["STT_PROVIDER"] = ""
 
 import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402

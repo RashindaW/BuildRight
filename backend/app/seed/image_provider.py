@@ -69,59 +69,81 @@ def _active_licensed_provider() -> str | None:
     return None
 
 
-def backfill_images(products: list[dict], *, limit: int | None = None) -> int:
-    """Fetch category-matched licensed photos for products that still use a
-    placeholder. Requires a configured key; otherwise a no-op (returns 0).
+def _stable_index(slug: str, n: int) -> int:
+    """Deterministic 0..n-1 from a slug (no Math.random / hash-seed surprises)."""
+    return (sum(ord(c) for c in slug) % n) if n else 0
 
-    Network/rate-limit aware: caller passes a slice via `limit`. Returns the
-    number of products updated in place (sets product['image_url']).
+
+def build_category_image_map(categories, *, per_category: int = 10) -> dict[str, list[str]]:
+    """Fetch a small pool of licensed photos PER CATEGORY in one request each.
+
+    This is the rate-limit-safe strategy: ~20 requests total (one per category),
+    each returning up to `per_category` photos, which are then shared+rotated
+    across that category's products. Returns {category_slug: [url, ...]}.
+    Requires a configured key; otherwise returns {}.
     """
     provider = _active_licensed_provider()
     if provider is None:
-        return 0
+        return {}
 
     import httpx  # local import: only needed on the licensed path
 
-    updated = 0
-    targets = [p for p in products if str(p.get("image_url", "")).startswith("https://picsum.photos")]
-    if limit is not None:
-        targets = targets[:limit]
-
-    with httpx.Client(timeout=10.0) as client:
-        for p in targets:
-            query = image_query_for(p["category"], p["name"])
+    out: dict[str, list[str]] = {}
+    with httpx.Client(timeout=15.0) as client:
+        for cat in categories:
+            query = image_query_for(cat, cat.replace("-", " "))
             try:
                 if provider == "unsplash":
-                    url = _fetch_unsplash(client, query)
+                    urls = _fetch_unsplash(client, query, per_category)
                 else:
-                    url = _fetch_pexels(client, query)
-            except Exception:
-                url = None
-            if url:
-                p["image_url"] = url
-                updated += 1
+                    urls = _fetch_pexels(client, query, per_category)
+            except Exception:  # rate limit / network — leave this category on placeholders
+                urls = []
+            if urls:
+                out[cat] = urls
+    return out
+
+
+def backfill_images(products: list[dict], *, category_map: dict[str, list[str]] | None = None) -> int:
+    """Assign licensed photos to products in place, grouped by category.
+
+    Pass a prebuilt category_map, or one is fetched here. Each product gets a
+    deterministic photo from its category's pool (stable per slug). Returns the
+    number of products updated. No-op (0) when no key is configured.
+    """
+    if category_map is None:
+        cats = sorted({p["category"] for p in products})
+        category_map = build_category_image_map(cats)
+    if not category_map:
+        return 0
+
+    updated = 0
+    for p in products:
+        pool = category_map.get(p["category"])
+        if not pool:
+            continue
+        p["image_url"] = pool[_stable_index(p["id"], len(pool))]
+        updated += 1
     return updated
 
 
-def _fetch_unsplash(client, query: str) -> str | None:
+def _fetch_unsplash(client, query: str, count: int = 10) -> list[str]:
     key = settings.unsplash_access_key.get_secret_value()
     r = client.get(
         "https://api.unsplash.com/search/photos",
-        params={"query": query, "per_page": 1, "orientation": "landscape"},
+        params={"query": query, "per_page": count, "orientation": "landscape"},
         headers={"Authorization": f"Client-ID {key}"},
     )
     r.raise_for_status()
-    results = r.json().get("results") or []
-    return results[0]["urls"]["regular"] if results else None
+    return [p["urls"]["regular"] for p in (r.json().get("results") or [])]
 
 
-def _fetch_pexels(client, query: str) -> str | None:
+def _fetch_pexels(client, query: str, count: int = 10) -> list[str]:
     key = settings.pexels_api_key.get_secret_value()
     r = client.get(
         "https://api.pexels.com/v1/search",
-        params={"query": query, "per_page": 1, "orientation": "landscape"},
+        params={"query": query, "per_page": count, "orientation": "landscape"},
         headers={"Authorization": key},
     )
     r.raise_for_status()
-    photos = r.json().get("photos") or []
-    return photos[0]["src"]["large"] if photos else None
+    return [p["src"]["large"] for p in (r.json().get("photos") or [])]
