@@ -134,6 +134,45 @@ def _resolve_order(db: Session, pi, order):
     return db.execute(select(Order).where(Order.id == order_id)).scalar_one_or_none()
 
 
+def refund_order(db: Session, order, *, amount_cents: int | None = None) -> dict:
+    """Refund a paid order through Stripe (full by default, or a partial amount).
+
+    Guards against double-refunds at the app level (only a 'paid' order can be
+    refunded) and via a per-(order, amount) idempotency key. Marks the order
+    refunded + cancelled on success. Returns a small status dict.
+    """
+    if order.payment_status != "paid":
+        raise AppError("Only a paid order can be refunded.", "not_refundable", 409)
+    if not order.stripe_payment_intent_id:
+        raise AppError("This order has no payment to refund.", "not_refundable", 409)
+
+    stripe = _stripe()
+    paid = order.amount_paid_cents or order.total_cents
+    kwargs = {
+        "payment_intent": order.stripe_payment_intent_id,
+        "metadata": {"order_id": order.id, "order_number": order.order_number},
+    }
+    key_suffix = "full"
+    if amount_cents is not None:
+        amt = max(1, min(int(amount_cents), paid))
+        kwargs["amount"] = amt
+        key_suffix = str(amt)
+
+    refund = stripe.Refund.create(idempotency_key=f"refund_{order.id}_{key_suffix}", **kwargs)
+
+    order.payment_status = "refunded"
+    order.status = "cancelled"
+    db.commit()
+    logger.info("payment_refunded: order=%s refund=%s amount=%s", order.id, refund.id, getattr(refund, "amount", None))
+    return {
+        "refund_id": refund.id,
+        "status": refund.status,
+        "amount_cents": getattr(refund, "amount", None),
+        "order_status": order.status,
+        "payment_status": order.payment_status,
+    }
+
+
 def _mark_paid(db: Session, pi, order=None) -> None:
     from app.models.cart import Cart
 

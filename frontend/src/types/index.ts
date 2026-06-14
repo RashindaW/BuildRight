@@ -92,6 +92,7 @@ export interface Order {
   id: string;
   order_number: string;
   status: string;
+  payment_status: string;
   subtotal_cents: number;
   total_cents: number;
   notes: string | null;

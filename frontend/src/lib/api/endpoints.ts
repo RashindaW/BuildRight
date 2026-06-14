@@ -96,6 +96,11 @@ export const paymentsApi = {
     ),
   status: (orderId: string) =>
     api<PaymentStatusResponse>(`/payments/status/${orderId}`),
+  refund: (orderId: string, amountCents?: number) =>
+    api<{ refund_id: string; status: string; amount_cents: number | null; payment_status: string }>(
+      `/payments/refund/${orderId}`,
+      { method: "POST", body: { amount_cents: amountCents ?? null } },
+    ),
 };
 
 // ---- Manager analytics ----

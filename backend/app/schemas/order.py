@@ -23,6 +23,7 @@ class OrderOut(BaseModel):
     id: str
     order_number: str
     status: str
+    payment_status: str = "unpaid"
     subtotal_cents: int
     total_cents: int
     notes: str | None

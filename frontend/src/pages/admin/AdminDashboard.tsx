@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { adminApi, menuApi, ordersApi } from "../../lib/api/endpoints";
+import { adminApi, menuApi, ordersApi, paymentsApi } from "../../lib/api/endpoints";
 import { formatPrice } from "../../lib/format";
 import { useToast } from "../../context/ToastProvider";
 import type { Order } from "../../types";
@@ -33,22 +33,49 @@ function OrdersPanel() {
     },
     onError: (e) => toast((e as Error).message, "error"),
   });
+  const refund = useMutation({
+    mutationFn: (id: string) => paymentsApi.refund(id),
+    onSuccess: (r) => {
+      qc.invalidateQueries({ queryKey: ["admin-orders"] });
+      toast(`Refunded — ${r.status}`, "success");
+    },
+    onError: (e) => toast((e as Error).message, "error"),
+  });
 
   return (
     <div className="space-y-3">
       {(orders ?? []).map((o: Order) => (
-        <div key={o.id} className="card flex items-center justify-between p-4">
+        <div key={o.id} className="card flex items-center justify-between gap-3 p-4">
           <div>
             <span className="font-mono font-semibold">{o.order_number}</span>
-            <p className="text-sm text-gray-500">{o.items.length} items · {formatPrice(o.total_cents)}</p>
+            <p className="text-sm text-gray-500">
+              {o.items.length} items · {formatPrice(o.total_cents)} ·{" "}
+              <span className={o.payment_status === "refunded" ? "text-red-600" : "text-gray-500"}>
+                {o.payment_status}
+              </span>
+            </p>
           </div>
-          <select
-            className="rounded-lg border border-gray-300 px-2 py-1"
-            value={o.status}
-            onChange={(e) => setStatus.mutate({ id: o.id, status: e.target.value })}
-          >
-            {ORDER_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-          </select>
+          <div className="flex items-center gap-2">
+            {o.payment_status === "paid" && (
+              <button
+                className="rounded-lg border border-red-300 px-3 py-1 text-sm text-red-700 hover:bg-red-50 disabled:opacity-50"
+                disabled={refund.isPending}
+                onClick={() => {
+                  if (confirm(`Refund ${o.order_number} for ${formatPrice(o.total_cents)}?`))
+                    refund.mutate(o.id);
+                }}
+              >
+                Refund
+              </button>
+            )}
+            <select
+              className="rounded-lg border border-gray-300 px-2 py-1"
+              value={o.status}
+              onChange={(e) => setStatus.mutate({ id: o.id, status: e.target.value })}
+            >
+              {ORDER_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
         </div>
       ))}
       {orders && orders.length === 0 && <p className="text-gray-500">No orders yet.</p>}

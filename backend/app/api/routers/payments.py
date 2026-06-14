@@ -13,10 +13,10 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.core.db import get_db
-from app.core.deps import Actor, get_actor
+from app.core.deps import Actor, get_actor, require_manager
 from app.core.errors import NotFoundError
 from app.core.security import verify_csrf
-from app.services import payment_service
+from app.services import audit_service, payment_service
 from app.services.order_service import create_pending_order, get_order
 
 router = APIRouter(prefix="/payments", tags=["payments"])
@@ -25,6 +25,10 @@ router = APIRouter(prefix="/payments", tags=["payments"])
 class CreateIntentBody(BaseModel):
     notes: str | None = None
     guest_email: str | None = None
+
+
+class RefundBody(BaseModel):
+    amount_cents: int | None = None  # omit for a full refund
 
 
 def _own_order_or_404(db: Session, order_id: str, actor: Actor):
@@ -75,3 +79,15 @@ def confirm_payment(order_id: str, actor: Actor = Depends(get_actor), db: Sessio
 def payment_status(order_id: str, actor: Actor = Depends(get_actor), db: Session = Depends(get_db)):
     order = _own_order_or_404(db, order_id, actor)
     return {"payment_status": order.payment_status, "order_status": order.status, "order_id": order.id}
+
+
+@router.post("/refund/{order_id}", dependencies=[Depends(verify_csrf)])
+def refund_order(order_id: str, body: RefundBody | None = None,
+                 user=Depends(require_manager), db: Session = Depends(get_db)):
+    """Refund a paid order (manager/admin only). Full refund unless amount_cents is given."""
+    order = get_order(db, order_id)  # 404s if missing
+    result = payment_service.refund_order(
+        db, order, amount_cents=(body.amount_cents if body else None)
+    )
+    audit_service.log(db, "payment_refund", actor_id=user.id, target=order.id, detail=result)
+    return result
