@@ -49,8 +49,12 @@ class Settings(BaseSettings):
     chat_rate_limit: str = "20/minute"
     auth_rate_limit: str = "10/minute"
 
-    # LLM
-    llm_model: str = "claude-haiku-4-5"
+    # LLM — multi-agent router: a cheap model triages every turn; complex/multimodal
+    # turns escalate to the heavy model.
+    llm_model: str = "claude-haiku-4-5"          # default / simple turns
+    llm_model_heavy: str = "claude-sonnet-4-6"   # complex multi-step + multimodal turns
+    llm_router_model: str = "claude-haiku-4-5"   # the cheap classifier
+    model_router_enabled: bool = True            # toggle the Haiku→Sonnet router
     llm_max_tokens: int = 400
     llm_temperature: float = 0.0
     max_tokens_per_conversation: int = 50_000

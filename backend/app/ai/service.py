@@ -108,6 +108,7 @@ async def stream_chat(
     ctx: ToolContext,
     user_question: str,
     max_tokens: int | None = None,
+    has_image: bool = False,
 ) -> AsyncIterator[dict]:
     """Yield SSE event dicts: {event, data}.
 
@@ -115,12 +116,22 @@ async def stream_chat(
     we accumulate grounded items (for price validation) and grounded chunks
     (for citation soft-check) before emitting any token.
 
+    A cheap router classifies the turn first (see ai/router.py): simple turns
+    run on the cheap model, while project-planning / multimodal / complex turns
+    escalate to the heavy model. Guardrails apply identically either way.
+
     Events: start | delta | validated | done | error
     """
-    from app.ai import tools  # local import avoids module-load cycle
+    from app.ai import router  # local import avoids module-load cycle
+    from app.ai import tools
 
     client = _get_async_client()
     executors = _build_executors()
+
+    # Route once per turn; the chosen model drives every round of the tool loop.
+    route_label, route_model = await router.classify_turn(
+        client, user_question, has_image=has_image
+    )
 
     preamble = build_memory_preamble(ctx.preferences)
     effective_question = preamble + user_question if preamble else user_question
@@ -128,7 +139,7 @@ async def stream_chat(
     messages = list(prior_messages)
     messages.append({"role": "user", "content": effective_question})
 
-    yield {"event": "start", "data": {}}
+    yield {"event": "start", "data": {"model": route_model, "route": route_label}}
 
     grounded_items: list[dict] = []
     grounded_chunks: list = []
@@ -140,7 +151,7 @@ async def stream_chat(
     try:
         for _ in range(_MAX_TOOL_ROUNDS):
             resp = await client.messages.create(
-                model=models.MODEL,
+                model=route_model,
                 max_tokens=max_tokens or models.MAX_TOKENS,
                 temperature=models.TEMPERATURE,
                 system=SYSTEM_PROMPT_RETAIL,
@@ -244,5 +255,7 @@ async def stream_chat(
             "grounded_item_ids": [it.get("slug") or it.get("id") for it in grounded_unique],
             "grounded_doc_ids": [c.chunk_id for c in grounded_chunks],
             "cart_dirty": cart_dirty,
+            "model": route_model,
+            "route": route_label,
         },
     }
