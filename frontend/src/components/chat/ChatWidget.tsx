@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { streamChat } from "../../lib/api/chatStream";
 import { mediaApi } from "../../lib/api/endpoints";
@@ -11,14 +12,19 @@ const QUICK = ["Where are cordless drills?", "What's your return policy?", "Do y
 
 export function ChatWidget() {
   const { chatOpen, setChatOpen, sessionId, setShortlistedItemIds } = useUiStore();
+  const shortlistedItemIds = useUiStore((s) => s.shortlistedItemIds);
+  const setShowOnlyShortlist = useUiStore((s) => s.setShowOnlyShortlist);
+  const navigate = useNavigate();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [recording, setRecording] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
+  const [imgBusy, setImgBusy] = useState(false);
   const [voiceErr, setVoiceErr] = useState<string | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const fileRef = useRef<HTMLInputElement>(null);
   const convId = useRef<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -105,6 +111,56 @@ export function ChatWidget() {
     setRecording(false);
   }
 
+  async function handleImage(file: File) {
+    setVoiceErr(null);
+    if (!file.type.startsWith("image/")) {
+      setVoiceErr("Please choose an image file.");
+      return;
+    }
+    setImgBusy(true);
+    setMessages((m) => [
+      ...m,
+      { role: "user", content: `📷 Sent a photo (${file.name})` },
+      { role: "assistant", content: "", pending: true },
+    ]);
+    scrollDown();
+    try {
+      const { query, results, note } = await mediaApi.findByImage(file);
+      const text =
+        results.length > 0
+          ? `I think that's a **${query}**. Here's what we carry:\n\n${results
+              .slice(0, 8)
+              .map((r) => `- ${r.name} — $${(r.price_cents / 100).toFixed(2)}`)
+              .join("\n")}`
+          : note || "I couldn't identify that item from the photo. Try a clearer, closer shot.";
+      setMessages((m) => {
+        const copy = [...m];
+        copy[copy.length - 1] = { role: "assistant", content: text, pending: false };
+        return copy;
+      });
+      if (results.length) setShortlistedItemIds(results.map((r) => r.slug));
+    } catch (e) {
+      const msg =
+        e instanceof ApiError && e.code === "invalid_image"
+          ? "That image couldn't be read."
+          : "Sorry, image search failed. Please try again.";
+      setMessages((m) => {
+        const copy = [...m];
+        copy[copy.length - 1] = { role: "assistant", content: msg, pending: false };
+        return copy;
+      });
+    } finally {
+      setImgBusy(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  }
+
+  function showShortlistOnSite() {
+    setShowOnlyShortlist(true);
+    setChatOpen(false);
+    navigate("/");
+  }
+
   if (!chatOpen) {
     return (
       <button
@@ -155,6 +211,15 @@ export function ChatWidget() {
         ))}
       </div>
 
+      {shortlistedItemIds.length > 0 && (
+        <button
+          type="button"
+          onClick={showShortlistOnSite}
+          className="border-t bg-brand-50 px-3 py-2 text-sm font-medium text-brand-700 hover:bg-brand-100"
+        >
+          🛍️ Show these {shortlistedItemIds.length} item{shortlistedItemIds.length > 1 ? "s" : ""} on the storefront →
+        </button>
+      )}
       {voiceErr && (
         <div className="border-t bg-amber-50 px-3 py-1.5 text-xs text-amber-700">{voiceErr}</div>
       )}
@@ -165,10 +230,27 @@ export function ChatWidget() {
           send(input);
         }}
       >
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => e.target.files?.[0] && handleImage(e.target.files[0])}
+        />
+        <button
+          type="button"
+          onClick={() => fileRef.current?.click()}
+          disabled={busy || imgBusy || recording}
+          aria-label="Attach a photo to find an item"
+          title="Find an item by photo"
+          className="rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-700 hover:bg-gray-200 disabled:opacity-50"
+        >
+          {imgBusy ? "…" : "🖼️"}
+        </button>
         <button
           type="button"
           onClick={recording ? stopRecording : startRecording}
-          disabled={busy || transcribing}
+          disabled={busy || transcribing || imgBusy}
           aria-label={recording ? "Stop recording" : "Record a voice message"}
           title={recording ? "Stop recording" : "Speak your question"}
           className={`rounded-lg px-3 py-2 text-sm ${

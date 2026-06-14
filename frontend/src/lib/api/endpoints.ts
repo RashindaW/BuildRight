@@ -8,6 +8,14 @@ export const mediaApi = {
     form.append("file", audio, filename);
     return postForm<{ text: string }>("/media/transcribe", form);
   },
+  findByImage: (image: File) => {
+    const form = new FormData();
+    form.append("file", image, image.name || "photo.jpg");
+    return postForm<{ query: string; results: MenuItem[]; note?: string }>(
+      "/media/find-by-image",
+      form,
+    );
+  },
 };
 
 // ---- Auth ----

@@ -10,16 +10,19 @@ type SortKey = "relevance" | "price-asc" | "price-desc" | "name";
 export default function Home() {
   const [q, setQ] = useState("");
   const [category, setCategory] = useState("");
-  const [dietary, setDietary] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortKey>("relevance");
 
   const shortlistedItemIds = useUiStore((s) => s.shortlistedItemIds);
   const clearShortlist = useUiStore((s) => s.clearShortlist);
+  const showOnlyShortlist = useUiStore((s) => s.showOnlyShortlist);
+  const setShowOnlyShortlist = useUiStore((s) => s.setShowOnlyShortlist);
+  const onlyShortlist = showOnlyShortlist && shortlistedItemIds.length > 0;
 
   const categories = useQuery({ queryKey: ["categories"], queryFn: menuApi.categories });
   const menu = useQuery({
-    queryKey: ["menu", q, category, dietary],
-    queryFn: () => menuApi.list({ q, category, dietary }),
+    queryKey: ["menu", q, category],
+    queryFn: () => menuApi.list({ q, category }),
+    enabled: !onlyShortlist, // skip the full catalog when focused on the shortlist
   });
   const shortlist = useQuery({
     queryKey: ["shortlist", shortlistedItemIds],
@@ -34,9 +37,6 @@ export default function Home() {
     else if (sortBy === "name") items.sort((a, b) => a.name.localeCompare(b.name));
     return items; // "relevance" keeps the assistant's order
   }, [shortlist.data, sortBy]);
-
-  const toggleDietary = (d: string) =>
-    setDietary((cur) => (cur.includes(d) ? cur.filter((x) => x !== d) : [...cur, d]));
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
@@ -66,6 +66,14 @@ export default function Home() {
                   <option value="name">Name</option>
                 </select>
               </label>
+              {onlyShortlist && (
+                <button
+                  className="text-brand-600 hover:text-brand-800"
+                  onClick={() => setShowOnlyShortlist(false)}
+                >
+                  Show all products
+                </button>
+              )}
               <button className="text-gray-500 hover:text-gray-800" onClick={clearShortlist}>
                 Clear
               </button>
@@ -83,30 +91,32 @@ export default function Home() {
         </section>
       )}
 
-      <FilterBar
-        categories={categories.data ?? []}
-        q={q}
-        category={category}
-        dietary={dietary}
-        onQ={setQ}
-        onCategory={setCategory}
-        onToggleDietary={toggleDietary}
-      />
+      {!onlyShortlist && (
+        <>
+          <FilterBar
+            categories={categories.data ?? []}
+            q={q}
+            category={category}
+            onQ={setQ}
+            onCategory={setCategory}
+          />
 
-      {menu.isLoading ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="card h-72 animate-pulse bg-gray-100" />
-          ))}
-        </div>
-      ) : menu.data && menu.data.items.length > 0 ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {menu.data.items.map((item) => (
-            <MenuCard key={item.id} item={item} />
-          ))}
-        </div>
-      ) : (
-        <p className="py-12 text-center text-gray-500">No items match your filters.</p>
+          {menu.isLoading ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="card h-72 animate-pulse bg-gray-100" />
+              ))}
+            </div>
+          ) : menu.data && menu.data.items.length > 0 ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {menu.data.items.map((item) => (
+                <MenuCard key={item.id} item={item} />
+              ))}
+            </div>
+          ) : (
+            <p className="py-12 text-center text-gray-500">No items match your filters.</p>
+          )}
+        </>
       )}
     </div>
   );

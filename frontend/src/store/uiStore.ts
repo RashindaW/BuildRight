@@ -6,10 +6,13 @@ interface UiState {
   sessionId: string;
   /** Product slugs the chat assistant grounded its last answer on (shown on the storefront). */
   shortlistedItemIds: string[];
+  /** When true, the storefront shows ONLY the shortlisted items (set from the chat). */
+  showOnlyShortlist: boolean;
   setCartOpen: (v: boolean) => void;
   setChatOpen: (v: boolean) => void;
   setShortlistedItemIds: (ids: string[]) => void;
   clearShortlist: () => void;
+  setShowOnlyShortlist: (v: boolean) => void;
 }
 
 function getSessionId(): string {
@@ -27,8 +30,10 @@ export const useUiStore = create<UiState>((set) => ({
   chatOpen: false,
   sessionId: getSessionId(),
   shortlistedItemIds: [],
+  showOnlyShortlist: false,
   setCartOpen: (v) => set({ cartOpen: v }),
   setChatOpen: (v) => set({ chatOpen: v }),
   setShortlistedItemIds: (ids) => set({ shortlistedItemIds: ids }),
-  clearShortlist: () => set({ shortlistedItemIds: [] }),
+  clearShortlist: () => set({ shortlistedItemIds: [], showOnlyShortlist: false }),
+  setShowOnlyShortlist: (v) => set({ showOnlyShortlist: v }),
 }));
