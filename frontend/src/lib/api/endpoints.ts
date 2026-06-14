@@ -31,6 +31,7 @@ export const menuApi = {
   },
   get: (slug: string) => api<MenuItem>(`/menu/${slug}`),
   categories: () => api<Category[]>("/menu/categories"),
+  byIds: (ids: string[]) => api<MenuItem[]>("/menu/by-ids", { method: "POST", body: { ids } }),
 };
 
 // ---- Cart ----

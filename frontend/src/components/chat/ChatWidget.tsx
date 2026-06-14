@@ -8,7 +8,7 @@ import type { ChatMessage } from "../../types";
 const QUICK = ["Where are cordless drills?", "What's your return policy?", "Do you price match?"];
 
 export function ChatWidget() {
-  const { chatOpen, setChatOpen, sessionId } = useUiStore();
+  const { chatOpen, setChatOpen, sessionId, setShortlistedItemIds } = useUiStore();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -38,8 +38,10 @@ export function ChatWidget() {
         if (ev.event === "meta") convId.current = (ev.data.conversation_id as string) ?? convId.current;
         else if (ev.event === "delta") setLast((c) => c + (ev.data.text as string));
         else if (ev.event === "validated" && ev.data.replace) setLast(() => ev.data.text as string);
-        else if (ev.event === "done" && ev.data.cart_dirty) {
-          queryClient.invalidateQueries({ queryKey: ["cart"] });
+        else if (ev.event === "done") {
+          if (ev.data.cart_dirty) queryClient.invalidateQueries({ queryKey: ["cart"] });
+          const ids = (ev.data.grounded_item_ids as string[] | undefined) ?? [];
+          if (ids.length) setShortlistedItemIds(ids); // surface them on the storefront
         } else if (ev.event === "error") setLast((c) => c || (ev.data.message as string));
         scrollDown();
       });

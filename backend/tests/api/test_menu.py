@@ -45,6 +45,18 @@ def test_get_unknown_item_404(client):
     assert client.get("/api/v1/menu/does-not-exist").status_code == 404
 
 
+def test_by_ids_preserves_order_and_dedups(client, menu_items):
+    a, b = menu_items[0]["slug"], menu_items[1]["slug"]
+    r = client.post("/api/v1/menu/by-ids", json={"ids": [b, a, b, "nope"]})
+    assert r.status_code == 200
+    slugs = [i["slug"] for i in r.json()]
+    assert slugs == [b, a]  # requested order, deduped, unknown dropped
+
+
+def test_by_ids_empty(client):
+    assert client.post("/api/v1/menu/by-ids", json={"ids": []}).json() == []
+
+
 def test_categories_listed(client, seeded_item):
     r = client.get("/api/v1/menu/categories")
     assert r.status_code == 200

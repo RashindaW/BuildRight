@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Query
+from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
@@ -60,6 +61,33 @@ def list_menu(
         items=[MenuItemOut.from_model(i) for i in page_items],
         total=total, page=page, page_size=page_size,
     )
+
+
+class ItemsByIds(BaseModel):
+    ids: list[str] = Field(default_factory=list)
+
+
+@router.post("/by-ids", response_model=list[MenuItemOut])
+def items_by_ids(body: ItemsByIds, db: Session = Depends(get_db)):
+    """Hydrate a list of product slugs/ids (e.g. the chat's grounded_item_ids) into full
+    items, preserving the requested order. Used to render chat-shortlisted products."""
+    ids = [i for i in body.ids if i][:100]
+    if not ids:
+        return []
+    items = db.execute(
+        _base_query().where((MenuItem.slug.in_(ids)) | (MenuItem.id.in_(ids)))
+    ).scalars().unique().all()
+    by_key: dict[str, MenuItem] = {}
+    for it in items:
+        by_key.setdefault(it.slug, it)
+        by_key.setdefault(it.id, it)
+    out, seen = [], set()
+    for k in ids:
+        it = by_key.get(k)
+        if it and it.id not in seen:
+            seen.add(it.id)
+            out.append(MenuItemOut.from_model(it))
+    return out
 
 
 @router.get("/categories", response_model=list[CategoryOut])
