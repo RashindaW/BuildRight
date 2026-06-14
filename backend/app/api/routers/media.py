@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.ai import vision
+from app.ai import vision, voice
 from app.core.db import get_db
 from app.core.deps import require_staff
 from app.core.errors import AppError
@@ -75,6 +75,26 @@ async def find_by_image(file: UploadFile = File(...), db: Session = Depends(get_
     by_slug = {r.slug: r for r in rows}
     results = [MenuItemOut.from_model(by_slug[s]) for s in slugs if s in by_slug]
     return {"query": query, "results": results}
+
+
+# ---- Voice → text (voice messages / voice ordering) -----------------------
+
+@router.post("/transcribe")
+async def transcribe(file: UploadFile = File(...)):
+    """Transcribe a voice message to text (feeds the normal chat/reorder flow).
+
+    Returns 503 when no STT provider is configured (honest, not a fake transcript).
+    """
+    data = await file.read()
+    try:
+        mt = voice.validate_audio(data, file.content_type)
+    except voice.VoiceError as e:
+        raise AppError(str(e), "invalid_audio", 422)
+    try:
+        text = voice.transcribe(data, mt, filename=file.filename or "audio.webm")
+    except voice.STTNotConfigured as e:
+        raise AppError(str(e), "stt_not_configured", 503)
+    return {"text": text}
 
 
 # ---- Handwritten stock intake (staff) -------------------------------------

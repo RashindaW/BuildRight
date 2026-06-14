@@ -61,6 +61,9 @@ class Settings(BaseSettings):
     image_provider: Literal["placeholder", "unsplash", "pexels"] = "placeholder"
     unsplash_access_key: SecretStr | None = None
     pexels_api_key: SecretStr | None = None
+    # Voice: optional speech-to-text provider for /media/transcribe
+    stt_provider: Literal["", "openai"] = ""
+    stt_api_key: SecretStr | None = None
     llm_temperature: float = 0.0
     max_tokens_per_conversation: int = 50_000
     max_messages_per_conversation: int = 100
