@@ -27,11 +27,20 @@ def test_generation_is_deterministic():
     assert [p["sku"] for p in a] == [p["sku"] for p in b]
 
 
-def test_image_url_is_deterministic_per_slug():
-    u1 = image_url_for("paint", "Interior Paint", "interior-paint")
-    u2 = image_url_for("paint", "Interior Paint", "interior-paint")
+def test_image_url_placeholder_for_unknown_type():
+    # An unknown type → deterministic per-slug placeholder containing the slug.
+    u1 = image_url_for("paint", "Totally Unknown Type Xyz", "some-slug")
+    u2 = image_url_for("paint", "Totally Unknown Type Xyz", "some-slug")
     assert u1 == u2
-    assert "interior-paint" in u1
+    assert "some-slug" in u1
+
+
+def test_image_url_uses_committed_type_image_when_present():
+    from app.seed.image_provider import load_type_images
+    if not load_type_images():
+        return  # type_images.json not built in this env — nothing to assert
+    u = image_url_for("paint", "Interior Paint", "interior-paint")
+    assert u.startswith("http")  # a committed licensed photo, not the slug placeholder
 
 
 def test_image_query_for_known_category():

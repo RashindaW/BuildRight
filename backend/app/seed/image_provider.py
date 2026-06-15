@@ -15,7 +15,29 @@ clean, category-aware search phrase the licensed fetch uses.
 
 from __future__ import annotations
 
+import json
+import re
+from functools import lru_cache
+from pathlib import Path
+
 from app.core.config import settings
+
+# Per-TYPE images (e.g. all "Cordless Drill" variants share a real drill photo).
+# Built once locally from Pexels (product_type_images.py) and COMMITTED, so the
+# storefront gets title-matching images at seed time with zero API calls.
+_TYPE_IMAGES_PATH = Path(__file__).with_name("type_images.json")
+
+
+def type_slug(name: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")[:90]
+
+
+@lru_cache(maxsize=1)
+def load_type_images() -> dict[str, list[str]]:
+    try:
+        return json.loads(_TYPE_IMAGES_PATH.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001 - missing/invalid file → fall back to placeholders
+        return {}
 
 # Category slug → a concrete, photographable search phrase for the licensed API.
 _CATEGORY_IMAGE_QUERY = {
@@ -52,12 +74,16 @@ def _placeholder_url(slug: str) -> str:
     return f"https://picsum.photos/seed/{slug}/600/400"
 
 
-def image_url_for(category: str, name: str, slug: str) -> str:
-    """Return an image URL to store on the product at generation time.
+def image_url_for(category: str, type_name: str, slug: str) -> str:
+    """Image URL stored on a product at generation time.
 
-    Always deterministic and offline — real licensed photos (when a key is set)
-    are layered in later by backfill_images(), not here.
+    Prefers a committed per-TYPE licensed photo (title-matching, offline, no key);
+    falls back to a deterministic per-product placeholder. `type_name` is the
+    catalog product TYPE (e.g. "Cordless Drill/Driver"), not the variant name.
     """
+    pool = load_type_images().get(type_slug(type_name))
+    if pool:
+        return pool[_stable_index(slug, len(pool))]
     return _placeholder_url(slug)
 
 

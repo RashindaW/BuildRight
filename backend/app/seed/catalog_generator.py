@@ -393,7 +393,7 @@ def generate_products(seed: int = 1337, target: int | None = None) -> list[dict]
                             "dietary_tags": sorted(set(tags)),
                             "allergens": sorted(set(ptype["flags"])),
                             "featured": rng.random() < 0.03,
-                            "image_url": image_url_for(cat["slug"], name, slug),
+                            "image_url": image_url_for(cat["slug"], ptype["name"], slug),
                         })
 
     if target is not None and len(products) > target:
