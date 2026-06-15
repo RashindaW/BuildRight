@@ -48,9 +48,12 @@ export default function Home() {
         </div>
         <div className="p-6 sm:p-8">
           <h1 className="text-2xl font-bold sm:text-3xl">🤖 BuildRight AI</h1>
-          <p className="mt-1 max-w-xl text-sm opacity-90 sm:text-base">
-            Quality tools, honest answers. Ask our guardrailed AI assistant about any product or store policy —
-            it never invents items or prices.
+          <p className="mt-1 text-base font-medium text-white sm:text-lg">
+            The smart hardware store — ask, plan, and build with an AI that never guesses.
+          </p>
+          <p className="mt-1 max-w-xl text-sm opacity-80 sm:text-base">
+            Search the catalog, get project plans and honest recommendations, and check store policies —
+            grounded in real data, never invented items or prices.
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             {["Hybrid RAG", "Guardrailed", "Multi-agent router", "Multimodal"].map((c) => (

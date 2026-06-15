@@ -201,7 +201,7 @@ export function ChatWidget() {
   return (
     <div className="fixed bottom-6 right-6 z-40 flex h-[32rem] w-96 max-w-[calc(100vw-2rem)] flex-col card">
       <div className="flex items-center justify-between border-b bg-brand-600 px-4 py-3 text-white rounded-t-xl">
-        <span className="font-semibold">Store Assistant</span>
+        <span className="font-semibold">🤖 BuildRight AI assistant</span>
         <div className="flex items-center gap-2">
           {user && memCount > 0 && (
             <button
