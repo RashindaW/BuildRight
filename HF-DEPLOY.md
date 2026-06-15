@@ -1,7 +1,7 @@
 # Deploy BuildRight to Hugging Face Spaces (free)
 
 The whole app runs as **one free Docker Space** — FastAPI serves the built React SPA
-single-origin, with the catalog baked into the image at build time. All tooling is free;
+single-origin, with the catalog seeded into a fresh DB at container startup. All tooling is free;
 only Anthropic is paid (your key).
 
 ## 1. Create the Space
@@ -29,11 +29,20 @@ Add these as **runtime secrets** (never commit them):
 |---|---|---|
 | `ANTHROPIC_API_KEY` | `sk-ant-...` | required — chat / vision / router |
 | `SECRET_KEY` | a 32+ char random string | required (prod validator enforces strength) |
+| `ADMIN_EMAIL` | `admin@buildright.com` | **strongly recommended** — the seeded admin login |
+| `ADMIN_PASSWORD` | a strong random string | **strongly recommended** — otherwise admin defaults to `changeme` (guessable) |
 | `STT_PROVIDER` | `groq` | enables voice |
 | `STT_API_KEY` | `gsk_...` | free Groq Whisper key |
 | `UNSPLASH_ACCESS_KEY` | your Unsplash key | optional — real product photos |
 | `IMAGE_PROVIDER` | `unsplash` | only if you set the Unsplash key |
 | `STRIPE_SECRET_KEY` / `STRIPE_PUBLISHABLE_KEY` | `sk_test_...` / `pk_test_...` | optional — test-mode payments + refunds |
+
+> **Security — set `ADMIN_PASSWORD`.** Without it the build-time seed creates
+> `admin@cutdry.example.com` / `changeme` (a guessable default reachable on the public URL).
+> Set a strong `ADMIN_PASSWORD` (and `ADMIN_EMAIL`) as secrets, then redeploy. Generate one with
+> `python -c "import secrets,string; a=string.ascii_letters+string.digits; print('Br'+''.join(secrets.choice(a) for _ in range(18))+'!9')"`.
+> Keep the admin login **private** (share with reviewers on request) — the public About page only
+> lists the lower-privilege shopper/manager/staff demo logins.
 
 `ENVIRONMENT=production` and port 8000 are already baked into the image; CORS is same-origin.
 
@@ -43,12 +52,13 @@ storefront with images, the chat assistant (router live), the 🎤 voice mic, im
 and `/manager` → **AI Operations**.
 
 ## Notes
-- **Persistence:** the free filesystem is **ephemeral** — the baked catalog is always present,
+- **Persistence:** the free filesystem is **ephemeral** — the catalog is re-seeded at each startup,
   but new orders/chat reset when the Space restarts/sleeps. That's fine for a demo. For
   persistence (still free): create a **Neon** or **Supabase** Postgres (with `pgvector`) and add
   `DATABASE_URL=postgresql+psycopg://...` as a secret (then run `alembic upgrade head` + seed once).
-- **Catalog size:** the image bakes ~3,000 products for fast cold starts. For the full 10k,
-  rebuild with `--build-arg CATALOG_TARGET=10000` (or set it in the Space's Dockerfile ARG).
+- **Catalog size:** defaults to ~3,000 products (`CATALOG_TARGET` env, baked into the image as 3000).
+  For the full 10k, add a Space secret/variable `CATALOG_TARGET=10000` and restart — no rebuild needed.
+  (Larger = slower cold start, since seeding runs at startup.)
 - **Real images on HF:** after deploy, with `UNSPLASH_ACCESS_KEY` set, the picsum placeholders can
   be swapped for licensed photos by running `python -m app.seed.backfill_images` once.
 - **Embeddings:** the image uses the deterministic `hash` provider so build + query stay
@@ -78,7 +88,7 @@ export HF_TOKEN=hf_xxx          # write token (push only)
 `./scripts/hf.sh pull` (or `git pull space main`) to bring it local **before** your next push,
 so the mirror doesn't clobber it.
 
-**What a redeploy resets:** each deploy rebuilds the image, which **re-seeds the baked catalog** —
+**What a redeploy resets:** each deploy/restart **re-seeds a fresh catalog at startup** —
 so runtime data (orders/chat placed on the live site) resets on redeploy. Code/UI/prompt changes
 persist (they're in the image). For data that survives redeploys, use the free Neon/Supabase
 `DATABASE_URL` (see Notes above) — then the DB lives outside the container.

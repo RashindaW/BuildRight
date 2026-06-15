@@ -18,8 +18,12 @@ RUN npm run build          # → /fe/dist
 
 # ---- Stage 2: Python runtime ----------------------------------------------
 FROM python:3.11-slim AS runtime
+# EMBEDDING_PROVIDER=hash → no model download. CATALOG_TARGET sizes the catalog.
+# ENVIRONMENT=production → secure cookies + secret-key validation on the live HTTPS Space.
 ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 \
-    EMBEDDING_PROVIDER=hash
+    EMBEDDING_PROVIDER=hash \
+    CATALOG_TARGET=3000 \
+    ENVIRONMENT=production
 
 WORKDIR /app/backend
 
@@ -33,19 +37,10 @@ COPY backend/ /app/backend/
 COPY menu_data.py /app/menu_data.py
 COPY --from=frontend /fe/dist /app/frontend/dist
 
-# Bake the catalog into the image. Dummy keys satisfy required config fields; the
-# seed makes NO external calls and uses hash embeddings, so this is fully offline.
-# Override catalog size with --build-arg CATALOG_TARGET=10000 (larger image/build).
-ARG CATALOG_TARGET=3000
-RUN ANTHROPIC_API_KEY=build-time-dummy \
-    SECRET_KEY=build-time-seed-key-0123456789-abcdefghij \
-    ENVIRONMENT=development \
-    CATALOG_TARGET=${CATALOG_TARGET} \
-    python -m app.seed
-
 # Hugging Face routes to this port (see app_port in the Space README).
-ENV ENVIRONMENT=production
 EXPOSE 8000
 
-# DB is already baked — just serve. Runtime secrets come from the Space settings.
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Seed at STARTUP so runtime Space secrets take effect (ADMIN_PASSWORD, CATALOG_TARGET,
+# IMAGE_PROVIDER, …). The heavy build steps (npm/pip) are already done in the image, and
+# the seed is offline (hash embeddings) + idempotent. Then serve the SPA + API.
+CMD ["sh", "-c", "python -m app.seed && uvicorn app.main:app --host 0.0.0.0 --port 8000"]
