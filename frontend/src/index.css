@@ -10,13 +10,21 @@ body {
   @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition;
 }
 .btn-primary {
-  @apply btn bg-brand-600 text-white hover:bg-brand-700 disabled:opacity-50;
+  @apply btn bg-brand-600 text-white shadow-sm hover:bg-brand-700 hover:shadow disabled:opacity-50;
 }
 .btn-ghost {
   @apply btn border border-gray-300 bg-white hover:bg-gray-100;
 }
 .card {
   @apply rounded-xl border border-gray-200 bg-white shadow-sm;
+}
+/* Interactive product/feature cards: subtle lift on hover. */
+.card-hover {
+  @apply transition duration-200 hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-md;
+}
+/* Small pill/badge token reused across cards, navbar, hero. */
+.badge {
+  @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium;
 }
 .markdown p {
   @apply mb-2;

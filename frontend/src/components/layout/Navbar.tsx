@@ -1,7 +1,10 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthProvider";
 import { useCart } from "../../hooks/useCart";
 import { useUiStore } from "../../store/uiStore";
+
+const linkClass = ({ isActive }: { isActive: boolean }) =>
+  `text-sm ${isActive ? "font-medium text-brand-700" : "text-gray-600 hover:text-gray-900"}`;
 
 export function Navbar() {
   const { user, logout } = useAuth();
@@ -12,29 +15,33 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-30 border-b bg-white/90 backdrop-blur">
       <nav className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
-        <Link to="/" className="text-xl font-bold text-brand-600">
-          BuildRight Hardware
+        <Link to="/" className="flex items-center gap-2 text-xl font-bold text-brand-700">
+          🔧 BuildRight
+          <span className="badge bg-amber-100 font-normal text-amber-700">Sandbox</span>
         </Link>
-        <Link to="/" className="text-sm text-gray-600 hover:text-gray-900">
+        <NavLink to="/" end className={linkClass}>
           Products
-        </Link>
-        <Link to="/about" className="text-sm text-gray-600 hover:text-gray-900">
+        </NavLink>
+        <NavLink to="/about" className={linkClass}>
           About
-        </Link>
+        </NavLink>
+        <NavLink to="/how-to-test" className={linkClass}>
+          How to test
+        </NavLink>
         {user && (
-          <Link to="/orders" className="text-sm text-gray-600 hover:text-gray-900">
+          <NavLink to="/orders" className={linkClass}>
             My Orders
-          </Link>
+          </NavLink>
         )}
         {(user?.role === "manager" || user?.role === "admin") && (
-          <Link to="/manager" className="text-sm text-gray-600 hover:text-gray-900">
+          <NavLink to="/manager" className={linkClass}>
             Dashboard
-          </Link>
+          </NavLink>
         )}
         {user?.role === "admin" && (
-          <Link to="/admin" className="text-sm text-gray-600 hover:text-gray-900">
+          <NavLink to="/admin" className={linkClass}>
             Admin
-          </Link>
+          </NavLink>
         )}
 
         <div className="ml-auto flex items-center gap-3">

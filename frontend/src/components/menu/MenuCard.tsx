@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
 import type { MenuItem } from "../../types";
 import { formatPrice, imageSrc } from "../../lib/format";
-import { DietaryBadge } from "./DietaryBadge";
 import { useCartMutations } from "../../hooks/useCart";
 import { useToast } from "../../context/ToastProvider";
+
+const PLACEHOLDER = "/img/_placeholder.svg";
 
 export function MenuCard({ item }: { item: MenuItem }) {
   const { add } = useCartMutations();
@@ -11,6 +12,8 @@ export function MenuCard({ item }: { item: MenuItem }) {
   const hasOptions = item.option_groups.length > 0;
   const outOfStock = !item.is_available || item.stock_qty <= 0;
   const lowStock = !outOfStock && item.stock_qty <= 15;
+  const onSale = item.dietary_tags.includes("sale");
+  const isNew = item.dietary_tags.includes("new-arrival");
 
   const onAdd = () => {
     add.mutate(
@@ -23,48 +26,48 @@ export function MenuCard({ item }: { item: MenuItem }) {
   };
 
   return (
-    <div className="card flex flex-col overflow-hidden">
-      <Link to={`/item/${item.slug}`}>
+    <div className="card card-hover group flex flex-col overflow-hidden">
+      <Link to={`/item/${item.slug}`} className="relative block overflow-hidden bg-gray-100">
         <img
           src={imageSrc(item.image_url)}
           alt={item.name}
-          className="h-40 w-full object-cover"
+          className="aspect-[4/3] w-full object-cover transition-transform duration-300 group-hover:scale-105"
           loading="lazy"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = PLACEHOLDER;
+          }}
         />
+        {(onSale || isNew) && (
+          <div className="absolute left-2 top-2 flex gap-1">
+            {onSale && <span className="badge bg-brand-600 text-white shadow">Sale</span>}
+            {isNew && <span className="badge bg-emerald-600 text-white shadow">New</span>}
+          </div>
+        )}
+        {outOfStock && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white/60">
+            <span className="badge bg-gray-700 text-white">Out of stock</span>
+          </div>
+        )}
       </Link>
       <div className="flex flex-1 flex-col p-4">
         <div className="flex items-start justify-between gap-2">
-          <Link to={`/item/${item.slug}`} className="font-semibold hover:text-brand-600">
+          <Link to={`/item/${item.slug}`} className="font-semibold leading-snug hover:text-brand-600">
             {item.name}
           </Link>
           <span className="whitespace-nowrap font-semibold text-brand-700">
             {formatPrice(item.price_cents)}
           </span>
         </div>
-        {item.sku && (
-          <div className="mt-1 flex items-center gap-2">
-            <span className="font-mono text-xs text-gray-400">SKU {item.sku}</span>
-            {outOfStock ? (
-              <span className="rounded bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-500">
-                Out of stock
-              </span>
-            ) : lowStock ? (
-              <span className="rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-700">
-                Only {item.stock_qty} left
-              </span>
-            ) : (
-              <span className="rounded bg-green-100 px-1.5 py-0.5 text-xs font-medium text-green-700">
-                In stock
-              </span>
-            )}
-          </div>
-        )}
-        <p className="mt-1 line-clamp-2 text-sm text-gray-600">{item.description}</p>
-        <div className="mt-2 flex flex-wrap gap-1">
-          {item.dietary_tags.map((t) => (
-            <DietaryBadge key={t} tag={t} />
-          ))}
+        <div className="mt-1 flex items-center gap-2">
+          {item.sku && <span className="font-mono text-xs text-gray-400">SKU {item.sku}</span>}
+          {!outOfStock && lowStock ? (
+            <span className="badge bg-amber-100 text-amber-700">Only {item.stock_qty} left</span>
+          ) : !outOfStock ? (
+            <span className="badge bg-green-100 text-green-700">In stock</span>
+          ) : null}
         </div>
+        <p className="mt-1 line-clamp-2 text-sm text-gray-600">{item.description}</p>
         <div className="mt-auto pt-3">
           {hasOptions ? (
             <Link to={`/item/${item.slug}`} className="btn-ghost w-full">

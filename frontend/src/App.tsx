@@ -5,6 +5,7 @@ import { ChatWidget } from "./components/chat/ChatWidget";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import Home from "./pages/Home";
 import About from "./pages/About";
+import HowToTest from "./pages/HowToTest";
 import ItemDetail from "./pages/ItemDetail";
 import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
@@ -23,6 +24,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
+          <Route path="/how-to-test" element={<HowToTest />} />
           <Route path="/item/:slug" element={<ItemDetail />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

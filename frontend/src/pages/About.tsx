@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const ARCHITECTURE = String.raw`
 ┌──────────────────────────────────────────────────────────────────────┐
 │  React SPA  (Vite · TypeScript · Tailwind · TanStack Query · Zustand) │
@@ -90,13 +92,20 @@ const LOGINS = [
 export default function About() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
-      <div className="mb-6 rounded-2xl bg-gradient-to-r from-brand-500 to-brand-700 p-6 text-white sm:p-8">
+      <div className="mb-6 rounded-2xl bg-gradient-to-br from-brand-600 to-brand-800 p-6 text-white sm:p-8">
         <h1 className="text-2xl font-bold sm:text-3xl">About BuildRight Hardware</h1>
         <p className="mt-1 max-w-2xl text-sm opacity-90 sm:text-base">
           A production-leaning, full-stack hardware store built around a guardrailed, multi-agent AI
           assistant — hybrid RAG, conversational project planning, multimodal (vision · voice · OCR),
           recommendations, payments, RBAC dashboards, and AI cost/quality observability.
         </p>
+      </div>
+
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3">
+        <span className="text-sm text-brand-800">
+          New here? Follow the guided 5-minute tour with copy-ready prompts.
+        </span>
+        <Link to="/how-to-test" className="btn-primary">How to test →</Link>
       </div>
 
       <section className="mb-8">

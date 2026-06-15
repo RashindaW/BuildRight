@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { menuApi } from "../lib/api/endpoints";
 import { FilterBar } from "../components/menu/FilterBar";
@@ -14,6 +15,7 @@ export default function Home() {
 
   const shortlistedItemIds = useUiStore((s) => s.shortlistedItemIds);
   const clearShortlist = useUiStore((s) => s.clearShortlist);
+  const setChatOpen = useUiStore((s) => s.setChatOpen);
   const showOnlyShortlist = useUiStore((s) => s.showOnlyShortlist);
   const setShowOnlyShortlist = useUiStore((s) => s.setShowOnlyShortlist);
   const onlyShortlist = showOnlyShortlist && shortlistedItemIds.length > 0;
@@ -40,9 +42,36 @@ export default function Home() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <div className="mb-6 rounded-2xl bg-gradient-to-r from-brand-500 to-brand-700 p-6 text-white sm:p-8">
-        <h1 className="text-2xl font-bold sm:text-3xl">BuildRight Hardware</h1>
-        <p className="mt-1 text-sm opacity-90 sm:text-base">Quality tools, honest answers. Ask our assistant about any product or store policy.</p>
+      <div className="mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-brand-600 via-brand-700 to-brand-800 text-white shadow-sm">
+        <div className="bg-white/10 px-6 py-1.5 text-center text-xs font-medium tracking-wide">
+          🧪 Sandbox demo — test data only · Stripe test mode · re-seeds on deploy
+        </div>
+        <div className="p-6 sm:p-8">
+          <h1 className="text-2xl font-bold sm:text-3xl">BuildRight Hardware</h1>
+          <p className="mt-1 max-w-xl text-sm opacity-90 sm:text-base">
+            Quality tools, honest answers. Ask our guardrailed AI assistant about any product or store policy —
+            it never invents items or prices.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {["Hybrid RAG", "Guardrailed", "Multi-agent router", "Multimodal"].map((c) => (
+              <span key={c} className="badge bg-white/15 text-white">{c}</span>
+            ))}
+          </div>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button
+              onClick={() => setChatOpen(true)}
+              className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-brand-700 shadow-sm hover:bg-brand-50"
+            >
+              💬 Ask the assistant
+            </button>
+            <Link
+              to="/how-to-test"
+              className="rounded-lg border border-white/40 px-4 py-2 text-sm font-medium text-white hover:bg-white/10"
+            >
+              How to test →
+            </Link>
+          </div>
+        </div>
       </div>
 
       {shortlistedItemIds.length > 0 && (
