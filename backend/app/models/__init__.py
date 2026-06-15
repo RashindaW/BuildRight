@@ -16,6 +16,7 @@ from app.models.menu import (
 )
 from app.models.order import Order, OrderItem, OrderItemOption
 from app.models.product_embedding import ProductEmbedding
+from app.models.product_image_embedding import ProductImageEmbedding
 from app.models.user import RefreshToken, User
 from app.models.user_memory import UserPreference
 
@@ -42,5 +43,6 @@ __all__ = [
     "Document",
     "DocumentChunk",
     "ProductEmbedding",
+    "ProductImageEmbedding",
     "ConversationFeedback",
 ]

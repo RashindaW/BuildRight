@@ -143,11 +143,23 @@ def hybrid_search_products(
         except Exception:
             logger.exception("product vector arm failed for query=%r; lexical-only", query)
 
-    if not lexical_ranked and not vector_ranked:
+    # Visual arm (CLIP): rank by what products LOOK like. A no-op — returns [] — when
+    # CLIP/torch is absent or no product images are embedded, so fusion is unchanged.
+    visual_ranked: list[dict] = []
+    if query.strip() and settings.visual_search_enabled:
+        try:
+            from app.ai.embeddings.clip import visual_search_products
+            for slug in visual_search_products(db, query, k=min(k * 2, 24)):
+                if slug in slug_lookup:
+                    visual_ranked.append(slug_lookup[slug])
+        except Exception:
+            logger.exception("product visual arm failed for query=%r; skipping", query)
+
+    if not lexical_ranked and not vector_ranked and not visual_ranked:
         return [sku_hit] if sku_hit else []
 
     fused = reciprocal_rank_fusion(
-        [lexical_ranked, vector_ranked],
+        [lexical_ranked, vector_ranked, visual_ranked],
         key_fn=_item_slug,
     )
     ranked = [item for item, _ in fused[:k]]

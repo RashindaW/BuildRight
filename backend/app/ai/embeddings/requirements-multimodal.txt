@@ -1,0 +1,8 @@
+# OPTIONAL multimodal (CLIP visual arm) deps — NOT in the deployed image.
+# Runs on a torch host; the visual arm is a no-op without these.
+#   pip install -r app/ai/embeddings/requirements-multimodal.txt
+#   python -c "from app.core.db import SessionLocal; from app.ai.embeddings.clip import index_product_images; index_product_images(SessionLocal())"
+open-clip-torch>=2.24,<3.0
+torch>=2.2
+Pillow>=10.0
+httpx>=0.27

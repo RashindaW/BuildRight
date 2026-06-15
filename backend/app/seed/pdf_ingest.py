@@ -40,6 +40,24 @@ def ingest_pdf(db, pdf_path: str | Path, slug: str, title: str,
     return n
 
 
+def ingest_image_manual(db, data: bytes, media_type: str, slug: str, title: str,
+                        source_type: str = "manual") -> int:
+    """OCR a photographed manual/spec page (Claude vision) → upsert as a Document.
+
+    The image counterpart to ingest_pdf: a customer's snapshot of a paper manual
+    becomes vector-searchable KB content. Returns chunk count (0 if OCR yields nothing).
+    """
+    from app.ai.vision import ocr_image_to_text
+    from app.seed.seed_kb import _upsert_document
+    text = ocr_image_to_text(data, media_type)
+    if not text.strip():
+        return 0
+    n = _upsert_document(db, slug, title, source_type, text)
+    db.commit()
+    logger.info("ocr_ingest: %s -> %d chunks", slug, n)
+    return n
+
+
 def make_sample_spec_pdf(path: str | Path = _SAMPLE) -> Path:
     """Render a sample product spec-sheet PDF (reportlab) for the PDF-ingest demo."""
     from reportlab.lib import colors

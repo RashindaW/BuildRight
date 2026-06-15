@@ -145,3 +145,36 @@ def extract_stock_counts(data: bytes, media_type: str | None, *, model: str | No
         logger.warning('"vision_ocr_failed: %s"', type(e).__name__)
         return []
     return parse_stock_json(_text_of(resp))
+
+
+# ---- Manual / document OCR → knowledge base -------------------------------
+
+_OCR_DOC_SYSTEM = (
+    "You transcribe a product manual or spec sheet from an image into clean Markdown. "
+    "Preserve headings (##), bullet lists, and any spec TABLE as a Markdown table. "
+    "Transcribe only what is visible; do not invent content. Reply with ONLY the Markdown."
+)
+
+
+def ocr_image_to_text(data: bytes, media_type: str | None, *, model: str | None = None) -> str:
+    """OCR a scanned manual/spec page into Markdown (for KB ingestion). '' on failure.
+
+    This turns a photographed manual into a vector-searchable document — the OCR
+    counterpart to the digital PDF arm. Needs a live ANTHROPIC_API_KEY.
+    """
+    mt = validate_image(data, media_type)
+    try:
+        resp = _client().messages.create(
+            model=model or settings.llm_model_heavy,
+            max_tokens=2000,
+            temperature=0.0,
+            system=_OCR_DOC_SYSTEM,
+            messages=[{"role": "user", "content": [
+                _image_block(data, mt),
+                {"type": "text", "text": "Transcribe this page to Markdown."},
+            ]}],
+        )
+    except (anthropic.APIConnectionError, anthropic.RateLimitError, anthropic.APIError) as e:
+        logger.warning('"vision_doc_ocr_failed: %s"', type(e).__name__)
+        return ""
+    return _text_of(resp)
