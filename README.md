@@ -1,4 +1,3 @@
-<!-- Hugging Face Spaces metadata (Docker SDK). Harmless on GitHub. See HF-DEPLOY.md. -->
 ---
 title: BuildRight Hardware
 emoji: 🔧
@@ -10,6 +9,9 @@ pinned: false
 ---
 
 # BuildRight Hardware — Conversational Retail Store with Hybrid RAG
+
+<!-- The YAML block above is Hugging Face Spaces config (Docker SDK). See HF-DEPLOY.md. -->
+
 
 A professional, secure, full-stack online store for a Canadian-Tire-style hardware retailer,
 built around a **guardrailed AI store assistant** with **hybrid retrieval (vector + keyword)**
