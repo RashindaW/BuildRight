@@ -27,8 +27,19 @@ from app.models.product_embedding import ProductEmbedding
 logger = logging.getLogger("app.ai.embeddings")
 
 
+_EMBED_BATCH = 256  # cap provider calls so 10k+ corpora embed in bounded memory
+
+
 def _content_hash(text: str) -> str:
     return hashlib.sha256(text.encode()).hexdigest()[:16]
+
+
+def _embed_in_batches(provider: EmbeddingProvider, texts: list[str]) -> list:
+    """Embed `texts` in batches (scales to large corpora without one giant call)."""
+    out: list = []
+    for i in range(0, len(texts), _EMBED_BATCH):
+        out.extend(provider.embed_documents(texts[i:i + _EMBED_BATCH]))
+    return out
 
 
 def embed_products(db: Session, provider: EmbeddingProvider) -> int:
@@ -60,7 +71,7 @@ def embed_products(db: Session, provider: EmbeddingProvider) -> int:
     if not texts:
         return 0
 
-    vectors = provider.embed_documents(texts)
+    vectors = _embed_in_batches(provider, texts)
     for (item_id, h, existing), vec in zip(to_upsert, vectors):
         if existing:
             existing.embedding = vec
@@ -97,7 +108,7 @@ def embed_documents(db: Session, provider: EmbeddingProvider) -> int:
     if not texts:
         return 0
 
-    vectors = provider.embed_documents(texts)
+    vectors = _embed_in_batches(provider, texts)
     for chunk, vec in zip(to_update, vectors):
         chunk.embedding = vec
     db.commit()
