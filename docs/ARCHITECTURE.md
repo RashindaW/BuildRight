@@ -30,7 +30,7 @@ skills mapping see [`VECTOR_MLA.md`](VECTOR_MLA.md); for deployment SOPs see
 11. [Catalog, knowledge base & images](#11-catalog-knowledge-base--images)
 12. [Payments (Stripe)](#12-payments-stripe)
 13. [Observability & analytics](#13-observability--analytics)
-14. [Machine learning & evaluation](#14-machine-learning--evaluation)
+14. [Retrieval evaluation](#14-retrieval-evaluation)
 15. [Frontend architecture](#15-frontend-architecture)
 16. [Configuration reference](#16-configuration-reference)
 17. [Database migrations](#17-database-migrations)
@@ -79,9 +79,8 @@ Design goals that shaped every subsystem:
 
 **Optional / out-of-image** (never in `backend/requirements.txt`)
 - `torch` + `open-clip-torch` + `Pillow` → CLIP visual arm
-- `torch` + `transformers` → DistilBERT route-classifier fine-tuning
+- `sentence-transformers` (+ `torch`) → cross-encoder re-ranker
 - `pypdf` + `reportlab` → PDF / spec-sheet ingestion
-- `sentence-transformers` → cross-encoder re-ranker
 
 **Infra:** Docker (multi-stage), Hugging Face Spaces (free), `docker-compose` (Postgres + Redis + MinIO), GitHub Actions CI/CD.
 
@@ -166,7 +165,6 @@ Cut_Dry/
 │   │   │   ├── vision.py voice.py
 │   │   │   ├── embeddings/    # provider, vector_index, indexer, chunking, clip
 │   │   │   └── eval/          # retrieval_eval.py + retrieval_metrics.json
-│   │   ├── ml/                 # synth_data, train_router (DistilBERT), train_router_lite (sklearn), route_classifier
 │   │   └── seed/              # catalog_generator, seed, seed_kb, category_guides,
 │   │                          #  product_guides, pdf_ingest, image_provider, placeholder_svg
 │   ├── migrations/versions/    # Alembic chain
@@ -499,21 +497,21 @@ Everything user/admin-impacting is also written to `audit_logs`.
 
 ---
 
-## 14. Machine learning & evaluation
+## 14. Retrieval evaluation
 
 **Retrieval evaluation (`ai/eval/retrieval_eval.py`).** Pure metric functions — `hit@k`,
 `MRR`, `nDCG@k` — over labeled question→doc sets (14 KB, 10 product). `evaluate_kb` /
 `evaluate_products` measure the live pipeline (with/without re-rank) and write
 `retrieval_metrics.json`. This harness was built *first*, so every retrieval change is
-quantified.
+quantified rather than guessed (e.g. the re-ranker's measured lift, §9).
 
-**Route-classifier fine-tuning (`app/ml/`).** `synth_data.py` generates ~1600 labeled
-SIMPLE/COMPLEX utterances from catalog vocabulary. `train_router.py` fine-tunes **DistilBERT**
-(transformers + torch, offline) and writes metrics/report; `train_router_lite.py` trains a
-**TF-IDF + LogisticRegression** alternative that runs anywhere (committed
-`router_lite.joblib`). `route_classifier.py` loads the best available model at runtime
-(DistilBERT → lite → heuristic) and feeds the router. Training deps live in
-`requirements-train.txt`, never in the image.
+> **A note on fine-tuning.** Model routing (Haiku vs Sonnet) is intentionally handled by a
+> cheap heuristic + a 4-token Haiku micro-classification — the task is simple enough that a
+> trained classifier wouldn't earn its dependency or latency cost. Transformer fine-tuning is
+> therefore scoped to a *separate, dedicated project* (where a proper labeled dataset and a
+> held-out evaluation can do it justice), not bolted onto this app. PyTorch still appears here,
+> but only behind the optional CLIP visual arm (§9) and the cross-encoder re-ranker (§9),
+> each with a deterministic CPU fallback.
 
 ---
 
@@ -588,7 +586,7 @@ SQLite. CI runs the suite against **both** backends to prove the abstraction hol
 
 ## 18. Testing & CI
 
-**~270 tests** across three tiers (`backend/tests/`): **unit** (retrieval, RRF, router,
+**~267 tests** across three tiers (`backend/tests/`): **unit** (retrieval, RRF, router,
 guardrail/pricing, query-expand, rerank, vision/CLIP, catalog scale, placeholders, eval
 metrics), **api** (auth/RBAC/CSRF, chat stream, menu/search, cart/orders, guest checkout,
 refunds, analytics, CSAT, media/voice), and **golden** (retrieval quality + validator
@@ -644,8 +642,7 @@ cd frontend && npx vitest run && npm run build
 
 Optional extras (never required for the core app):
 `pip install -r app/seed/requirements-ingest.txt` (PDF ingest),
-`-r app/ai/embeddings/requirements-multimodal.txt` (CLIP),
-`-r app/ml/requirements-train.txt` (DistilBERT training).
+`-r app/ai/embeddings/requirements-multimodal.txt` (CLIP visual arm + cross-encoder re-ranker).
 
 ---
 

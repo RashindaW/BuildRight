@@ -14,7 +14,7 @@ pinned: false
 
 > **Vector Institute MLA (Cohort 12) reviewers:** see **[`docs/VECTOR_MLA.md`](docs/VECTOR_MLA.md)**
 > for a point-by-point mapping of this project to the Generative-AI / Agentic-AI skills
-> (Foundation Models · Prompt Engineering · RAG · Fine-tuning · Embeddings · Agents/Tool use ·
+> (Foundation Models · Prompt Engineering · RAG · Re-ranking · Embeddings · Agents/Tool use ·
 > Memory · Synthetic data · Evaluation · Deployment). Try it: **[`docs`](docs/)** · live `/how-to-test`.
 
 

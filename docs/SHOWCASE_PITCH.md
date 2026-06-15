@@ -21,7 +21,7 @@ store's 10,000-SKU catalog and policy library into a conversation that never inv
 
 ### Slide 3 — Solution overview (1:30–2:15)
 - An **agentic assistant** embedded in a full store: search, plan a project, reorder, recommend, check policy, pay — by talking.
-- Cohort anchors, all live: **Foundation Models · Prompt Engineering · RAG · Fine-tuning** + agents, memory, multimodal.
+- Cohort anchors, all live: **Foundation Models · Prompt Engineering · RAG · Agentic tool use** + memory, multimodal.
 - *"I owned this end-to-end: framing → build → evaluation → deploy → docs."*
 
 ### Slide 4 — Architecture (2:15–3:00)  *(show the `/about` diagram)*
@@ -41,7 +41,7 @@ Run these in order (also on `/how-to-test`):
 ### Slide 6 — How it works (AI techniques) (5:30–6:45)
 - **RAG:** lexical + vector arms fused with Reciprocal Rank Fusion over catalog + policy + ~195 buying guides.
 - **Multi-agent routing:** Haiku classifies the turn; only complex/multimodal turns pay for Sonnet → **cost-optimized**.
-- **Fine-tuning:** synthetic labeled data → **DistilBERT** route classifier (HF Transformers + PyTorch); **100% acc vs 78% heuristic** on held-out data — an offline upgrade; the live router stays cheap by design.
+- **Retrieval, measured:** an eval harness scores hit@k / MRR / nDCG, so a re-ranker's lift is quantified, not guessed.
 - **Memory:** preferences captured + injected; per-conversation need-summary; "what we remember" panel.
 
 ### Slide 7 — Evaluation & trust (6:45–7:45)  *(the differentiator)*
@@ -74,7 +74,7 @@ driver and a hammer drill?` · `I want to paint my bedroom, it's 12 by 10 feet w
 ## Anticipated Q&A
 - **Why not LangChain?** Hand-built the loop so the **price guardrail** + routing are fully controlled; LlamaIndex retriever included to show the integration.
 - **Why Anthropic not OpenAI?** Provider-agnostic tool-use; Groq (OpenAI-compatible) used for Whisper — APIs are swappable.
-- **Real fine-tuning?** Yes — DistilBERT script (runs on a torch host); a scikit-learn model reproduces results anywhere. Kept **off the hot path** for cost/latency.
+- **Where's fine-tuning?** Deliberately *not* here — turn routing is simple enough that a heuristic + a 4-token Haiku call solve it cheaply, so a trained classifier wouldn't earn its keep. Transformer fine-tuning is scoped to a separate, dedicated project where a proper labeled dataset + held-out eval can do it justice.
 - **Is it production?** Demo is on free HF; production gap is documented and config-level (managed DB, CDN, monitoring, secrets).
 - **Hallucinated prices?** Structurally impossible to render — the deterministic validator blocks any ungrounded price.
 - **Latency/cost?** Router keeps ~simple turns on Haiku; observability shows real per-turn $.
