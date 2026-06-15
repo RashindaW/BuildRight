@@ -49,20 +49,11 @@ if str(_ROOT) not in sys.path:
 
 from menu_data import MENU_DATA  # noqa: E402
 
-CATEGORY_LABELS = {
-    "power-tools": "Power Tools",
-    "hand-tools": "Hand Tools",
-    "hardware": "Hardware & Fasteners",
-    "automotive": "Automotive",
-    "kitchen": "Kitchen Appliances",
-    "outdoor": "Outdoor & Garden",
-    "cleaning": "Cleaning",
-    "paint": "Paint & Coatings",
-    "electrical": "Electrical",
-    "plumbing": "Plumbing",
-    "seasonal": "Seasonal",
-    **_GEN_CATEGORY_LABELS,  # adds fasteners, lawn-garden, lighting, building-materials, storage, etc.
-}
+# Labels come straight from the generated catalog's CATEGORIES (the single source
+# of truth). The old curated-only "hardware" slug was a duplicate of "fasteners"
+# (Fasteners & Hardware) and is intentionally dropped — its few curated items now
+# map to "fasteners" in menu_data.py.
+CATEGORY_LABELS = dict(_GEN_CATEGORY_LABELS)
 
 DIETARY_LABELS = {
     "cordless": "Cordless",

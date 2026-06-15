@@ -64,3 +64,12 @@ def test_categories_listed(client, seeded_item):
     assert slugs, "no categories returned"
     # The seeded item's own category must be present in the category listing.
     assert seeded_item["category"] in slugs
+
+
+def test_listed_categories_are_never_empty(client):
+    """Every category in the filter bar must have products — an empty one renders
+    a 'nothing here' page when clicked."""
+    cats = client.get("/api/v1/menu/categories").json()
+    for c in cats:
+        items = client.get("/api/v1/menu", params={"category": c["slug"], "page_size": 1}).json()["items"]
+        assert items, f"category {c['slug']!r} is listed but has no products"

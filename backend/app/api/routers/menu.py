@@ -92,7 +92,14 @@ def items_by_ids(body: ItemsByIds, db: Session = Depends(get_db)):
 
 @router.get("/categories", response_model=list[CategoryOut])
 def list_categories(db: Session = Depends(get_db)):
-    cats = db.execute(select(Category).order_by(Category.display_order, Category.name)).scalars().all()
+    # Only surface categories that actually have products — an empty category in
+    # the filter bar leads to a "nothing here" page when clicked.
+    cats = db.execute(
+        select(Category)
+        .join(MenuItem, MenuItem.category_id == Category.id)
+        .group_by(Category.id)
+        .order_by(Category.display_order, Category.name)
+    ).scalars().unique().all()
     return [CategoryOut.model_validate(c) for c in cats]
 
 

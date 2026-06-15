@@ -27,6 +27,17 @@ def test_generation_is_deterministic():
     assert [p["sku"] for p in a] == [p["sku"] for p in b]
 
 
+def test_small_target_still_covers_every_category():
+    # Regression: a flat products[:target] dropped whole trailing categories, so
+    # the storefront listed empty categories. Round-robin truncation must keep all.
+    from app.seed.catalog_generator import CATEGORIES
+
+    all_cats = {c["slug"] for c in CATEGORIES}
+    for target in (1500, 3000):
+        cats = {p["category"] for p in generate_products(target=target)}
+        assert cats == all_cats, f"target={target} missing {sorted(all_cats - cats)}"
+
+
 def test_image_url_is_category_placeholder_by_default():
     # Default: a deterministic category SVG placeholder carrying the cat + label.
     u1 = image_url_for("paint", "Interior Paint", "some-slug")

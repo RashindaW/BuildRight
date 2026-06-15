@@ -135,7 +135,7 @@ MENU_DATA = [
     {
         "id": "wood-screws-assortment",
         "name": "200-Piece Wood Screw Assortment",
-        "category": "hardware",
+        "category": "fasteners",
         "description": "Coarse-thread zinc-plated screws in eight sizes from #6 × 3/4\" to #10 × 2\". Reusable storage case.",
         "price": 14.99,
         "dietary_tags": [],
@@ -145,7 +145,7 @@ MENU_DATA = [
     {
         "id": "picture-hanging-kit",
         "name": "50-Piece Picture Hanging Kit",
-        "category": "hardware",
+        "category": "fasteners",
         "description": "Assortment of picture hooks, D-rings, wire, and wall anchors for frames up to 50 lbs.",
         "price": 12.99,
         "dietary_tags": [],
@@ -155,7 +155,7 @@ MENU_DATA = [
     {
         "id": "shelf-brackets",
         "name": "Heavy-Duty Shelf Brackets 2-Pack",
-        "category": "hardware",
+        "category": "fasteners",
         "description": "Powder-coated steel L-brackets, 10\" × 8\", rated to 200 lbs per pair. Mounting hardware included.",
         "price": 16.99,
         "dietary_tags": [],

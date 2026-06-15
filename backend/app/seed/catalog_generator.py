@@ -397,7 +397,26 @@ def generate_products(seed: int = 1337, target: int | None = None) -> list[dict]
                         })
 
     if target is not None and len(products) > target:
-        products = products[:target]
+        # Round-robin across categories so a smaller target still covers EVERY
+        # category. A flat products[:target] builds in category order and drops
+        # whole trailing categories (e.g. target=3000 kept only 6 of 19).
+        from collections import OrderedDict
+
+        by_cat: "OrderedDict[str, list[dict]]" = OrderedDict()
+        for p in products:
+            by_cat.setdefault(p["category"], []).append(p)
+
+        selected: list[dict] = []
+        idx = 0
+        cols = list(by_cat.values())
+        while len(selected) < target and any(idx < len(col) for col in cols):
+            for col in cols:
+                if idx < len(col):
+                    selected.append(col[idx])
+                    if len(selected) >= target:
+                        break
+            idx += 1
+        products = selected
     return products
 
 
