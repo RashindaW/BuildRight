@@ -54,6 +54,35 @@ and `/manager` → **AI Operations**.
 - **Embeddings:** the image uses the deterministic `hash` provider so build + query stay
   consistent and need no model download.
 
+## Continuous improvement (edit → deploy → pull loop)
+
+An HF Space is a git repo, so you get a two-way loop. **Source of truth = your local/GitHub
+repo; HF is a deploy target.**
+
+**Automatic (recommended):** the GitHub Action `.github/workflows/deploy-hf.yml` mirrors the repo
+to the Space on every push to `main`, and HF rebuilds + redeploys. One-time setup:
+- GitHub → Settings → Secrets and variables → Actions:
+  - Secret **`HF_TOKEN`** = a Hugging Face **write** token (hf.co/settings/tokens)
+  - Variable **`HF_SPACE`** = `<user>/<space>` (e.g. `rashi/buildright`)
+- Then: edit code → commit → push to `main` → it's live in ~3–5 min. (Or click **Run workflow**.)
+
+**Manual** (any branch), via `scripts/hf.sh`:
+```bash
+export HF_SPACE=<user>/<space>
+export HF_TOKEN=hf_xxx          # write token (push only)
+./scripts/hf.sh push            # deploy current branch -> Space (HF rebuilds)
+./scripts/hf.sh pull            # bring HF-web-editor edits back down
+```
+
+**Pulling from HF:** if you tweak something in the HF web editor (README, a config), run
+`./scripts/hf.sh pull` (or `git pull space main`) to bring it local **before** your next push,
+so the mirror doesn't clobber it.
+
+**What a redeploy resets:** each deploy rebuilds the image, which **re-seeds the baked catalog** —
+so runtime data (orders/chat placed on the live site) resets on redeploy. Code/UI/prompt changes
+persist (they're in the image). For data that survives redeploys, use the free Neon/Supabase
+`DATABASE_URL` (see Notes above) — then the DB lives outside the container.
+
 ## Local smoke test (optional, needs Docker)
 ```bash
 docker build -t buildright .

@@ -1,0 +1,45 @@
+name: Deploy to Hugging Face Spaces
+
+# Continuous deployment: every push to the deploy branch mirrors the repo to the
+# HF Space, which rebuilds the Docker image and redeploys automatically.
+#
+# Setup (one time):
+#   - GitHub repo → Settings → Secrets and variables → Actions
+#       Secret  HF_TOKEN  = a Hugging Face WRITE access token (hf.co/settings/tokens)
+#       Variable HF_SPACE = "<user>/<space>"   e.g.  rashi/buildright
+#   - Trigger manually anytime via the "Run workflow" button (workflow_dispatch).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Avoid overlapping deploys.
+concurrency:
+  group: hf-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # full history for the push
+          lfs: true
+
+      - name: Mirror to the HF Space (triggers a rebuild)
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_SPACE: ${{ vars.HF_SPACE }}
+        run: |
+          if [ -z "$HF_TOKEN" ] || [ -z "$HF_SPACE" ]; then
+            echo "::error::Set the HF_TOKEN secret and HF_SPACE variable first (see file header)."
+            exit 1
+          fi
+          git config user.email "ci@buildright.local"
+          git config user.name "buildright-ci"
+          # The Space's main branch mirrors this repo. Force-push keeps it a clean mirror;
+          # if you also edit on HF, `git pull space main` locally BEFORE pushing.
+          git push --force "https://user:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE}" HEAD:main
+          echo "Deployed to https://huggingface.co/spaces/${HF_SPACE} — HF will rebuild."
