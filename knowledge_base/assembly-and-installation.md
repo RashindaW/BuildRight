@@ -2,7 +2,7 @@
 
 ## Overview
 
-BuildRight Hardware offers assembly and professional installation so your purchase is ready to use without the hassle. From snapping together a BBQ to installing a new dishwasher or smart thermostat, our trained associates and licensed installer network handle the work. This page covers what's available, what's included, fees, and how to book.
+Smart Handy Man offers assembly and professional installation so your purchase is ready to use without the hassle. From snapping together a BBQ to installing a new dishwasher or smart thermostat, our trained associates and licensed installer network handle the work. This page covers what's available, what's included, fees, and how to book.
 
 All installation work is performed by trained BuildRight associates or vetted, licensed, and insured contractors in our installer network.
 
@@ -99,5 +99,5 @@ If the installer finds extra work is required, they will pause and provide a wri
 ## Contact
 
 - **Phone:** 1-800-BUILD-IT (Monday–Friday 8 AM–8 PM ET)
-- **Email:** support@buildright.ca
-- **Online chat:** at buildright.ca during store hours
+- **Email:** support@smarthandyman.ca
+- **Online chat:** at smarthandyman.ca during store hours

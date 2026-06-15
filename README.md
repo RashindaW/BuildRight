@@ -1,5 +1,5 @@
 ---
-title: BuildRight Hardware
+title: Smart Handy Man
 emoji: 🔧
 colorFrom: blue
 colorTo: indigo
@@ -8,7 +8,7 @@ app_port: 8000
 pinned: false
 ---
 
-# BuildRight Hardware — Conversational Retail Store with Hybrid RAG
+# Smart Handy Man — Conversational Retail Store with Hybrid RAG
 
 <!-- The YAML block above is Hugging Face Spaces config (Docker SDK). See HF-DEPLOY.md. -->
 

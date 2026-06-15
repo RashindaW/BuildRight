@@ -77,6 +77,6 @@ For warranty terms, see the [Warranty Policy](warranty.md).
 
 ## Contact
 
-- **Online chat:** at buildright.ca during store hours
-- **Email:** support@buildright.ca
+- **Online chat:** at smarthandyman.ca during store hours
+- **Email:** support@smarthandyman.ca
 - **Phone:** 1-800-BUILD-IT (Monday–Friday 8 AM–8 PM ET)

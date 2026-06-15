@@ -1,4 +1,4 @@
-"""Live golden tests for the BuildRight Hardware retail catalog.
+"""Live golden tests for the Smart Handy Man retail catalog.
 
 Exercises retail products, price guardrails, and the tag/category system against
 the same retrieval + guardrail stack the live app uses (no separate PoC module).
@@ -183,7 +183,7 @@ def run_golden_tests() -> int:
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("BuildRight Hardware — Retail Golden Tests")
+    print("Smart Handy Man — Retail Golden Tests")
     print("=" * 60)
     failures = run_golden_tests()
     print("=" * 60)

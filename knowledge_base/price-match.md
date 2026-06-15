@@ -2,7 +2,7 @@
 
 ## Our Commitment
 
-BuildRight Hardware offers a **Price Match Guarantee**. If you find a lower price on an identical, in-stock item at a qualifying Canadian competitor, we will match it — both in store and online. We also match our own prices for a limited time after you buy (see [Post-Purchase Price Protection](#post-purchase-price-protection)).
+Smart Handy Man offers a **Price Match Guarantee**. If you find a lower price on an identical, in-stock item at a qualifying Canadian competitor, we will match it — both in store and online. We also match our own prices for a limited time after you buy (see [Post-Purchase Price Protection](#post-purchase-price-protection)).
 
 Our goal is simple: you should never have to choose between BuildRight service and the best price.
 
@@ -12,7 +12,7 @@ We will match the advertised price of identical items (same brand, model number,
 
 - Major Canadian hardware and home-improvement retailers (physical stores and their official websites)
 - National department stores and warehouse clubs with a hardware section, where the item is available to the general public
-- Our own buildright.ca price if it drops after your purchase, within the protection window
+- Our own smarthandyman.ca price if it drops after your purchase, within the protection window
 
 ## Conditions for Price Match
 
@@ -47,7 +47,7 @@ Show the advertised price (printed flyer or on your phone) to a store associate 
 
 ### Online (At Time of Purchase)
 
-Start a chat at buildright.ca before completing your order, share a link or screenshot of the competitor's price, and our team will adjust your cart if it qualifies.
+Start a chat at smarthandyman.ca before completing your order, share a link or screenshot of the competitor's price, and our team will adjust your cart if it qualifies.
 
 ### After Purchase
 
@@ -55,7 +55,7 @@ If you find a lower qualifying price **within 7 days** of your purchase, contact
 
 ## Post-Purchase Price Protection
 
-If BuildRight Hardware lowers the price of an item you bought within the last **30 days**, we will refund the difference. Bring your receipt to any store or contact us online — BuildRight Rewards members are automatically eligible and can request the adjustment from their order history. Price protection excludes clearance markdowns, limited-time doorcrasher events, and special orders.
+If Smart Handy Man lowers the price of an item you bought within the last **30 days**, we will refund the difference. Bring your receipt to any store or contact us online — BuildRight Rewards members are automatically eligible and can request the adjustment from their order history. Price protection excludes clearance markdowns, limited-time doorcrasher events, and special orders.
 
 ## Price Match on Sale Items
 
@@ -67,6 +67,6 @@ A price match reflects the competitor's price in place of any BuildRight promoti
 
 ## Contact Us
 
-- **Online chat:** at buildright.ca during store hours
-- **Email:** support@buildright.ca
+- **Online chat:** at smarthandyman.ca during store hours
+- **Email:** support@smarthandyman.ca
 - **Phone:** 1-800-BUILD-IT (Monday–Friday 8 AM–8 PM ET)

@@ -2,7 +2,7 @@
 
 ## Overview
 
-BuildRight Hardware takes product safety seriously. This page explains how we handle product recalls, where to find Safety Data Sheets, which items are age-restricted, our guidance on personal protective equipment, and the rules for handling and shipping hazardous materials. Following product safety information protects you, your household, and your warranty.
+Smart Handy Man takes product safety seriously. This page explains how we handle product recalls, where to find Safety Data Sheets, which items are age-restricted, our guidance on personal protective equipment, and the rules for handling and shipping hazardous materials. Following product safety information protects you, your household, and your warranty.
 
 ## Product Recalls
 
@@ -10,7 +10,7 @@ BuildRight Hardware takes product safety seriously. This page explains how we ha
 
 When a manufacturer or Health Canada issues a recall on a product we sell:
 
-1. We **post the recall** on the Product Recalls page at buildright.ca with affected models, lot numbers, and what to do.
+1. We **post the recall** on the Product Recalls page at smarthandyman.ca with affected models, lot numbers, and what to do.
 2. We **notify customers we can identify**, including BuildRight Rewards members who purchased the item, by email.
 3. We **remove affected stock** from shelves and the website immediately.
 
@@ -23,15 +23,15 @@ When a manufacturer or Health Canada issues a recall on a product we sell:
 
 ### Reporting a Safety Concern
 
-If you believe a product is unsafe but is not yet under recall, contact us at safety@buildright.ca or 1-800-BUILD-IT. Serious incidents can also be reported to **Health Canada's Consumer Product Safety** program.
+If you believe a product is unsafe but is not yet under recall, contact us at safety@smarthandyman.ca or 1-800-BUILD-IT. Serious incidents can also be reported to **Health Canada's Consumer Product Safety** program.
 
 ## Safety Data Sheets (SDS)
 
 For chemical and hazardous products (paints, solvents, adhesives, pesticides, cleaners, lubricants):
 
-- **Online:** the SDS is linked on the product page at buildright.ca.
+- **Online:** the SDS is linked on the product page at smarthandyman.ca.
 - **In store:** ask any associate; we keep SDS documentation available at the service desk.
-- **By request:** email support@buildright.ca with the product name and we will send the current SDS.
+- **By request:** email support@smarthandyman.ca with the product name and we will send the current SDS.
 
 Always read the SDS and product label before use, and follow the handling, storage, and disposal instructions.
 
@@ -79,6 +79,6 @@ These restrictions exist to keep carriers, our staff, and your household safe. S
 
 ## Recall and Safety Resources
 
-- **Product Recalls page:** buildright.ca/recalls
-- **Safety concerns:** safety@buildright.ca
-- **General help:** support@buildright.ca or 1-800-BUILD-IT (Monday–Friday 8 AM–8 PM ET)
+- **Product Recalls page:** smarthandyman.ca/recalls
+- **Safety concerns:** safety@smarthandyman.ca
+- **General help:** support@smarthandyman.ca or 1-800-BUILD-IT (Monday–Friday 8 AM–8 PM ET)

@@ -2,7 +2,7 @@
 
 ## Overview
 
-BuildRight Hardware issues refunds for eligible returned items promptly and to the original payment method wherever possible. This policy explains how refunds are calculated, when they are issued, and the circumstances under which a refund may be reduced or denied.
+Smart Handy Man issues refunds for eligible returned items promptly and to the original payment method wherever possible. This policy explains how refunds are calculated, when they are issued, and the circumstances under which a refund may be reduced or denied.
 
 For details on which items can be returned and how to start a return, see our [Returns Policy](returns.md). For payment-method-specific timelines, partial refunds, and escalation steps, see [Refund Policy Details](refund-policy-details.md).
 
@@ -75,8 +75,8 @@ Refunded sales tax is returned at the same rate it was charged, based on the ori
 
 If your refund is not received within the stated timeframe, contact us:
 
-- **Online chat** (during store hours, at buildright.ca)
-- **Email:** refunds@buildright.ca
+- **Online chat** (during store hours, at smarthandyman.ca)
+- **Email:** refunds@smarthandyman.ca
 - **Phone:** 1-800-BUILD-IT (Monday–Friday 8 AM–8 PM ET)
 
 Please have your order number, return confirmation, and original payment method ready when contacting us. For escalation steps when a refund is delayed or disputed, see [Refund Policy Details › How to Escalate a Refund](refund-policy-details.md).

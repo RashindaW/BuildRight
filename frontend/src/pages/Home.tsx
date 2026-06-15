@@ -47,7 +47,7 @@ export default function Home() {
           🧪 Sandbox demo — test data only · Stripe test mode · re-seeds on deploy
         </div>
         <div className="p-6 sm:p-8">
-          <h1 className="text-2xl font-bold sm:text-3xl">BuildRight Hardware</h1>
+          <h1 className="text-2xl font-bold sm:text-3xl">🤖 Smart Handy Man</h1>
           <p className="mt-1 max-w-xl text-sm opacity-90 sm:text-base">
             Quality tools, honest answers. Ask our guardrailed AI assistant about any product or store policy —
             it never invents items or prices.

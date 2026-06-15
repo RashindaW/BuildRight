@@ -16,7 +16,7 @@ export function Navbar() {
     <header className="sticky top-0 z-30 border-b bg-white/90 backdrop-blur">
       <nav className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
         <Link to="/" className="flex items-center gap-2 text-xl font-bold text-brand-700">
-          🔧 BuildRight
+          🤖 Smart Handy Man
           <span className="badge bg-amber-100 font-normal text-amber-700">Sandbox</span>
         </Link>
         <NavLink to="/" end className={linkClass}>

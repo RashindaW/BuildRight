@@ -1,4 +1,4 @@
-# BuildRight Hardware — Demo Guide
+# Smart Handy Man — Demo Guide
 
 A ready-to-run demo of a retail store with a **guardrailed, hybrid-RAG AI assistant**.
 

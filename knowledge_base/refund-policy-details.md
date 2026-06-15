@@ -2,7 +2,7 @@
 
 ## Overview
 
-This page provides the fine print behind BuildRight Hardware refunds: exact timelines by payment method, how partial refunds and restocking fees are calculated, the reasons a refund may be denied, and how to escalate if something goes wrong. For the basics of what gets refunded, see the [Refund Policy](refunds.md). For what can be returned, see the [Returns Policy](returns.md).
+This page provides the fine print behind Smart Handy Man refunds: exact timelines by payment method, how partial refunds and restocking fees are calculated, the reasons a refund may be denied, and how to escalate if something goes wrong. For the basics of what gets refunded, see the [Refund Policy](refunds.md). For what can be returned, see the [Returns Policy](returns.md).
 
 ## Refund Timelines by Payment Method
 
@@ -83,7 +83,7 @@ If we deny a refund, we will explain the reason and offer to return the item to 
 If your refund is late, the amount looks wrong, or a request was denied and you would like it reviewed:
 
 1. **Confirm the timeline.** Allow the full 5–7 business days for card refunds before escalating.
-2. **Contact the refunds team.** Email refunds@buildright.ca or call 1-800-BUILD-IT with your order number, return confirmation, and the last four digits of the payment card.
+2. **Contact the refunds team.** Email refunds@smarthandyman.ca or call 1-800-BUILD-IT with your order number, return confirmation, and the last four digits of the payment card.
 3. **Request a supervisor review.** If unresolved within **3 business days**, ask for an escalation to a customer-care supervisor; you will receive a case number.
 4. **Provide your bank reference.** For card refunds that we have released but you cannot see, your bank may need the **ARN (Acquirer Reference Number)**, which our team can provide so your bank can locate the deposit.
 5. **Final review.** Unresolved cases are reviewed by our resolutions team, which responds within **5 business days** with a final decision.
@@ -92,6 +92,6 @@ Keep your return tracking number and any inspection notes; they speed up every s
 
 ## Contact
 
-- **Email:** refunds@buildright.ca
+- **Email:** refunds@smarthandyman.ca
 - **Phone:** 1-800-BUILD-IT (Monday–Friday 8 AM–8 PM ET)
-- **Online chat:** at buildright.ca during store hours
+- **Online chat:** at smarthandyman.ca during store hours

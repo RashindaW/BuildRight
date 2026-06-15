@@ -51,7 +51,7 @@ class SecurityMiddleware(BaseHTTPMiddleware):
 
 def create_app() -> FastAPI:
     setup_logging()
-    app = FastAPI(title="BuildRight Hardware API", version="1.0.0",
+    app = FastAPI(title="Smart Handy Man API", version="1.0.0",
                   docs_url="/docs" if settings.is_dev else None)
 
     # DB tables (dev convenience; prod uses Alembic)
@@ -110,7 +110,7 @@ def create_app() -> FastAPI:
 
     @app.get("/version")
     def version():
-        return {"name": "BuildRight Hardware API", "version": "1.0.0", "environment": settings.environment}
+        return {"name": "Smart Handy Man API", "version": "1.0.0", "environment": settings.environment}
 
     _mount_spa(app)
     return app

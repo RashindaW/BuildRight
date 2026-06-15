@@ -4,7 +4,7 @@ const uniqueEmail = () => `e2e-${Date.now()}@example.com`;
 
 test("browse, register, add to cart, checkout", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: /BuildRight Hardware/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Smart Handy Man/i })).toBeVisible();
 
   // Register
   await page.getByRole("link", { name: /Sign up/i }).click();

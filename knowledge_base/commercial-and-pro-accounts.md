@@ -2,7 +2,7 @@
 
 ## Overview
 
-BuildRight Hardware supports contractors, trades, builders, property managers, and businesses with dedicated accounts built for volume, speed, and predictable billing. Commercial and Pro accounts unlock volume pricing, a dedicated rep, net-30 terms, priority processing, and bulk/special-order support. This page explains the tiers, benefits, and how to apply.
+Smart Handy Man supports contractors, trades, builders, property managers, and businesses with dedicated accounts built for volume, speed, and predictable billing. Commercial and Pro accounts unlock volume pricing, a dedicated rep, net-30 terms, priority processing, and bulk/special-order support. This page explains the tiers, benefits, and how to apply.
 
 ## Account Tiers
 
@@ -68,7 +68,7 @@ To open a Commercial or Pro account you typically need:
 
 ### How to Apply
 
-1. **Online:** complete the Commercial/Pro account application at buildright.ca.
+1. **Online:** complete the Commercial/Pro account application at smarthandyman.ca.
 2. **In store:** ask at the Pro desk or service desk; staff can start your application.
 3. **By phone:** call 1-800-BUILD-IT and ask for commercial sales.
 
@@ -76,6 +76,6 @@ Pro accounts are often approved quickly; Commercial and Enterprise accounts with
 
 ## Contact
 
-- **Email:** commercial@buildright.ca
+- **Email:** commercial@smarthandyman.ca
 - **Phone:** 1-800-BUILD-IT (Monday–Friday 8 AM–8 PM ET) — ask for commercial sales
-- **Online chat:** at buildright.ca during store hours
+- **Online chat:** at smarthandyman.ca during store hours

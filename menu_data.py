@@ -1,4 +1,4 @@
-"""Product catalog for the BuildRight Hardware store.
+"""Product catalog for the Smart Handy Man store.
 
 This file is the single source of truth for the catalog; the backend seed
 (backend/app/seed/seed.py) loads it into the database.

@@ -1,4 +1,4 @@
-"""Tool definitions + server-side executors for the BuildRight Hardware assistant.
+"""Tool definitions + server-side executors for the Smart Handy Man assistant.
 
 Three tools:
   search_products    — hybrid (lexical + vector) product search (live app)
@@ -72,7 +72,7 @@ SEARCH_MENU_TOOL = {
 SEARCH_PRODUCTS_TOOL = {
     "name": "search_products",
     "description": (
-        "Search BuildRight Hardware's product catalog (1000+ items). Call this BEFORE "
+        "Search Smart Handy Man's product catalog (1000+ items). Call this BEFORE "
         "mentioning any product, price, SKU, or stock level. Combine a free-text 'query' "
         "with optional filters. You can search by product SKU (e.g. 'BR-PWR-04821'), by "
         "keywords ('cordless drill'), or by need ('something to cut plywood'). Returns "
@@ -118,7 +118,7 @@ SEARCH_PRODUCTS_TOOL = {
 SEARCH_KNOWLEDGE_BASE_TOOL = {
     "name": "search_knowledge_base",
     "description": (
-        "Search BuildRight Hardware's knowledge base: store policies (returns, refunds, "
+        "Search Smart Handy Man's knowledge base: store policies (returns, refunds, "
         "warranty, shipping, price-match) AND product buying guides ('how do I choose', "
         "'what's the difference between X and Y', what each variant/option means). Call this "
         "BEFORE answering any policy question or any advice/how-to-choose question. Always cite the source."
