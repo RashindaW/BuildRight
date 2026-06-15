@@ -4,6 +4,7 @@ import { CartDrawer } from "./components/cart/CartDrawer";
 import { ChatWidget } from "./components/chat/ChatWidget";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import Home from "./pages/Home";
+import About from "./pages/About";
 import ItemDetail from "./pages/ItemDetail";
 import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
@@ -21,6 +22,7 @@ export default function App() {
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
           <Route path="/item/:slug" element={<ItemDetail />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

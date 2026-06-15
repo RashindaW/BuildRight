@@ -13,10 +13,13 @@ export function Navbar() {
     <header className="sticky top-0 z-30 border-b bg-white/90 backdrop-blur">
       <nav className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
         <Link to="/" className="text-xl font-bold text-brand-600">
-          BuildRight
+          BuildRight Hardware
         </Link>
         <Link to="/" className="text-sm text-gray-600 hover:text-gray-900">
           Products
+        </Link>
+        <Link to="/about" className="text-sm text-gray-600 hover:text-gray-900">
+          About
         </Link>
         {user && (
           <Link to="/orders" className="text-sm text-gray-600 hover:text-gray-900">
