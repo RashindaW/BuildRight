@@ -31,3 +31,6 @@ test-results/
 
 # Fine-tuned DistilBERT weights (large; trained offline, not shipped)
 backend/app/ml/model/
+
+# local placeholder preview artifact
+backend/placeholder_gallery.html

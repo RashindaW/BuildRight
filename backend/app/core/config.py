@@ -61,6 +61,7 @@ class Settings(BaseSettings):
     # Catalog scale + product imagery
     catalog_target: int | None = None            # None = curated ~1.2k; e.g. 10000 for the big catalog
     image_provider: Literal["placeholder", "unsplash", "pexels"] = "placeholder"
+    use_placeholder_images: bool = True           # render category SVG tiles (vs committed licensed photos)
     unsplash_access_key: SecretStr | None = None
     pexels_api_key: SecretStr | None = None
     # Voice: optional speech-to-text provider for /media/transcribe

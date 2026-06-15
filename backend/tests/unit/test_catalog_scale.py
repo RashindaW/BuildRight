@@ -27,20 +27,23 @@ def test_generation_is_deterministic():
     assert [p["sku"] for p in a] == [p["sku"] for p in b]
 
 
-def test_image_url_placeholder_for_unknown_type():
-    # An unknown type → deterministic per-slug placeholder containing the slug.
-    u1 = image_url_for("paint", "Totally Unknown Type Xyz", "some-slug")
-    u2 = image_url_for("paint", "Totally Unknown Type Xyz", "some-slug")
+def test_image_url_is_category_placeholder_by_default():
+    # Default: a deterministic category SVG placeholder carrying the cat + label.
+    u1 = image_url_for("paint", "Interior Paint", "some-slug")
+    u2 = image_url_for("paint", "Interior Paint", "some-slug")
     assert u1 == u2
-    assert "some-slug" in u1
+    assert u1.startswith("/api/v1/media/placeholder.svg")
+    assert "cat=paint" in u1 and "Interior" in u1
 
 
-def test_image_url_uses_committed_type_image_when_present():
+def test_image_url_uses_committed_type_image_when_opted_in(monkeypatch):
+    from app.core.config import settings
     from app.seed.image_provider import load_type_images
     if not load_type_images():
         return  # type_images.json not built in this env — nothing to assert
+    monkeypatch.setattr(settings, "use_placeholder_images", False)
     u = image_url_for("paint", "Interior Paint", "interior-paint")
-    assert u.startswith("http")  # a committed licensed photo, not the slug placeholder
+    assert u.startswith("http")  # a committed licensed photo, not the SVG placeholder
 
 
 def test_image_query_for_known_category():

@@ -25,6 +25,8 @@ export const ALLERGEN_LABELS: Record<string, string> = {
 
 export function imageSrc(url: string | null): string {
   if (!url) return "/img/_placeholder.svg";
-  if (url.startsWith("http")) return url;
+  // Absolute URLs and same-origin paths (e.g. the /api/v1/media/placeholder.svg
+  // tiles) pass through untouched; bare filenames live under /img.
+  if (url.startsWith("http") || url.startsWith("/")) return url;
   return `/img/${url}`;
 }

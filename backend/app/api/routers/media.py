@@ -9,7 +9,7 @@ Vision calls need a real ANTHROPIC_API_KEY; failures degrade gracefully.
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi import APIRouter, Depends, File, Query, Response, UploadFile
 from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -25,6 +25,28 @@ from app.services import audit_service
 router = APIRouter(prefix="/media", tags=["media"])
 
 _MAX_UPLOAD = vision.MAX_IMAGE_BYTES
+
+
+# ---- Product placeholder image (public, cacheable, no files) ---------------
+
+@router.get("/placeholder.svg")
+def placeholder_svg(
+    cat: str = Query("", max_length=60),
+    label: str = Query("", max_length=80),
+):
+    """Render a category-coloured product placeholder (icon + label) as SVG.
+
+    Deterministic and offline — every one of the 10k SKUs gets a clean branded
+    tile instead of a random scenic stock photo. Aggressively cached.
+    """
+    from app.seed.placeholder_svg import render_placeholder
+
+    svg = render_placeholder(cat, label)
+    return Response(
+        content=svg,
+        media_type="image/svg+xml",
+        headers={"Cache-Control": "public, max-age=31536000, immutable"},
+    )
 
 
 async def _read_image(file: UploadFile) -> tuple[bytes, str]:

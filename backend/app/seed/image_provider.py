@@ -69,22 +69,47 @@ def image_query_for(category: str, name: str) -> str:
     return _CATEGORY_IMAGE_QUERY.get(category, f"{category.replace('-', ' ')} hardware")
 
 
-def _placeholder_url(slug: str) -> str:
-    # Deterministic, stable per product (Lorem Picsum seeds on the slug).
-    return f"https://picsum.photos/seed/{slug}/600/400"
+def placeholder_url(category: str, label: str) -> str:
+    """Relative URL of the rendered SVG placeholder for a product.
+
+    A category-coloured, icon + label tile served by /media/placeholder.svg —
+    deterministic, offline, no files, and same-origin (resolves on HF and via the
+    Vite dev proxy). Beats a random scenic stock photo on a hardware item.
+    """
+    from urllib.parse import urlencode
+    return "/api/v1/media/placeholder.svg?" + urlencode({"cat": category, "label": label})
 
 
 def image_url_for(category: str, type_name: str, slug: str) -> str:
     """Image URL stored on a product at generation time.
 
-    Prefers a committed per-TYPE licensed photo (title-matching, offline, no key);
-    falls back to a deterministic per-product placeholder. `type_name` is the
-    catalog product TYPE (e.g. "Cordless Drill/Driver"), not the variant name.
+    Default: a clean per-TYPE SVG placeholder (category colour + icon + the product
+    type). Real licensed photos are opt-in: set use_placeholder_images=False AND
+    commit a per-TYPE pool in type_images.json. `type_name` is the catalog product
+    TYPE (e.g. "Cordless Drill/Driver"), not the variant name.
     """
-    pool = load_type_images().get(type_slug(type_name))
-    if pool:
-        return pool[_stable_index(slug, len(pool))]
-    return _placeholder_url(slug)
+    if not settings.use_placeholder_images:
+        pool = load_type_images().get(type_slug(type_name))
+        if pool:
+            return pool[_stable_index(slug, len(pool))]
+    return placeholder_url(category, type_name)
+
+
+def backfill_placeholder_images(db) -> int:
+    """Point every existing product at its category SVG placeholder. Returns the
+    count updated. Idempotent — safe to re-run on any DB (dev SQLite or Postgres)."""
+    from sqlalchemy import select
+    from app.models.menu import Category, MenuItem
+
+    cat_slug = {c.id: c.slug for c in db.execute(select(Category)).scalars()}
+    n = 0
+    for item in db.execute(select(MenuItem)).scalars():
+        url = placeholder_url(cat_slug.get(item.category_id, ""), item.name)
+        if item.image_url != url:
+            item.image_url = url
+            n += 1
+    db.commit()
+    return n
 
 
 def _active_licensed_provider() -> str | None:
