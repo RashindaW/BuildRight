@@ -8,9 +8,14 @@ app_port: 8000
 pinned: false
 ---
 
-# Smart Handy Man — Conversational Retail Store with Hybrid RAG
+# Smart Handy Man 🤖 — Conversational Retail Store with Hybrid RAG
 
 <!-- The YAML block above is Hugging Face Spaces config (Docker SDK). See HF-DEPLOY.md. -->
+
+> **Vector Institute MLA (Cohort 12) reviewers:** see **[`docs/VECTOR_MLA.md`](docs/VECTOR_MLA.md)**
+> for a point-by-point mapping of this project to the Generative-AI / Agentic-AI skills
+> (Foundation Models · Prompt Engineering · RAG · Fine-tuning · Embeddings · Agents/Tool use ·
+> Memory · Synthetic data · Evaluation · Deployment). Try it: **[`docs`](docs/)** · live `/how-to-test`.
 
 
 A professional, secure, full-stack online store for a Canadian-Tire-style hardware retailer,
