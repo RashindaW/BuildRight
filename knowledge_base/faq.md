@@ -3,7 +3,7 @@
 ## Store Policies
 
 ### What are your store hours?
-Smart Handy Man stores are open Monday–Friday 7 AM–9 PM, Saturday 7 AM–8 PM, and Sunday 8 AM–6 PM (local time). Hours may vary by location and on statutory holidays. Check your local store page at smarthandyman.ca for holiday hours.
+BuildRight AI stores are open Monday–Friday 7 AM–9 PM, Saturday 7 AM–8 PM, and Sunday 8 AM–6 PM (local time). Hours may vary by location and on statutory holidays. Check your local store page at smarthandyman.ca for holiday hours.
 
 ### Do you offer installation services?
 Yes. We offer professional installation for select products including appliances, smart-home devices, and outdoor power equipment. We also offer in-store and in-home assembly for items like BBQs, furniture, and shelving. See [Assembly & Installation](assembly-and-installation.md) for what's included and how to book.

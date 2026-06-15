@@ -2,7 +2,7 @@
 
 ## Overview
 
-This page provides the fine print behind Smart Handy Man refunds: exact timelines by payment method, how partial refunds and restocking fees are calculated, the reasons a refund may be denied, and how to escalate if something goes wrong. For the basics of what gets refunded, see the [Refund Policy](refunds.md). For what can be returned, see the [Returns Policy](returns.md).
+This page provides the fine print behind BuildRight AI refunds: exact timelines by payment method, how partial refunds and restocking fees are calculated, the reasons a refund may be denied, and how to escalate if something goes wrong. For the basics of what gets refunded, see the [Refund Policy](refunds.md). For what can be returned, see the [Returns Policy](returns.md).
 
 ## Refund Timelines by Payment Method
 

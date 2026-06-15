@@ -56,8 +56,8 @@ def check_guardrail(answer: str, grounded_prices: str):
             else f"🛑 BLOCKED — {res.reason}")
 
 
-with gr.Blocks(title="Smart Handy Man — RAG & Guardrail Playground") as demo:
-    gr.Markdown("# 🤖 Smart Handy Man — Hybrid RAG & Guardrail playground")
+with gr.Blocks(title="BuildRight AI — RAG & Guardrail Playground") as demo:
+    gr.Markdown("# 🤖 BuildRight AI — Hybrid RAG & Guardrail playground")
     with gr.Tab("Product search (hybrid RAG)"):
         q = gr.Textbox(label="Query", placeholder="cordless drill / something to cut plywood")
         out = gr.Dataframe(headers=["SKU", "Name", "Price", "Category"], label="Top results")

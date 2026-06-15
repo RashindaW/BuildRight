@@ -2,7 +2,7 @@
 
 ## Overview
 
-Smart Handy Man offers assembly and professional installation so your purchase is ready to use without the hassle. From snapping together a BBQ to installing a new dishwasher or smart thermostat, our trained associates and licensed installer network handle the work. This page covers what's available, what's included, fees, and how to book.
+BuildRight AI offers assembly and professional installation so your purchase is ready to use without the hassle. From snapping together a BBQ to installing a new dishwasher or smart thermostat, our trained associates and licensed installer network handle the work. This page covers what's available, what's included, fees, and how to book.
 
 All installation work is performed by trained BuildRight associates or vetted, licensed, and insured contractors in our installer network.
 

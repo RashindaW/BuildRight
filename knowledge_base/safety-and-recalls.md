@@ -2,7 +2,7 @@
 
 ## Overview
 
-Smart Handy Man takes product safety seriously. This page explains how we handle product recalls, where to find Safety Data Sheets, which items are age-restricted, our guidance on personal protective equipment, and the rules for handling and shipping hazardous materials. Following product safety information protects you, your household, and your warranty.
+BuildRight AI takes product safety seriously. This page explains how we handle product recalls, where to find Safety Data Sheets, which items are age-restricted, our guidance on personal protective equipment, and the rules for handling and shipping hazardous materials. Following product safety information protects you, your household, and your warranty.
 
 ## Product Recalls
 

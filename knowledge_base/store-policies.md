@@ -2,11 +2,11 @@
 
 ## Overview
 
-This page summarizes Smart Handy Man's general store policies. Several topics have their own detailed pages, which are linked from each section below. For shopping policies like returns, refunds, warranty, shipping, and price matching, see those dedicated documents.
+This page summarizes BuildRight AI's general store policies. Several topics have their own detailed pages, which are linked from each section below. For shopping policies like returns, refunds, warranty, shipping, and price matching, see those dedicated documents.
 
 ## Privacy and Data
 
-Smart Handy Man respects your privacy. We collect only the information needed to process your orders, operate the BuildRight Rewards program, and improve your shopping experience. We do not sell your personal data to third parties, and we comply with Canadian privacy law (PIPEDA and applicable provincial legislation).
+BuildRight AI respects your privacy. We collect only the information needed to process your orders, operate the BuildRight Rewards program, and improve your shopping experience. We do not sell your personal data to third parties, and we comply with Canadian privacy law (PIPEDA and applicable provincial legislation).
 
 - You can request access to, correction of, or deletion of your personal data at privacy@smarthandyman.ca.
 - Marketing emails include an unsubscribe link; transactional messages (order updates) are sent regardless of marketing preferences.
@@ -29,7 +29,7 @@ BuildRight Rewards lets you earn **1 point per $1** spent on qualifying purchase
 
 ## Gift Cards
 
-Smart Handy Man gift cards are available in store and online in denominations of **$25, $50, $100, and $250**. They do not expire and can be used in store or online. Lost or stolen physical cards cannot be replaced. Bulk and corporate orders are available. See [Gift Cards](gift-cards.md) for balance checks and full terms.
+BuildRight AI gift cards are available in store and online in denominations of **$25, $50, $100, and $250**. They do not expire and can be used in store or online. Lost or stolen physical cards cannot be replaced. Bulk and corporate orders are available. See [Gift Cards](gift-cards.md) for balance checks and full terms.
 
 ## Special Orders
 
@@ -66,7 +66,7 @@ Orders can be modified or cancelled before they ship, and you can track shipment
 
 ## Accessibility
 
-Smart Handy Man is committed to accessible service in line with provincial accessibility legislation (such as the AODA in Ontario).
+BuildRight AI is committed to accessible service in line with provincial accessibility legislation (such as the AODA in Ontario).
 
 - All stores are wheelchair accessible, with accessible parking and washrooms.
 - Service animals are welcome.
@@ -74,7 +74,7 @@ Smart Handy Man is committed to accessible service in line with provincial acces
 
 ## Environmental and Recycling Programs
 
-Smart Handy Man participates in stewardship and recycling programs across Canada:
+BuildRight AI participates in stewardship and recycling programs across Canada:
 
 - **Battery, paint, and electronics recycling** drop-off is available at most stores, in line with provincial programs.
 - **Propane tank exchange** keeps old cylinders in safe circulation.

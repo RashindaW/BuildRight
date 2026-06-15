@@ -8,7 +8,7 @@ Credit is provided through our banking partner and is subject to approval. Terms
 
 ## The BuildRight Credit Card
 
-A retail credit card you can use across all Smart Handy Man stores and at smarthandyman.ca.
+A retail credit card you can use across all BuildRight AI stores and at smarthandyman.ca.
 
 ### Cardholder Benefits
 

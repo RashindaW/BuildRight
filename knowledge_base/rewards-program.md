@@ -76,7 +76,7 @@ Tiers are reviewed monthly. Pairing BuildRight Rewards with a [Commercial or Pro
 
 ## Program Terms
 
-Smart Handy Man may adjust earning rates, redemption values, tiers, and benefits with reasonable notice. Points and reward credits have no cash value, cannot be sold, and are void where prohibited. Full terms are posted at smarthandyman.ca.
+BuildRight AI may adjust earning rates, redemption values, tiers, and benefits with reasonable notice. Points and reward credits have no cash value, cannot be sold, and are void where prohibited. Full terms are posted at smarthandyman.ca.
 
 ## Contact
 

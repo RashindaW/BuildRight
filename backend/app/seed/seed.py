@@ -1,4 +1,4 @@
-"""Idempotent seed for Smart Handy Man.
+"""Idempotent seed for BuildRight AI.
 
 Loads the curated catalog (root menu_data.py), generates a large realistic catalog
 (catalog_generator, ~1000+ products with SKUs), ingests the policy knowledge base,

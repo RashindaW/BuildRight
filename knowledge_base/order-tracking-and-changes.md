@@ -2,7 +2,7 @@
 
 ## Overview
 
-This page explains how to track your Smart Handy Man order, change or cancel it before it ships, update a delivery address, and what to do about delays, missing items, or damage. For shipping rates and timelines, see [Shipping & Delivery](shipping-delivery.md).
+This page explains how to track your BuildRight AI order, change or cancel it before it ships, update a delivery address, and what to do about delays, missing items, or damage. For shipping rates and timelines, see [Shipping & Delivery](shipping-delivery.md).
 
 ## Tracking Your Order
 

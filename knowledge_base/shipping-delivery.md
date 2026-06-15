@@ -2,13 +2,13 @@
 
 ## Overview
 
-Smart Handy Man delivers everything from a single box of screws to a full appliance suite across Canada. This page explains our shipping options, rates, delivery timelines, and what to do if something goes wrong with a shipment.
+BuildRight AI delivers everything from a single box of screws to a full appliance suite across Canada. This page explains our shipping options, rates, delivery timelines, and what to do if something goes wrong with a shipment.
 
 To track an existing order or change a delivery, see [Order Tracking & Changes](order-tracking-and-changes.md).
 
 ## Delivery Areas
 
-Smart Handy Man ships to all **provinces and territories in Canada**. We do not currently ship outside of Canada.
+BuildRight AI ships to all **provinces and territories in Canada**. We do not currently ship outside of Canada.
 
 - Remote and northern postal codes (including parts of the Territories and remote Indigenous communities) may require additional transit time and, for heavy items, an additional remote-area surcharge shown at checkout.
 - Some items are restricted from shipping to certain regions due to provincial regulations (see [Delivery Restrictions](#delivery-restrictions)).

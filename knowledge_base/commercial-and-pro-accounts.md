@@ -2,7 +2,7 @@
 
 ## Overview
 
-Smart Handy Man supports contractors, trades, builders, property managers, and businesses with dedicated accounts built for volume, speed, and predictable billing. Commercial and Pro accounts unlock volume pricing, a dedicated rep, net-30 terms, priority processing, and bulk/special-order support. This page explains the tiers, benefits, and how to apply.
+BuildRight AI supports contractors, trades, builders, property managers, and businesses with dedicated accounts built for volume, speed, and predictable billing. Commercial and Pro accounts unlock volume pricing, a dedicated rep, net-30 terms, priority processing, and bulk/special-order support. This page explains the tiers, benefits, and how to apply.
 
 ## Account Tiers
 

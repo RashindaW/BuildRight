@@ -2,7 +2,7 @@
 
 ## Our Commitment
 
-Smart Handy Man offers a **Price Match Guarantee**. If you find a lower price on an identical, in-stock item at a qualifying Canadian competitor, we will match it — both in store and online. We also match our own prices for a limited time after you buy (see [Post-Purchase Price Protection](#post-purchase-price-protection)).
+BuildRight AI offers a **Price Match Guarantee**. If you find a lower price on an identical, in-stock item at a qualifying Canadian competitor, we will match it — both in store and online. We also match our own prices for a limited time after you buy (see [Post-Purchase Price Protection](#post-purchase-price-protection)).
 
 Our goal is simple: you should never have to choose between BuildRight service and the best price.
 
@@ -55,7 +55,7 @@ If you find a lower qualifying price **within 7 days** of your purchase, contact
 
 ## Post-Purchase Price Protection
 
-If Smart Handy Man lowers the price of an item you bought within the last **30 days**, we will refund the difference. Bring your receipt to any store or contact us online — BuildRight Rewards members are automatically eligible and can request the adjustment from their order history. Price protection excludes clearance markdowns, limited-time doorcrasher events, and special orders.
+If BuildRight AI lowers the price of an item you bought within the last **30 days**, we will refund the difference. Bring your receipt to any store or contact us online — BuildRight Rewards members are automatically eligible and can request the adjustment from their order history. Price protection excludes clearance markdowns, limited-time doorcrasher events, and special orders.
 
 ## Price Match on Sale Items
 

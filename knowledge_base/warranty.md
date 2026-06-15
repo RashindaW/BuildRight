@@ -2,13 +2,13 @@
 
 ## Overview
 
-Every product sold at Smart Handy Man is backed by a manufacturer's warranty against defects in materials and workmanship. Many of our house brands carry warranties that meet or exceed the industry standard. This policy explains warranty periods, what is and is not covered, how to make a claim, and the extended protection plans available at checkout.
+Every product sold at BuildRight AI is backed by a manufacturer's warranty against defects in materials and workmanship. Many of our house brands carry warranties that meet or exceed the industry standard. This policy explains warranty periods, what is and is not covered, how to make a claim, and the extended protection plans available at checkout.
 
 Warranty coverage is separate from your right to return an item. For change-of-mind returns, see the [Returns Policy](returns.md).
 
 ## Manufacturer Warranty
 
-All products sold at Smart Handy Man carry the manufacturer's warranty. Warranty periods vary by brand and product type. Our house brands — **Mastercraft**, **ProBuilt**, **IronClad**, **VoltEdge**, and **AquaFlow** — are warranted by Smart Handy Man directly, so claims can be handled at any store.
+All products sold at BuildRight AI carry the manufacturer's warranty. Warranty periods vary by brand and product type. Our house brands — **Mastercraft**, **ProBuilt**, **IronClad**, **VoltEdge**, and **AquaFlow** — are warranted by BuildRight AI directly, so claims can be handled at any store.
 
 ## Standard Warranty Periods
 
@@ -57,7 +57,7 @@ Warranties do not cover:
 
 ## How to Make a Warranty Claim
 
-1. **In store:** bring the product and your receipt to any Smart Handy Man location. Our staff will assess the defect and process the claim. Keep your receipt — BuildRight Rewards members can also retrieve proof of purchase from their account.
+1. **In store:** bring the product and your receipt to any BuildRight AI location. Our staff will assess the defect and process the claim. Keep your receipt — BuildRight Rewards members can also retrieve proof of purchase from their account.
 2. **Online:** log in at smarthandyman.ca, go to **My Orders**, select the item, and click **Warranty Claim**. Attach clear photos or a short video of the defect.
 3. **Manufacturer direct:** for some national brands, you may also contact the manufacturer's warranty line directly. For our house brands (Mastercraft, ProBuilt, IronClad, VoltEdge, AquaFlow), BuildRight handles the claim for you.
 
@@ -84,7 +84,7 @@ Most warranty claims are assessed within **10–14 business days**. Parts-depend
 
 ## Extended Warranty Options
 
-Smart Handy Man offers **BuildRight Protection Plans** on power tools, kitchen and major appliances, outdoor power equipment, and electronics.
+BuildRight AI offers **BuildRight Protection Plans** on power tools, kitchen and major appliances, outdoor power equipment, and electronics.
 
 - Extends coverage for up to **4 additional years** beyond the manufacturer warranty.
 - Includes **accidental damage protection** (drops, spills, power surges) on eligible categories.

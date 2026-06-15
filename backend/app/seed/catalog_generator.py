@@ -1,4 +1,4 @@
-"""Deterministic generator for a large, realistic Smart Handy Man catalog.
+"""Deterministic generator for a large, realistic BuildRight AI catalog.
 
 Produces ~1000+ products across 20 retail categories, each with a unique SKU
 (BR-XXX-NNNNN), realistic name/description/keywords/price/stock and tags. Output
@@ -354,7 +354,7 @@ def generate_products(seed: int = 1337, target: int | None = None) -> list[dict]
                             desc = f"{vlabel} model. {desc}"
                         if slabel:
                             desc = f"{slabel} edition. {desc}"
-                        desc = f"{desc} {brand} quality, backed by the Smart Handy Man warranty."
+                        desc = f"{desc} {brand} quality, backed by the BuildRight AI warranty."
 
                         kw = list(ptype["kw"]) + [brand.lower(), cat["slug"]]
                         if vlabel:

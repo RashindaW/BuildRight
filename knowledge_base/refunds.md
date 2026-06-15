@@ -2,7 +2,7 @@
 
 ## Overview
 
-Smart Handy Man issues refunds for eligible returned items promptly and to the original payment method wherever possible. This policy explains how refunds are calculated, when they are issued, and the circumstances under which a refund may be reduced or denied.
+BuildRight AI issues refunds for eligible returned items promptly and to the original payment method wherever possible. This policy explains how refunds are calculated, when they are issued, and the circumstances under which a refund may be reduced or denied.
 
 For details on which items can be returned and how to start a return, see our [Returns Policy](returns.md). For payment-method-specific timelines, partial refunds, and escalation steps, see [Refund Policy Details](refund-policy-details.md).
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Smart Handy Man gift cards are the easy gift for any DIYer, homeowner, or contractor. They never expire, work in store and online, and come in physical and digital formats. This page covers denominations, how and where to use them, balance checks, lost/stolen policy, and bulk/corporate ordering.
+BuildRight AI gift cards are the easy gift for any DIYer, homeowner, or contractor. They never expire, work in store and online, and come in physical and digital formats. This page covers denominations, how and where to use them, balance checks, lost/stolen policy, and bulk/corporate ordering.
 
 ## Denominations and Formats
 
@@ -15,7 +15,7 @@ Smart Handy Man gift cards are the easy gift for any DIYer, homeowner, or contra
 
 Gift cards can be used toward almost anything we sell:
 
-- In store at any Smart Handy Man location
+- In store at any BuildRight AI location
 - Online at smarthandyman.ca
 - Toward [Assembly & Installation](assembly-and-installation.md) services
 - Toward [BuildRight Protection Plans](warranty.md) and extended warranties
@@ -64,7 +64,7 @@ Register your gift card to your smarthandyman.ca account to make balance trackin
 
 ## Bulk and Corporate Gift Cards
 
-Smart Handy Man offers volume gift card programs for businesses:
+BuildRight AI offers volume gift card programs for businesses:
 
 - **Employee recognition, safety incentives, and customer rewards** programs.
 - **Volume discounts** are available on qualifying bulk orders.

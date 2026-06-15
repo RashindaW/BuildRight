@@ -2,7 +2,7 @@
 
 ## Overview
 
-Smart Handy Man wants you to be completely satisfied with every purchase. If a product is not right for your project, your home, or your job site, we offer a straightforward, no-hassle return and exchange process both in store and online. This policy explains what you can return, how long you have, and exactly how to do it.
+BuildRight AI wants you to be completely satisfied with every purchase. If a product is not right for your project, your home, or your job site, we offer a straightforward, no-hassle return and exchange process both in store and online. This policy explains what you can return, how long you have, and exactly how to do it.
 
 For questions about how money is returned to you, see our [Refund Policy](refunds.md) and [Refund Policy Details](refund-policy-details.md).
 
@@ -20,7 +20,7 @@ Items must be in their original condition with original packaging, manuals, acce
 
 ## Eligible Items
 
-Most products sold at Smart Handy Man are eligible for return, including:
+Most products sold at BuildRight AI are eligible for return, including:
 
 - Hand tools (unused, or defective within warranty)
 - Power tools (unopened, or defective within warranty)
@@ -36,7 +36,7 @@ Most products sold at Smart Handy Man are eligible for return, including:
 
 A valid proof of purchase is required for all returns. We accept:
 
-- An original or digital Smart Handy Man receipt
+- An original or digital BuildRight AI receipt
 - An online order confirmation or packing slip
 - The payment card used (for purchases we can look up electronically)
 - Your **BuildRight Rewards** account, which stores up to **24 months** of purchase history
@@ -61,7 +61,7 @@ The following items **cannot** be returned for change of mind. Defective items i
 
 ### In Store
 
-1. Bring the item to any Smart Handy Man store location with your original receipt or order confirmation.
+1. Bring the item to any BuildRight AI store location with your original receipt or order confirmation.
 2. Take the item to the Returns & Customer Service desk near the store entrance.
 3. Our associate will inspect the item and process your refund or exchange on the spot. No appointment is needed.
 

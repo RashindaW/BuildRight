@@ -1,4 +1,4 @@
-# Smart Handy Man 🤖 — Vector Institute MLA (Cohort 12) skills mapping
+# BuildRight AI 🤖 — Vector Institute MLA (Cohort 12) skills mapping
 
 This project is a **guardrailed, multi-agent AI shopping assistant** for a hardware
 store, deployed live (free) on Hugging Face Spaces. It is built to demonstrate the
