@@ -15,6 +15,8 @@ class Conversation(TimestampMixin, Base):
     )
     session_id: Mapped[str | None] = mapped_column(String, nullable=True, index=True)
     title: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    # A 1-line, best-effort summary of what the customer is looking for (session memory).
+    summary: Mapped[str | None] = mapped_column(String(400), nullable=True)
     total_input_tokens: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     total_output_tokens: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 

@@ -1,11 +1,13 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import ReactMarkdown from "react-markdown";
 import { streamChat } from "../../lib/api/chatStream";
 import { chatApi, mediaApi } from "../../lib/api/endpoints";
 import { ApiError } from "../../lib/api/client";
 import { queryClient } from "../../lib/queryClient";
 import { useUiStore } from "../../store/uiStore";
+import { useAuth } from "../../context/AuthProvider";
 import type { ChatMessage } from "../../types";
 
 const QUICK = ["Where are cordless drills?", "Do you sell a laser level?", "What's your return policy?"];
@@ -14,7 +16,16 @@ export function ChatWidget() {
   const { chatOpen, setChatOpen, sessionId, setShortlistedItemIds } = useUiStore();
   const shortlistedItemIds = useUiStore((s) => s.shortlistedItemIds);
   const setShowOnlyShortlist = useUiStore((s) => s.setShowOnlyShortlist);
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const [showMemory, setShowMemory] = useState(false);
+  const memory = useQuery({
+    queryKey: ["chat-memory"],
+    queryFn: chatApi.memory,
+    enabled: chatOpen && !!user,
+  });
+  const memCount =
+    Object.keys(memory.data?.preferences ?? {}).length + (memory.data?.recent_summaries.length ?? 0);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -68,6 +79,7 @@ export function ChatWidget() {
       });
       setBusy(false);
       if (convId.current && rated === null) setAskRating(true); // invite a CSAT rating
+      if (user) queryClient.invalidateQueries({ queryKey: ["chat-memory"] }); // refresh remembered prefs
     }
   }
 
@@ -190,8 +202,41 @@ export function ChatWidget() {
     <div className="fixed bottom-6 right-6 z-40 flex h-[32rem] w-96 max-w-[calc(100vw-2rem)] flex-col card">
       <div className="flex items-center justify-between border-b bg-brand-600 px-4 py-3 text-white rounded-t-xl">
         <span className="font-semibold">Store Assistant</span>
-        <button onClick={() => setChatOpen(false)} aria-label="Close chat">✕</button>
+        <div className="flex items-center gap-2">
+          {user && memCount > 0 && (
+            <button
+              onClick={() => setShowMemory((v) => !v)}
+              className="rounded bg-white/15 px-2 py-0.5 text-xs hover:bg-white/25"
+              title="What we remember about you"
+            >
+              🧠 Memory
+            </button>
+          )}
+          <button onClick={() => setChatOpen(false)} aria-label="Close chat">✕</button>
+        </div>
       </div>
+
+      {user && showMemory && (
+        <div className="border-b bg-brand-50 px-4 py-2 text-xs text-gray-700">
+          <div className="mb-1 font-medium text-brand-800">What we remember</div>
+          {memCount === 0 ? (
+            <p className="text-gray-500">Nothing yet — tell me your preferred brand or what you're building.</p>
+          ) : (
+            <>
+              {Object.entries(memory.data?.preferences ?? {}).length > 0 && (
+                <div className="mb-1 flex flex-wrap gap-1">
+                  {Object.entries(memory.data!.preferences).map(([k, v]) => (
+                    <span key={k} className="badge bg-white text-brand-700">{k.replace(/_/g, " ")}: {v}</span>
+                  ))}
+                </div>
+              )}
+              {(memory.data?.recent_summaries ?? []).map((s, i) => (
+                <div key={i} className="text-gray-600">• {s}</div>
+              ))}
+            </>
+          )}
+        </div>
+      )}
 
       <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto p-4">
         {messages.length === 0 && (

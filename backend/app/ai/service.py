@@ -73,6 +73,34 @@ def complete(user_question: str, grounded_items: list[dict], max_tokens: int | N
     return text
 
 
+def summarize_need(messages: list[dict]) -> str:
+    """Best-effort 1-line summary of what the customer is looking for (session memory).
+
+    Cheap (Haiku, tiny output) and OFF the user-visible path — call it after the SSE
+    stream has already finished. Returns "" on any failure; never raises.
+    """
+    transcript = []
+    for m in messages[-8:]:
+        content = m.get("content")
+        if isinstance(content, str) and content.strip():
+            transcript.append(f"{m.get('role', '?')}: {content[:300]}")
+    if not transcript:
+        return ""
+    try:
+        resp = _get_sync_client().messages.create(
+            model=models.MODEL,
+            max_tokens=40,
+            temperature=0.0,
+            system=("Summarize, in ONE short line (max 18 words), what this hardware-store "
+                    "customer is looking for or working on. No preamble, just the line."),
+            messages=[{"role": "user", "content": "\n".join(transcript)}],
+        )
+        return "".join(b.text for b in resp.content if b.type == "text").strip()[:400]
+    except Exception:  # noqa: BLE001 - summary is optional; never break persistence
+        logger.info('"conversation_summary_failed"')
+        return ""
+
+
 # ---- Multi-turn chat with tool-use -------------------------------------
 
 _MAX_TOOL_ROUNDS = 6

@@ -147,6 +147,18 @@ def chat_stream(
             if c:
                 c.total_input_tokens += in_tokens
                 c.total_output_tokens += out_tokens
+                # Session memory: refresh a 1-line need-summary for logged-in users.
+                # Best-effort, off the user-visible path (stream already finished);
+                # its tokens are NOT added to the conversation budget.
+                if c.user_id:
+                    need = service.summarize_need(
+                        history + [
+                            {"role": "user", "content": body.message},
+                            {"role": "assistant", "content": assistant_text},
+                        ]
+                    )
+                    if need:
+                        c.summary = need
             s.commit()
         finally:
             s.close()
@@ -156,6 +168,22 @@ def chat_stream(
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no", "Connection": "keep-alive"},
     )
+
+
+@router.get("/memory")
+def chat_memory(db: Session = Depends(get_db), user=Depends(get_optional_user)):
+    """What we remember about the logged-in user: saved preferences + recent need-summaries."""
+    if not user:
+        return {"preferences": {}, "recent_summaries": []}
+    from app.services.memory_service import get_preferences
+    prefs = get_preferences(db, user.id)
+    summaries = db.execute(
+        select(Conversation.summary)
+        .where(Conversation.user_id == user.id, Conversation.summary.is_not(None))
+        .order_by(Conversation.created_at.desc())
+        .limit(5)
+    ).scalars().all()
+    return {"preferences": prefs, "recent_summaries": [s for s in summaries if s]}
 
 
 @router.post("/feedback", dependencies=[Depends(verify_csrf)])

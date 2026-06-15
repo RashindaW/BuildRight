@@ -179,13 +179,19 @@ export const analyticsApi = {
   csat: (days = 30) => api<Csat>(`/analytics/csat?days=${days}`),
 };
 
-// ---- Chat feedback ----
+// ---- Chat feedback + memory ----
+export interface ChatMemory {
+  preferences: Record<string, string>;
+  recent_summaries: string[];
+}
+
 export const chatApi = {
   feedback: (conversationId: string, rating: number, comment?: string) =>
     api<{ message: string; rating: number }>("/chat/feedback", {
       method: "POST",
       body: { conversation_id: conversationId, rating, comment: comment ?? null },
     }),
+  memory: () => api<ChatMemory>("/chat/memory"),
 };
 
 // ---- Admin ----
