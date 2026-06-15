@@ -28,3 +28,6 @@ frontend/public/img/menu/*
 htmlcov/
 playwright-report/
 test-results/
+
+# Fine-tuned DistilBERT weights (large; trained offline, not shipped)
+backend/app/ml/model/

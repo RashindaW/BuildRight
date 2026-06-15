@@ -1,0 +1,4 @@
+# OFFLINE training only — NEVER added to the deployed image (backend/requirements.txt).
+# Install into a throwaway env:  pip install -r backend/ml/requirements-train.txt
+torch>=2.2,<3.0
+transformers>=4.40,<5.0
