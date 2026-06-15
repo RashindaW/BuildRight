@@ -8,7 +8,7 @@ import { queryClient } from "../../lib/queryClient";
 import { useUiStore } from "../../store/uiStore";
 import type { ChatMessage } from "../../types";
 
-const QUICK = ["Where are cordless drills?", "What's your return policy?", "Do you price match?"];
+const QUICK = ["Where are cordless drills?", "Do you sell a laser level?", "What's your return policy?"];
 
 export function ChatWidget() {
   const { chatOpen, setChatOpen, sessionId, setShortlistedItemIds } = useUiStore();
