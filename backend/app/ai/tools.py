@@ -837,8 +837,19 @@ def execute_search_kb(tool_input: dict, ctx) -> tuple[str, list]:
     doc_types = [_TOPIC_TO_DOC_TYPE[topic]] if topic and topic in _TOPIC_TO_DOC_TYPE else None
 
     from app.core.config import settings
-    chunks = hybrid_search_kb(ctx.db, inp.get("query", ""), doc_types=doc_types,
-                              rerank=settings.rerank_enabled)
+    from app.ai.query_expand import is_comparison, multi_retrieve
+    q = inp.get("query", "")
+    if is_comparison(q):
+        # Comparison question → fan out into sub-queries (multi-hop) so both sides
+        # are covered, then RRF-fuse.
+        chunks = multi_retrieve(
+            q,
+            lambda s: hybrid_search_kb(ctx.db, s, doc_types=doc_types, rerank=settings.rerank_enabled),
+            key_fn=lambda h: h.chunk_id,
+            k=settings.kb_top_k,
+        )
+    else:
+        chunks = hybrid_search_kb(ctx.db, q, doc_types=doc_types, rerank=settings.rerank_enabled)
     if not chunks:
         return json.dumps({"results": [], "note": "No matching policy found. Suggest contacting customer service."}), []
 
