@@ -111,6 +111,13 @@ class Settings(BaseSettings):
         # Secure cookies only over HTTPS (production). Dev/test use http.
         return self.environment == "production"
 
+    @property
+    def cookie_samesite(self) -> str:
+        # In production (HTTPS) use SameSite=None so cookies survive when the app
+        # is embedded in an iframe (e.g. a Hugging Face Space). None REQUIRES Secure,
+        # which cookie_secure provides. Dev/test stay on Lax (http can't use None).
+        return "none" if self.cookie_secure else "lax"
+
 
 def get_settings() -> Settings:
     return Settings()

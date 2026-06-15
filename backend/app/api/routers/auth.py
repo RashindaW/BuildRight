@@ -52,7 +52,7 @@ def _set_auth_cookies(response: Response, user: User, db: Session) -> str:
     db.commit()
     csrf = generate_csrf_token()
     secure = settings.cookie_secure
-    samesite = "lax"
+    samesite = settings.cookie_samesite
     response.set_cookie("access_token", access, httponly=True, secure=secure,
                         samesite=samesite, max_age=settings.access_token_expire_minutes * 60)
     response.set_cookie("refresh_token", f"{jti}.{raw_refresh}", httponly=True, secure=secure,
@@ -151,5 +151,6 @@ def me(user: User = Depends(get_current_user)):
 def get_csrf(response: Response):
     csrf = generate_csrf_token()
     secure = settings.cookie_secure
-    response.set_cookie(CSRF_COOKIE, csrf, httponly=False, secure=secure, samesite="lax")
+    response.set_cookie(CSRF_COOKIE, csrf, httponly=False, secure=secure,
+                        samesite=settings.cookie_samesite)
     return CsrfOut(csrf_token=csrf)
