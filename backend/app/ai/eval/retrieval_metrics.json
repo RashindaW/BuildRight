@@ -1,8 +1,14 @@
 {
-  "kb": {
+  "kb_baseline": {
     "hit@5": 0.8571,
     "mrr": 0.5417,
     "ndcg@5": 0.6022,
+    "queries": 14
+  },
+  "kb_reranked": {
+    "hit@5": 0.9286,
+    "mrr": 0.5893,
+    "ndcg@5": 0.6284,
     "queries": 14
   },
   "products": {

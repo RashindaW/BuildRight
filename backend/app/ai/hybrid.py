@@ -179,11 +179,14 @@ def hybrid_search_kb(
     query: str,
     k: int | None = None,
     doc_types: list[str] | None = None,
+    rerank: bool = False,
 ) -> list[ChunkHit]:
-    """Hybrid KB search: lexical + vector → RRF → top-k ChunkHits.
+    """Hybrid KB search: lexical + vector → RRF → (optional re-rank) → top-k ChunkHits.
 
     doc_types: filter by Document.source_type (e.g. ["policy", "warranty"]).
     k defaults to settings.kb_top_k.
+    rerank: re-score the RRF candidate pool with the re-ranker (cross-encoder if
+    available, else a feature re-ranker) before truncating to k — improves precision.
     ChunkHits carry doc_slug, doc_title, heading, content for citations.
     """
     from sqlalchemy import select
@@ -247,4 +250,13 @@ def hybrid_search_kb(
         [lexical_ranked, vector_ranked],
         key_fn=lambda h: h.chunk_id,
     )
-    return [hit for hit, _ in fused[:k]]
+    candidates = [hit for hit, _ in fused]
+    if rerank:
+        # Re-rank a wider candidate pool, then truncate — precision lives here.
+        from app.ai.rerank import rerank as _rerank
+        candidates = _rerank(
+            query, candidates[: max(k * 3, 12)],
+            text_fn=lambda h: h.content,
+            heading_fn=lambda h: h.heading or "",
+        )
+    return candidates[:k]

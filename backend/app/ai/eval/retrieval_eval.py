@@ -99,11 +99,11 @@ def aggregate(rankings: list[tuple[list[str], set[str]]], k: int = 5) -> dict:
 
 # --- Live evaluators over the seeded DB ------------------------------------
 
-def evaluate_kb(db, k: int = 5) -> dict:
+def evaluate_kb(db, k: int = 5, rerank: bool = False) -> dict:
     from app.ai.hybrid import hybrid_search_kb
     rankings = []
     for q, relevant in LABELED_KB:
-        hits = hybrid_search_kb(db, q, k=max(k, 8))
+        hits = hybrid_search_kb(db, q, k=max(k, 8), rerank=rerank)
         rankings.append(([h.doc_slug for h in hits], relevant))
     return aggregate(rankings, k)
 
@@ -122,7 +122,11 @@ def main() -> None:
     logging.basicConfig(level=logging.INFO)
     db = SessionLocal()
     try:
-        result = {"kb": evaluate_kb(db), "products": evaluate_products(db)}
+        result = {
+            "kb_baseline": evaluate_kb(db, rerank=False),
+            "kb_reranked": evaluate_kb(db, rerank=True),
+            "products": evaluate_products(db),
+        }
     finally:
         db.close()
     _OUT.write_text(json.dumps(result, indent=2), encoding="utf-8")

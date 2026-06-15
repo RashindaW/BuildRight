@@ -836,7 +836,9 @@ def execute_search_kb(tool_input: dict, ctx) -> tuple[str, list]:
     topic = inp.get("topic")
     doc_types = [_TOPIC_TO_DOC_TYPE[topic]] if topic and topic in _TOPIC_TO_DOC_TYPE else None
 
-    chunks = hybrid_search_kb(ctx.db, inp.get("query", ""), doc_types=doc_types)
+    from app.core.config import settings
+    chunks = hybrid_search_kb(ctx.db, inp.get("query", ""), doc_types=doc_types,
+                              rerank=settings.rerank_enabled)
     if not chunks:
         return json.dumps({"results": [], "note": "No matching policy found. Suggest contacting customer service."}), []
 

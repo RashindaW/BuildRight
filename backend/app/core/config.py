@@ -55,6 +55,7 @@ class Settings(BaseSettings):
     llm_model_heavy: str = "claude-sonnet-4-6"   # complex multi-step + multimodal turns
     llm_router_model: str = "claude-haiku-4-5"   # the cheap classifier
     model_router_enabled: bool = True            # toggle the Haiku→Sonnet router
+    rerank_enabled: bool = True                  # re-rank KB retrieval (cross-encoder/feature)
     llm_max_tokens: int = 400
     # Catalog scale + product imagery
     catalog_target: int | None = None            # None = curated ~1.2k; e.g. 10000 for the big catalog
