@@ -118,9 +118,10 @@ SEARCH_PRODUCTS_TOOL = {
 SEARCH_KNOWLEDGE_BASE_TOOL = {
     "name": "search_knowledge_base",
     "description": (
-        "Search BuildRight Hardware's policy and FAQ knowledge base. Call this BEFORE "
-        "answering any question about returns, refunds, warranty, shipping, price-match, "
-        "or store policies. Always cite the source in your answer."
+        "Search BuildRight Hardware's knowledge base: store policies (returns, refunds, "
+        "warranty, shipping, price-match) AND product buying guides ('how do I choose', "
+        "'what's the difference between X and Y', what each variant/option means). Call this "
+        "BEFORE answering any policy question or any advice/how-to-choose question. Always cite the source."
     ),
     "input_schema": {
         "type": "object",

@@ -406,8 +406,9 @@ def run() -> None:
         made_admin = seed_admin(db)
         n_demo = seed_demo_accounts(db)
 
-        from app.seed.seed_kb import ingest_knowledge_base
+        from app.seed.seed_kb import ingest_buying_guides, ingest_knowledge_base
         n_chunks = ingest_knowledge_base(db)
+        n_chunks += ingest_buying_guides(db)  # per-type buying guides → vector KB
 
         # Embeddings power the vector arm of hybrid retrieval. The provider auto-falls
         # back to the deterministic 'hash' provider if fastembed/onnxruntime can't load,
