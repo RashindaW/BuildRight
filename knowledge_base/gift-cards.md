@@ -8,7 +8,7 @@ BuildRight AI gift cards are the easy gift for any DIYer, homeowner, or contract
 
 - **Preset denominations:** **$25, $50, $100, and $250** (CAD).
 - **Custom amounts:** load any amount from **$10 to $1,000** in store or online.
-- **Physical cards:** available at any store and shipped from smarthandyman.ca.
+- **Physical cards:** available at any store and shipped from buildright.ca.
 - **eGift cards:** delivered by email, usually within minutes (up to a few hours during high volume), with a message you choose.
 
 ## Where You Can Use Gift Cards
@@ -16,7 +16,7 @@ BuildRight AI gift cards are the easy gift for any DIYer, homeowner, or contract
 Gift cards can be used toward almost anything we sell:
 
 - In store at any BuildRight AI location
-- Online at smarthandyman.ca
+- Online at buildright.ca
 - Toward [Assembly & Installation](assembly-and-installation.md) services
 - Toward [BuildRight Protection Plans](warranty.md) and extended warranties
 
@@ -38,7 +38,7 @@ You can **combine multiple gift cards** on a single order, and use a gift card a
 
 You can check a gift card balance any time:
 
-- **Online:** enter the card number and PIN at the **Check Gift Card Balance** page on smarthandyman.ca.
+- **Online:** enter the card number and PIN at the **Check Gift Card Balance** page on buildright.ca.
 - **In store:** ask any associate at the service desk.
 - **By phone:** call 1-800-BUILD-IT and follow the gift card prompts.
 
@@ -58,9 +58,9 @@ When you return an item that was paid for with a gift card, the refund is issued
 
 - **Physical gift cards** are treated like cash: if lost or stolen, they **cannot be replaced**, and any remaining balance may be used by whoever holds the card. Keep your card and PIN secure.
 - **Damaged physical cards** that are still readable, or where you have your purchase receipt and card number, may be replaced for the remaining balance at our discretion — bring them to a service desk.
-- **eGift cards:** if you cannot find the email, we can resend it to the original recipient address; contact support@smarthandyman.ca with your order number.
+- **eGift cards:** if you cannot find the email, we can resend it to the original recipient address; contact support@buildright.ca with your order number.
 
-Register your gift card to your smarthandyman.ca account to make balance tracking and support easier.
+Register your gift card to your buildright.ca account to make balance tracking and support easier.
 
 ## Bulk and Corporate Gift Cards
 
@@ -72,10 +72,10 @@ BuildRight AI offers volume gift card programs for businesses:
 - Physical card bundles or bulk **eGift card** distribution by email/CSV.
 - Often paired with a [Commercial or Pro account](commercial-and-pro-accounts.md) for streamlined billing.
 
-To set up a bulk order, contact our corporate sales team at corporate@smarthandyman.ca or call 1-800-BUILD-IT and ask for gift card sales.
+To set up a bulk order, contact our corporate sales team at corporate@buildright.ca or call 1-800-BUILD-IT and ask for gift card sales.
 
 ## Contact
 
-- **Online chat:** at smarthandyman.ca during store hours
-- **Email:** support@smarthandyman.ca (or corporate@smarthandyman.ca for bulk orders)
+- **Online chat:** at buildright.ca during store hours
+- **Email:** support@buildright.ca (or corporate@buildright.ca for bulk orders)
 - **Phone:** 1-800-BUILD-IT (Monday–Friday 8 AM–8 PM ET)

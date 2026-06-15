@@ -77,7 +77,7 @@ We do not ship or deliver on Canadian statutory holidays (for example, New Year'
 
 ## Order Tracking
 
-Once your order ships, you will receive a tracking number by email. You can track your order through smarthandyman.ca under **My Orders**, or via the carrier's website directly. See [Order Tracking & Changes](order-tracking-and-changes.md) for help with delays, address changes, and missing items.
+Once your order ships, you will receive a tracking number by email. You can track your order through buildright.ca under **My Orders**, or via the carrier's website directly. See [Order Tracking & Changes](order-tracking-and-changes.md) for help with delays, address changes, and missing items.
 
 ## Delivery Restrictions
 
@@ -102,10 +102,10 @@ We will arrange a free replacement or refund at no cost to you. Do not discard t
 
 ## Lost or Delayed Shipments
 
-If tracking shows no movement for **5 business days**, or a delivery is marked delivered but you have not received it, contact us at 1-800-BUILD-IT or support@smarthandyman.ca. We will open a carrier investigation and, if the package cannot be located, send a replacement or issue a full refund.
+If tracking shows no movement for **5 business days**, or a delivery is marked delivered but you have not received it, contact us at 1-800-BUILD-IT or support@buildright.ca. We will open a carrier investigation and, if the package cannot be located, send a replacement or issue a full refund.
 
 ## Contact Us
 
-- **Online chat:** at smarthandyman.ca during store hours
-- **Email:** support@smarthandyman.ca
+- **Online chat:** at buildright.ca during store hours
+- **Email:** support@buildright.ca
 - **Phone:** 1-800-BUILD-IT (Monday–Friday 8 AM–8 PM ET)

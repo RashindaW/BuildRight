@@ -69,7 +69,7 @@ You may return online orders in store at no cost — this is the fastest way to 
 
 ### Online
 
-1. Log in to your account at smarthandyman.ca, go to **My Orders**, and select **Request Return**.
+1. Log in to your account at buildright.ca, go to **My Orders**, and select **Request Return**.
 2. Choose the items and a reason for the return.
 3. You will receive a **prepaid return shipping label** by email within **1–2 business days**.
 4. Pack the item securely in its original packaging where possible, attach the label, and drop it at any authorized carrier location.
@@ -109,8 +109,8 @@ If you cannot locate a receipt and we are unable to find your purchase electroni
 
 ## Contact Us
 
-- **Online chat:** available at smarthandyman.ca during store hours
-- **Email:** support@smarthandyman.ca (response within 1 business day)
+- **Online chat:** available at buildright.ca during store hours
+- **Email:** support@buildright.ca (response within 1 business day)
 - **Phone:** 1-800-BUILD-IT (Monday–Friday 8 AM–8 PM ET)
 
 Please have your order number and the original payment method ready.

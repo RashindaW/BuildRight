@@ -280,7 +280,7 @@ async def stream_chat(
         logger.info('"guardrail_citation_soft: policy answer without grounded chunks"')
         final_text += (
             "\n\n_(For the most accurate policy details, please contact our customer "
-            "service team or visit smarthandyman.ca.)_"
+            "service team or visit buildright.ca.)_"
         )
 
     for chunk in _emit_chunks(final_text):

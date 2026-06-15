@@ -8,7 +8,7 @@ Credit is provided through our banking partner and is subject to approval. Terms
 
 ## The BuildRight Credit Card
 
-A retail credit card you can use across all BuildRight AI stores and at smarthandyman.ca.
+A retail credit card you can use across all BuildRight AI stores and at buildright.ca.
 
 ### Cardholder Benefits
 
@@ -16,7 +16,7 @@ A retail credit card you can use across all BuildRight AI stores and at smarthan
 - **Access to special financing** offers (equal-payment and deferred plans) on qualifying purchases.
 - **Exclusive cardholder events** and early access to select sales.
 - **No annual fee.**
-- Digital statements and account management in your smarthandyman.ca account.
+- Digital statements and account management in your buildright.ca account.
 
 ### Rates and Fees
 
@@ -63,12 +63,12 @@ Approval, your credit limit, and your rate are determined by the lender based on
 ## How to Apply
 
 1. **In store:** apply at any service desk; instant decisions are common, and approved applicants can often use the card the same day.
-2. **Online:** apply at smarthandyman.ca — the application takes a few minutes and is secured with SSL encryption.
+2. **Online:** apply at buildright.ca — the application takes a few minutes and is secured with SSL encryption.
 3. **At checkout:** ask an associate to apply your approved card and select a financing plan on a qualifying purchase.
 
 ## Managing Your Account
 
-- View statements, make payments, and set up autopay in your smarthandyman.ca account or through our banking partner's portal.
+- View statements, make payments, and set up autopay in your buildright.ca account or through our banking partner's portal.
 - Set up **automatic payments** to avoid missing an equal-payment or deferred-plan deadline.
 - Lost or stolen card? Report it immediately using the number on the back of your card or in your online account.
 
@@ -79,7 +79,7 @@ If you return an item purchased on a financing plan, the refund is **credited to
 ## Contact
 
 - **Phone:** 1-800-BUILD-IT (Monday–Friday 8 AM–8 PM ET)
-- **Email:** support@smarthandyman.ca
-- **Online chat:** at smarthandyman.ca during store hours
+- **Email:** support@buildright.ca
+- **Online chat:** at buildright.ca during store hours
 
 For account-specific questions (balance, payments, interest), use the contact information on your statement or in your cardholder agreement with our banking partner.

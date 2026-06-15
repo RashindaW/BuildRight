@@ -8,7 +8,7 @@ This page explains how to track your BuildRight AI order, change or cancel it be
 
 ### Online
 
-1. Sign in at smarthandyman.ca and go to **My Orders**.
+1. Sign in at buildright.ca and go to **My Orders**.
 2. Select your order to see its status: **Processing → Ready/Shipped → Out for Delivery → Delivered** (or **Ready for Pickup** for in-store pickup).
 3. Once shipped, your **tracking number** links directly to the carrier's tracking page.
 
@@ -20,7 +20,7 @@ This page explains how to track your BuildRight AI order, change or cancel it be
 
 ### Guest Orders
 
-If you checked out as a guest, use the **Track Order** link in your confirmation email, or enter your order number and email on the **Track Order** page at smarthandyman.ca.
+If you checked out as a guest, use the **Track Order** link in your confirmation email, or enter your order number and email on the **Track Order** page at buildright.ca.
 
 ## Order Status Explained
 
@@ -38,7 +38,7 @@ If you checked out as a guest, use the **Track Order** link in your confirmation
 
 You can modify or cancel an order **before it ships**.
 
-- **How:** go to **My Orders**, select the order, and choose **Cancel** or **Edit** if the option is available, or contact us right away at 1-800-BUILD-IT or support@smarthandyman.ca.
+- **How:** go to **My Orders**, select the order, and choose **Cancel** or **Edit** if the option is available, or contact us right away at 1-800-BUILD-IT or support@buildright.ca.
 - **Timing:** orders placed before 2 PM local time often ship the same day, so contact us as soon as possible. Once an order is in **Shipped** status, it can no longer be changed and you'll need the [Returns Policy](returns.md).
 - **Refunds for cancellations:** if you were already charged, the refund follows the [Refund Policy Details](refund-policy-details.md) timelines.
 - **Special orders:** cancellations may forfeit the 20% non-refundable deposit (see [Store Policies › Special Orders](store-policies.md)).
@@ -89,8 +89,8 @@ If your order is taking longer than expected:
 
 ## Contact
 
-- **Online chat:** at smarthandyman.ca during store hours
-- **Email:** support@smarthandyman.ca (response within 1 business day)
+- **Online chat:** at buildright.ca during store hours
+- **Email:** support@buildright.ca (response within 1 business day)
 - **Phone:** 1-800-BUILD-IT (Monday–Friday 8 AM–8 PM ET)
 
 Have your order number ready to speed things up.

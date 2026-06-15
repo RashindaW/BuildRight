@@ -8,7 +8,7 @@ Membership is **free** and there is no annual fee.
 
 ## How to Enroll
 
-- **Online:** sign up at smarthandyman.ca in a couple of minutes.
+- **Online:** sign up at buildright.ca in a couple of minutes.
 - **In store:** ask any associate at checkout or the service desk.
 - **In the app:** create your account and add your digital membership card.
 
@@ -70,16 +70,16 @@ Tiers are reviewed monthly. Pairing BuildRight Rewards with a [Commercial or Pro
 
 ## Managing Your Account
 
-- View your **points balance, tier, and history** in your smarthandyman.ca account or the app.
+- View your **points balance, tier, and history** in your buildright.ca account or the app.
 - Update your contact preferences to receive bonus-event and expiry notifications.
 - One membership per person; points are **not transferable** between accounts and have **no cash value** except as reward credit.
 
 ## Program Terms
 
-BuildRight AI may adjust earning rates, redemption values, tiers, and benefits with reasonable notice. Points and reward credits have no cash value, cannot be sold, and are void where prohibited. Full terms are posted at smarthandyman.ca.
+BuildRight AI may adjust earning rates, redemption values, tiers, and benefits with reasonable notice. Points and reward credits have no cash value, cannot be sold, and are void where prohibited. Full terms are posted at buildright.ca.
 
 ## Contact
 
-- **Online chat:** at smarthandyman.ca during store hours
-- **Email:** rewards@smarthandyman.ca
+- **Online chat:** at buildright.ca during store hours
+- **Email:** rewards@buildright.ca
 - **Phone:** 1-800-BUILD-IT (Monday–Friday 8 AM–8 PM ET)

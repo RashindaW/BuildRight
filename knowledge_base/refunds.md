@@ -75,8 +75,8 @@ Refunded sales tax is returned at the same rate it was charged, based on the ori
 
 If your refund is not received within the stated timeframe, contact us:
 
-- **Online chat** (during store hours, at smarthandyman.ca)
-- **Email:** refunds@smarthandyman.ca
+- **Online chat** (during store hours, at buildright.ca)
+- **Email:** refunds@buildright.ca
 - **Phone:** 1-800-BUILD-IT (Monday–Friday 8 AM–8 PM ET)
 
 Please have your order number, return confirmation, and original payment method ready when contacting us. For escalation steps when a refund is delayed or disputed, see [Refund Policy Details › How to Escalate a Refund](refund-policy-details.md).

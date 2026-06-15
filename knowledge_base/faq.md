@@ -3,7 +3,7 @@
 ## Store Policies
 
 ### What are your store hours?
-BuildRight AI stores are open Monday–Friday 7 AM–9 PM, Saturday 7 AM–8 PM, and Sunday 8 AM–6 PM (local time). Hours may vary by location and on statutory holidays. Check your local store page at smarthandyman.ca for holiday hours.
+BuildRight AI stores are open Monday–Friday 7 AM–9 PM, Saturday 7 AM–8 PM, and Sunday 8 AM–6 PM (local time). Hours may vary by location and on statutory holidays. Check your local store page at buildright.ca for holiday hours.
 
 ### Do you offer installation services?
 Yes. We offer professional installation for select products including appliances, smart-home devices, and outdoor power equipment. We also offer in-store and in-home assembly for items like BBQs, furniture, and shelving. See [Assembly & Installation](assembly-and-installation.md) for what's included and how to book.
@@ -33,7 +33,7 @@ Yes. Mastercraft is one of our key house brands for tools, hardware, and outdoor
 Yes. We carry 20 lb propane tanks and related accessories (regulators, hoses) in store. Propane tanks cannot be shipped and must be picked up in store, and purchasers must be 18 or older. See [Safety & Recalls](safety-and-recalls.md).
 
 ### Can I get a product recommendation?
-Our in-store associates are knowledgeable about every category and can help you choose the right tool or product for your project. You can also ask our Store Assistant chatbot at smarthandyman.ca for quick product guidance anytime.
+Our in-store associates are knowledgeable about every category and can help you choose the right tool or product for your project. You can also ask our Store Assistant chatbot at buildright.ca for quick product guidance anytime.
 
 ### Do your cordless tools share batteries?
 Yes. ProBuilt and VoltEdge cordless tools run on the shared VoltEdge battery platform, so one battery works across compatible tools. Batteries and chargers carry a 3-year warranty.
@@ -50,7 +50,7 @@ We accept Visa, Mastercard, American Express, debit cards, the BuildRight Credit
 Orders can be modified or cancelled before they are shipped. Once shipped, you will need to use our return process. Contact customer service as soon as possible — see [Order Tracking & Changes](order-tracking-and-changes.md).
 
 ### How do I track my order?
-Log in at smarthandyman.ca and go to **My Orders**, or use the tracking number emailed to you when your order ships. See [Order Tracking & Changes](order-tracking-and-changes.md).
+Log in at buildright.ca and go to **My Orders**, or use the tracking number emailed to you when your order ships. See [Order Tracking & Changes](order-tracking-and-changes.md).
 
 ### Is it safe to pay online?
 Yes. Our online store uses industry-standard SSL encryption and secure payment processing. We do not store your full card number.
@@ -78,7 +78,7 @@ Yes. We offer volume pricing, dedicated reps, net-30 terms, and priority process
 ## Safety and Recalls
 
 ### How do I find out about product recalls?
-We post active recalls at smarthandyman.ca and notify affected customers we can identify (including BuildRight Rewards members). See [Safety & Recalls](safety-and-recalls.md) for the recall process and how to return a recalled item.
+We post active recalls at buildright.ca and notify affected customers we can identify (including BuildRight Rewards members). See [Safety & Recalls](safety-and-recalls.md) for the recall process and how to return a recalled item.
 
 ### Where can I find a Safety Data Sheet (SDS)?
 SDS documents for chemicals and hazardous products are available on the product page online and from any store associate. See [Safety & Recalls › Safety Data Sheets](safety-and-recalls.md).
@@ -87,6 +87,6 @@ SDS documents for chemicals and hazardous products are available on the product 
 
 If your question is not answered here, please contact our customer service team:
 
-- **Online chat:** available at smarthandyman.ca during store hours
-- **Email:** support@smarthandyman.ca (response within 1 business day)
+- **Online chat:** available at buildright.ca during store hours
+- **Email:** support@buildright.ca (response within 1 business day)
 - **Phone:** 1-800-BUILD-IT (Monday–Friday 8 AM–8 PM ET)

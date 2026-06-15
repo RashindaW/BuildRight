@@ -8,9 +8,9 @@ This page summarizes BuildRight AI's general store policies. Several topics have
 
 BuildRight AI respects your privacy. We collect only the information needed to process your orders, operate the BuildRight Rewards program, and improve your shopping experience. We do not sell your personal data to third parties, and we comply with Canadian privacy law (PIPEDA and applicable provincial legislation).
 
-- You can request access to, correction of, or deletion of your personal data at privacy@smarthandyman.ca.
+- You can request access to, correction of, or deletion of your personal data at privacy@buildright.ca.
 - Marketing emails include an unsubscribe link; transactional messages (order updates) are sent regardless of marketing preferences.
-- For full details, see our Privacy Policy at smarthandyman.ca.
+- For full details, see our Privacy Policy at buildright.ca.
 
 ## Payment and Pricing
 
@@ -62,7 +62,7 @@ See [Safety & Recalls](safety-and-recalls.md) for recalls, SDS access, PPE, and 
 
 ## Order Changes and Tracking
 
-Orders can be modified or cancelled before they ship, and you can track shipments from **My Orders** at smarthandyman.ca. For address changes, delays, and missing or damaged items, see [Order Tracking & Changes](order-tracking-and-changes.md).
+Orders can be modified or cancelled before they ship, and you can track shipments from **My Orders** at buildright.ca. For address changes, delays, and missing or damaged items, see [Order Tracking & Changes](order-tracking-and-changes.md).
 
 ## Accessibility
 
@@ -70,7 +70,7 @@ BuildRight AI is committed to accessible service in line with provincial accessi
 
 - All stores are wheelchair accessible, with accessible parking and washrooms.
 - Service animals are welcome.
-- For assistance with online accessibility, contact accessibility@smarthandyman.ca.
+- For assistance with online accessibility, contact accessibility@buildright.ca.
 
 ## Environmental and Recycling Programs
 
@@ -88,6 +88,6 @@ We reserve the right to refuse service to anyone who is verbally abusive, harass
 
 ## Contact Us
 
-- **Online chat:** at smarthandyman.ca during store hours
-- **Email:** support@smarthandyman.ca
+- **Online chat:** at buildright.ca during store hours
+- **Email:** support@buildright.ca
 - **Phone:** 1-800-BUILD-IT (Monday–Friday 8 AM–8 PM ET)

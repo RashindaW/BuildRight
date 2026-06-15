@@ -99,5 +99,5 @@ If the installer finds extra work is required, they will pause and provide a wri
 ## Contact
 
 - **Phone:** 1-800-BUILD-IT (Monday–Friday 8 AM–8 PM ET)
-- **Email:** support@smarthandyman.ca
-- **Online chat:** at smarthandyman.ca during store hours
+- **Email:** support@buildright.ca
+- **Online chat:** at buildright.ca during store hours

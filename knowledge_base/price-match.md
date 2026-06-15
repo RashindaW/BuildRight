@@ -12,7 +12,7 @@ We will match the advertised price of identical items (same brand, model number,
 
 - Major Canadian hardware and home-improvement retailers (physical stores and their official websites)
 - National department stores and warehouse clubs with a hardware section, where the item is available to the general public
-- Our own smarthandyman.ca price if it drops after your purchase, within the protection window
+- Our own buildright.ca price if it drops after your purchase, within the protection window
 
 ## Conditions for Price Match
 
@@ -47,7 +47,7 @@ Show the advertised price (printed flyer or on your phone) to a store associate 
 
 ### Online (At Time of Purchase)
 
-Start a chat at smarthandyman.ca before completing your order, share a link or screenshot of the competitor's price, and our team will adjust your cart if it qualifies.
+Start a chat at buildright.ca before completing your order, share a link or screenshot of the competitor's price, and our team will adjust your cart if it qualifies.
 
 ### After Purchase
 
@@ -67,6 +67,6 @@ A price match reflects the competitor's price in place of any BuildRight promoti
 
 ## Contact Us
 
-- **Online chat:** at smarthandyman.ca during store hours
-- **Email:** support@smarthandyman.ca
+- **Online chat:** at buildright.ca during store hours
+- **Email:** support@buildright.ca
 - **Phone:** 1-800-BUILD-IT (Monday–Friday 8 AM–8 PM ET)

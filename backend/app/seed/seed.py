@@ -38,6 +38,7 @@ from app.seed.catalog_generator import (
     CATEGORY_LABELS as _GEN_CATEGORY_LABELS,
     generate_products,
 )
+from app.seed.image_provider import image_url_for
 
 logger = logging.getLogger("app.seed")
 
@@ -190,6 +191,10 @@ def seed_menu(db: Session, menu_data: list[dict] | None = None) -> int:
             item.image_url = entry["image_url"]
         elif (_IMG_DIR / f"{entry['id']}.jpg").exists():
             item.image_url = f"menu/{entry['id']}.jpg"
+        else:
+            # No curated image → reuse the per-type licensed photo (or a clean placeholder),
+            # so curated items match the generated catalog instead of showing a blank.
+            item.image_url = image_url_for(entry["category"], entry["name"], entry["id"])
 
     db.commit()
     return count

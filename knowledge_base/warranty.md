@@ -58,7 +58,7 @@ Warranties do not cover:
 ## How to Make a Warranty Claim
 
 1. **In store:** bring the product and your receipt to any BuildRight AI location. Our staff will assess the defect and process the claim. Keep your receipt — BuildRight Rewards members can also retrieve proof of purchase from their account.
-2. **Online:** log in at smarthandyman.ca, go to **My Orders**, select the item, and click **Warranty Claim**. Attach clear photos or a short video of the defect.
+2. **Online:** log in at buildright.ca, go to **My Orders**, select the item, and click **Warranty Claim**. Attach clear photos or a short video of the defect.
 3. **Manufacturer direct:** for some national brands, you may also contact the manufacturer's warranty line directly. For our house brands (Mastercraft, ProBuilt, IronClad, VoltEdge, AquaFlow), BuildRight handles the claim for you.
 
 ### What You Will Need
@@ -97,6 +97,6 @@ Plans can be added at checkout (in store or online) within **30 days** of your p
 
 ## Contact Us
 
-- **Online chat:** at smarthandyman.ca during store hours
-- **Email:** support@smarthandyman.ca
+- **Online chat:** at buildright.ca during store hours
+- **Email:** support@buildright.ca
 - **Phone:** 1-800-BUILD-IT (Monday–Friday 8 AM–8 PM ET)
