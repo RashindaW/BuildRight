@@ -259,3 +259,34 @@ def ai_operations(db: Session, days: int = 30, recent_limit: int = 20) -> dict:
         "quality": evaluate_recent(db, recent_limit).get("aggregate", {}),
         "recent": recent,
     }
+
+
+def csat_summary(db: Session, days: int = 30, recent: int = 10) -> dict:
+    """Customer-satisfaction ratings (1–5) over the window: average, count,
+    1–5 histogram, and recent comments."""
+    from app.models.feedback import ConversationFeedback
+
+    since = _since(days)
+    rows = db.execute(
+        select(ConversationFeedback)
+        .where(ConversationFeedback.created_at >= since)
+        .order_by(ConversationFeedback.created_at.desc())
+    ).scalars().all()
+
+    count = len(rows)
+    avg = round(sum(r.rating for r in rows) / count, 2) if count else 0.0
+    histogram = {str(n): 0 for n in range(1, 6)}
+    for r in rows:
+        histogram[str(r.rating)] = histogram.get(str(r.rating), 0) + 1
+    comments = [
+        {"rating": r.rating, "comment": r.comment, "created_at": r.created_at.isoformat()}
+        for r in rows if r.comment
+    ][:recent]
+
+    return {
+        "period_days": days,
+        "responses": count,
+        "average": avg,
+        "histogram": histogram,
+        "recent_comments": comments,
+    }

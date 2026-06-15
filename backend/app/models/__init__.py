@@ -4,6 +4,7 @@ from app.models.audit import AuditLog
 from app.models.base import Base
 from app.models.cart import Cart, CartItem, CartItemOption
 from app.models.chat import Conversation, Message
+from app.models.feedback import ConversationFeedback
 from app.models.knowledge import Document, DocumentChunk
 from app.models.menu import (
     Allergen,
@@ -41,4 +42,5 @@ __all__ = [
     "Document",
     "DocumentChunk",
     "ProductEmbedding",
+    "ConversationFeedback",
 ]

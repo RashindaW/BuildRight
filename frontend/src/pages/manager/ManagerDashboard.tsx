@@ -19,9 +19,12 @@ export default function ManagerDashboard() {
   const margins = useQuery({ queryKey: ["margins", days], queryFn: () => analyticsApi.margins(days) });
   const attr = useQuery({ queryKey: ["attr", days], queryFn: () => analyticsApi.aiAttribution(days) });
   const ops = useQuery({ queryKey: ["aiOps", days], queryFn: () => analyticsApi.aiOps(days) });
+  const csat = useQuery({ queryKey: ["csat", days], queryFn: () => analyticsApi.csat(days) });
 
   const m = margins.data?.overall;
   const o = ops.data;
+  const cs = csat.data;
+  const maxCsat = Math.max(1, ...Object.values(cs?.histogram ?? {}));
   const usd = (v: number) => `$${(v ?? 0).toFixed(v < 1 ? 4 : 2)}`;
   const maxRoute = Math.max(1, ...(o?.route_distribution ?? []).map((r) => r.count));
   const maxTool = Math.max(1, ...(o?.tool_usage ?? []).map((t) => t.count));
@@ -267,6 +270,51 @@ export default function ManagerDashboard() {
             </tbody>
           </table>
         </div>
+      </section>
+
+      {/* Customer satisfaction (CSAT) */}
+      <section className="mt-8">
+        <h2 className="mb-1 text-lg font-semibold">Customer satisfaction</h2>
+        <p className="mb-3 text-sm text-gray-500">
+          1–5 ratings customers gave the chat assistant{cs && <> · {cs.responses} responses in the last {cs.period_days} days.</>}
+        </p>
+        <div className="grid gap-4 md:grid-cols-3">
+          <Kpi
+            label="Average rating"
+            value={cs && cs.responses ? `${cs.average.toFixed(2)} / 5` : "—"}
+            sub={`${cs?.responses ?? 0} responses`}
+          />
+          <div className="card p-4 md:col-span-2">
+            <div className="mb-2 text-sm font-medium">Rating distribution</div>
+            <div className="space-y-1.5">
+              {["5", "4", "3", "2", "1"].map((star) => {
+                const n = cs?.histogram?.[star] ?? 0;
+                return (
+                  <div key={star} className="flex items-center gap-2 text-xs">
+                    <span className="w-8 text-gray-500">{star} ★</span>
+                    <div className="h-2 flex-1 rounded bg-gray-100">
+                      <div className="h-2 rounded bg-amber-400" style={{ width: `${(n / maxCsat) * 100}%` }} />
+                    </div>
+                    <span className="w-6 text-right text-gray-500">{n}</span>
+                  </div>
+                );
+              })}
+            </div>
+            {cs && cs.responses === 0 && (
+              <p className="mt-2 text-xs text-gray-400">No ratings yet — rate a chat to populate this.</p>
+            )}
+          </div>
+        </div>
+        {cs && cs.recent_comments.length > 0 && (
+          <div className="card mt-4 p-4">
+            <div className="mb-2 text-sm font-medium">Recent comments</div>
+            <ul className="space-y-1 text-sm text-gray-600">
+              {cs.recent_comments.map((c, i) => (
+                <li key={i}>{"⭐".repeat(c.rating)} — {c.comment}</li>
+              ))}
+            </ul>
+          </div>
+        )}
       </section>
     </div>
   );

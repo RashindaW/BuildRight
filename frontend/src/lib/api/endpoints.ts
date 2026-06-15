@@ -163,11 +163,29 @@ export interface AiOps {
   }[];
 }
 
+export interface Csat {
+  period_days: number;
+  responses: number;
+  average: number;
+  histogram: Record<string, number>;
+  recent_comments: { rating: number; comment: string; created_at: string }[];
+}
+
 export const analyticsApi = {
   inventory: () => api<InventorySummary>("/analytics/inventory"),
   margins: (days = 30) => api<MarginSummary>(`/analytics/margins?days=${days}`),
   aiAttribution: (days = 30) => api<AiAttribution>(`/analytics/ai-attribution?days=${days}`),
   aiOps: (days = 30) => api<AiOps>(`/analytics/ai-ops?days=${days}`),
+  csat: (days = 30) => api<Csat>(`/analytics/csat?days=${days}`),
+};
+
+// ---- Chat feedback ----
+export const chatApi = {
+  feedback: (conversationId: string, rating: number, comment?: string) =>
+    api<{ message: string; rating: number }>("/chat/feedback", {
+      method: "POST",
+      body: { conversation_id: conversationId, rating, comment: comment ?? null },
+    }),
 };
 
 // ---- Admin ----

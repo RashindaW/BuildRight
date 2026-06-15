@@ -11,6 +11,13 @@ class ChatMessageIn(BaseModel):
     conversation_id: str | None = None
 
 
+class FeedbackIn(BaseModel):
+    model_config = {"extra": "forbid"}
+    conversation_id: str
+    rating: int = Field(ge=1, le=5)
+    comment: str | None = Field(default=None, max_length=500)
+
+
 class MessageOut(BaseModel):
     id: str
     role: str

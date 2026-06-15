@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { streamChat } from "../../lib/api/chatStream";
-import { mediaApi } from "../../lib/api/endpoints";
+import { chatApi, mediaApi } from "../../lib/api/endpoints";
 import { ApiError } from "../../lib/api/client";
 import { queryClient } from "../../lib/queryClient";
 import { useUiStore } from "../../store/uiStore";
@@ -22,6 +22,8 @@ export function ChatWidget() {
   const [transcribing, setTranscribing] = useState(false);
   const [imgBusy, setImgBusy] = useState(false);
   const [voiceErr, setVoiceErr] = useState<string | null>(null);
+  const [askRating, setAskRating] = useState(false);
+  const [rated, setRated] = useState<number | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -65,6 +67,18 @@ export function ChatWidget() {
         return copy;
       });
       setBusy(false);
+      if (convId.current && rated === null) setAskRating(true); // invite a CSAT rating
+    }
+  }
+
+  async function submitRating(n: number) {
+    if (!convId.current) return;
+    setRated(n);
+    setAskRating(false);
+    try {
+      await chatApi.feedback(convId.current, n);
+    } catch {
+      /* non-blocking */
     }
   }
 
@@ -210,6 +224,28 @@ export function ChatWidget() {
           </div>
         ))}
       </div>
+
+      {rated !== null ? (
+        <div className="border-t bg-green-50 px-3 py-1.5 text-center text-xs text-green-700">
+          Thanks for rating this chat {"⭐".repeat(rated)} — it helps the team.
+        </div>
+      ) : askRating ? (
+        <div className="flex items-center justify-center gap-2 border-t bg-gray-50 px-3 py-2 text-sm">
+          <span className="text-gray-500">How did I do?</span>
+          {[1, 2, 3, 4, 5].map((n) => (
+            <button
+              key={n}
+              type="button"
+              onClick={() => submitRating(n)}
+              className="text-lg leading-none text-gray-300 transition hover:scale-110 hover:text-amber-400"
+              aria-label={`Rate ${n} of 5`}
+              title={`${n} / 5`}
+            >
+              ★
+            </button>
+          ))}
+        </div>
+      ) : null}
 
       {shortlistedItemIds.length > 0 && (
         <button

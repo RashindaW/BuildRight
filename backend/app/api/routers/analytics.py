@@ -41,3 +41,9 @@ def ai_ops(days: int = Query(default=30, ge=1, le=365),
     """AI observability: agent cost, routing/tool 'thinking pattern', guardrail +
     quality, and a recent-turns trace. Manager/admin only."""
     return analytics_service.ai_operations(db, days, recent)
+
+
+@router.get("/csat")
+def csat(days: int = Query(default=30, ge=1, le=365), db: Session = Depends(get_db)):
+    """Customer-satisfaction (1–5) summary: average, count, histogram, comments."""
+    return analytics_service.csat_summary(db, days)

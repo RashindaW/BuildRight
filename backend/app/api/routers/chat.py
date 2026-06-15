@@ -19,9 +19,10 @@ from app.core.errors import AppError, NotFoundError
 from app.core.rate_limit import limiter
 from app.core.security import verify_csrf
 from app.models.chat import Conversation, Message
+from app.models.feedback import ConversationFeedback
 from app.safety.injection import looks_like_injection
 from app.safety.moderation import screen_message
-from app.schemas.chat import ChatMessageIn, ConversationOut
+from app.schemas.chat import ChatMessageIn, ConversationOut, FeedbackIn
 from app.services import audit_service
 
 router = APIRouter(prefix="/chat", tags=["chat"])
@@ -155,6 +156,34 @@ def chat_stream(
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no", "Connection": "keep-alive"},
     )
+
+
+@router.post("/feedback", dependencies=[Depends(verify_csrf)])
+def chat_feedback(
+    body: FeedbackIn,
+    db: Session = Depends(get_db),
+    user=Depends(get_optional_user),
+    x_session_id: str | None = Header(default=None),
+):
+    """Record a 1–5 satisfaction rating for a conversation (one per conversation)."""
+    session_id = x_session_id or ""
+    # Ownership check reuses the conversation-resolution rules.
+    conv = _resolve_conversation(db, body.conversation_id, user, session_id)
+
+    fb = db.execute(
+        select(ConversationFeedback).where(ConversationFeedback.conversation_id == conv.id)
+    ).scalar_one_or_none()
+    if fb is None:
+        fb = ConversationFeedback(conversation_id=conv.id, rating=body.rating,
+                                  comment=body.comment,
+                                  user_id=user.id if user else None,
+                                  session_id=None if user else session_id)
+        db.add(fb)
+    else:
+        fb.rating = body.rating
+        fb.comment = body.comment
+    db.commit()
+    return {"message": "Thanks for your feedback!", "rating": body.rating}
 
 
 @router.get("/conversations", response_model=list[ConversationOut])
