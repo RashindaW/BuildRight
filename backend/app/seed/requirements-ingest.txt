@@ -1,0 +1,4 @@
+# OPTIONAL PDF-ingestion deps — NOT in the deployed image (backend/requirements.txt).
+# pip install -r app/seed/requirements-ingest.txt
+pypdf>=5.0,<7.0
+reportlab>=4.0,<5.0

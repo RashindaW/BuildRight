@@ -102,3 +102,15 @@ def ingest_buying_guides(db: Session) -> int:
     db.commit()
     logger.info("seed_kb: ingested buying guides -> %d chunks", total)
     return total
+
+
+def ingest_category_guides(db: Session) -> int:
+    """Generate + upsert richer per-category guides (tables + prose). Returns chunk count."""
+    from app.seed.category_guides import generate_category_guides
+
+    total = 0
+    for g in generate_category_guides():
+        total += _upsert_document(db, g["slug"], g["title"], "category-guide", g["text"])
+    db.commit()
+    logger.info("seed_kb: ingested category guides -> %d chunks", total)
+    return total
