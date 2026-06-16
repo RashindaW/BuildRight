@@ -34,3 +34,8 @@ backend/app/ml/model/
 
 # local placeholder preview artifact
 backend/placeholder_gallery.html
+
+# Personal interview-prep / portfolio material — keep local, never push to GitHub
+docs/VECTOR_MLA.md
+docs/SHOWCASE_PITCH.md
+buildright-portfolio.html

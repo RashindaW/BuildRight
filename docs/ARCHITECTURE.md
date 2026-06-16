@@ -8,10 +8,8 @@
 > observability. It deploys for free on Hugging Face Spaces as one Docker container and
 > runs identically on Postgres + pgvector in the cloud.
 
-**Audience:** engineers and reviewers who want a single source of truth for how the system
-is built. For the pitch narrative see [`SHOWCASE_PITCH.md`](SHOWCASE_PITCH.md); for the MLA
-skills mapping see [`VECTOR_MLA.md`](VECTOR_MLA.md); for deployment SOPs see
-[`../HF-DEPLOY.md`](../HF-DEPLOY.md) and [`CLOUD_DEPLOY.md`](CLOUD_DEPLOY.md).
+**Audience:** engineers who want a single source of truth for how the system is built. For
+deployment SOPs see [`../HF-DEPLOY.md`](../HF-DEPLOY.md) and [`CLOUD_DEPLOY.md`](CLOUD_DEPLOY.md).
 
 ---
 
@@ -146,7 +144,7 @@ Cut_Dry/
 ├── README.md  HF-DEPLOY.md  DEMO.md
 ├── docs/
 │   ├── ARCHITECTURE.md         # ← this file
-│   ├── SHOWCASE_PITCH.md  VECTOR_MLA.md  CLOUD_DEPLOY.md
+│   ├── CLOUD_DEPLOY.md
 ├── .github/workflows/
 │   ├── ci.yml                  # secret-scan, backend, backend-postgres, frontend
 │   └── deploy-hf.yml           # mirror to Hugging Face Space on push
