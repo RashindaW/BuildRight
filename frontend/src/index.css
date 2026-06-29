@@ -3,35 +3,102 @@
 @tailwind utilities;
 
 body {
-  @apply bg-gray-50 text-gray-900 antialiased;
+  @apply bg-gray-50 text-gray-900 antialiased font-sans;
 }
 
+/* ---- Buttons -------------------------------------------------------- */
 .btn {
-  @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition;
+  @apply inline-flex items-center justify-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold
+         transition-all duration-150 active:scale-[0.98]
+         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/50 focus-visible:ring-offset-1
+         disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100;
 }
 .btn-primary {
-  @apply btn bg-brand-600 text-white shadow-sm hover:bg-brand-700 hover:shadow disabled:opacity-50;
+  @apply btn bg-brand-600 text-white shadow-sm hover:bg-brand-700 hover:shadow-soft;
 }
 .btn-ghost {
-  @apply btn border border-gray-300 bg-white hover:bg-gray-100;
+  @apply btn border border-gray-300 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-50;
 }
+.btn-soft {
+  @apply btn bg-brand-50 text-brand-700 hover:bg-brand-100;
+}
+.btn-sm {
+  @apply px-3 py-1.5 text-xs;
+}
+
+/* ---- Cards ---------------------------------------------------------- */
 .card {
-  @apply rounded-xl border border-gray-200 bg-white shadow-sm;
+  @apply rounded-xl2 border border-gray-200/80 bg-white shadow-card;
 }
 /* Interactive product/feature cards: subtle lift on hover. */
 .card-hover {
-  @apply transition duration-200 hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-md;
+  @apply transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-card-hover;
 }
-/* Small pill/badge token reused across cards, navbar, hero. */
+
+/* ---- Badges / pills ------------------------------------------------- */
 .badge {
-  @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium;
+  @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold;
 }
+.badge-success {
+  @apply badge bg-success-light text-success-dark;
+}
+.badge-warning {
+  @apply badge bg-warning-light text-warning-dark;
+}
+.badge-danger {
+  @apply badge bg-danger-light text-danger-dark;
+}
+.badge-neutral {
+  @apply badge bg-gray-100 text-gray-600;
+}
+.badge-brand {
+  @apply badge bg-brand-600 text-white shadow-sm;
+}
+
+/* ---- Inputs --------------------------------------------------------- */
+.input {
+  @apply w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm
+         transition placeholder:text-gray-400
+         focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30;
+}
+
+/* ---- Skeleton loader ------------------------------------------------ */
+.skeleton {
+  @apply relative overflow-hidden rounded-md bg-gray-200/70;
+}
+.skeleton::after {
+  content: "";
+  @apply absolute inset-0 -translate-x-full;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* ---- Markdown (chat) ------------------------------------------------ */
 .markdown p {
-  @apply mb-2;
+  @apply mb-2 last:mb-0;
 }
 .markdown ul {
-  @apply list-disc pl-5 mb-2;
+  @apply mb-2 list-disc pl-5;
+}
+.markdown ol {
+  @apply mb-2 list-decimal pl-5;
+}
+.markdown li {
+  @apply mb-0.5;
 }
 .markdown strong {
   @apply font-semibold;
+}
+.markdown a {
+  @apply font-medium text-brand-600 underline underline-offset-2;
 }
