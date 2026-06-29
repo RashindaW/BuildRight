@@ -35,6 +35,8 @@ export interface MenuItem {
   spice_level: number;
   prep_time_min: number | null;
   option_groups: OptionGroup[];
+  rating_avg?: number | null;
+  rating_count?: number;
 }
 
 export interface Page<T> {

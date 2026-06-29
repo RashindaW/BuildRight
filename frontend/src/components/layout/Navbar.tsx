@@ -1,10 +1,13 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Bot, ShoppingCart } from "lucide-react";
 import { useAuth } from "../../context/AuthProvider";
 import { useCart } from "../../hooks/useCart";
 import { useUiStore } from "../../store/uiStore";
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
-  `text-sm ${isActive ? "font-medium text-brand-700" : "text-gray-600 hover:text-gray-900"}`;
+  `relative text-sm transition-colors ${
+    isActive ? "font-semibold text-brand-700" : "text-gray-600 hover:text-gray-900"
+  }`;
 
 export function Navbar() {
   const { user, logout } = useAuth();
@@ -15,9 +18,12 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-30 border-b bg-white/90 backdrop-blur">
       <nav className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
-        <Link to="/" className="flex items-center gap-2 text-xl font-bold text-brand-700">
-          🤖 BuildRight AI
-          <span className="badge bg-amber-100 font-normal text-amber-700">Sandbox</span>
+        <Link to="/" className="flex items-center gap-2 text-lg font-bold tracking-tight text-gray-900">
+          <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-600 text-white shadow-sm">
+            <Bot size={18} />
+          </span>
+          BuildRight <span className="text-brand-600">AI</span>
+          <span className="badge-warning ml-1 font-normal">Sandbox</span>
         </Link>
         <NavLink to="/" end className={linkClass}>
           Products
@@ -46,10 +52,14 @@ export function Navbar() {
 
         <div className="ml-auto flex items-center gap-3">
           {/* cart is available to guests + users */}
-          <button className="relative" onClick={() => setCartOpen(true)} aria-label="Open cart">
-            🛒
+          <button
+            className="relative grid h-9 w-9 place-items-center rounded-lg text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+            onClick={() => setCartOpen(true)}
+            aria-label="Open cart"
+          >
+            <ShoppingCart size={20} />
             {cart && cart.item_count > 0 && (
-              <span className="absolute -right-2 -top-2 rounded-full bg-brand-600 px-1.5 text-xs text-white">
+              <span className="absolute -right-1 -top-1 grid h-5 min-w-[1.25rem] place-items-center rounded-full bg-brand-600 px-1 text-[0.7rem] font-semibold text-white shadow-sm">
                 {cart.item_count}
               </span>
             )}

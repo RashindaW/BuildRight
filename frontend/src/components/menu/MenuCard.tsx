@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
+import { Plus } from "lucide-react";
 import type { MenuItem } from "../../types";
 import { formatPrice, imageSrc } from "../../lib/format";
 import { useCartMutations } from "../../hooks/useCart";
 import { useToast } from "../../context/ToastProvider";
+import { Stars } from "../ui/Stars";
 
 const PLACEHOLDER = "/img/_placeholder.svg";
 
@@ -40,13 +42,13 @@ export function MenuCard({ item }: { item: MenuItem }) {
         />
         {(onSale || isNew) && (
           <div className="absolute left-2 top-2 flex gap-1">
-            {onSale && <span className="badge bg-brand-600 text-white shadow">Sale</span>}
-            {isNew && <span className="badge bg-emerald-600 text-white shadow">New</span>}
+            {onSale && <span className="badge-brand shadow-sm">Sale</span>}
+            {isNew && <span className="badge bg-success text-white shadow-sm">New</span>}
           </div>
         )}
         {outOfStock && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/60">
-            <span className="badge bg-gray-700 text-white">Out of stock</span>
+          <div className="absolute inset-0 flex items-center justify-center bg-white/70 backdrop-blur-[1px]">
+            <span className="badge bg-gray-800 text-white">Out of stock</span>
           </div>
         )}
       </Link>
@@ -59,12 +61,17 @@ export function MenuCard({ item }: { item: MenuItem }) {
             {formatPrice(item.price_cents)}
           </span>
         </div>
+        {(item.rating_count ?? 0) > 0 && (
+          <div className="mt-1">
+            <Stars value={item.rating_avg ?? 0} count={item.rating_count} />
+          </div>
+        )}
         <div className="mt-1 flex items-center gap-2">
           {item.sku && <span className="font-mono text-xs text-gray-400">SKU {item.sku}</span>}
           {!outOfStock && lowStock ? (
-            <span className="badge bg-amber-100 text-amber-700">Only {item.stock_qty} left</span>
+            <span className="badge-warning">Only {item.stock_qty} left</span>
           ) : !outOfStock ? (
-            <span className="badge bg-green-100 text-green-700">In stock</span>
+            <span className="badge-success">In stock</span>
           ) : null}
         </div>
         <p className="mt-1 line-clamp-2 text-sm text-gray-600">{item.description}</p>
@@ -79,7 +86,8 @@ export function MenuCard({ item }: { item: MenuItem }) {
               onClick={onAdd}
               disabled={add.isPending || outOfStock}
             >
-              {outOfStock ? "Out of stock" : "Add to cart"}
+              {!outOfStock && <Plus size={16} />}
+              {outOfStock ? "Out of stock" : add.isPending ? "Adding…" : "Add to cart"}
             </button>
           )}
         </div>
