@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { ArrowLeft, Plus } from "lucide-react";
 import { menuApi } from "../lib/api/endpoints";
 import { formatPrice, imageSrc, ALLERGEN_LABELS } from "../lib/format";
 import { DietaryBadge } from "../components/menu/DietaryBadge";
+import { Skeleton } from "../components/ui/Skeleton";
+import { Stars } from "../components/ui/Stars";
 import { useCartMutations } from "../hooks/useCart";
 import { useToast } from "../context/ToastProvider";
 
@@ -19,7 +22,20 @@ export default function ItemDetail() {
   });
   const [selected, setSelected] = useState<Record<string, string>>({});
 
-  if (isLoading) return <div className="p-8 text-center text-gray-500">Loading…</div>;
+  if (isLoading)
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-8">
+        <div className="card overflow-hidden">
+          <Skeleton className="h-56 w-full rounded-none" />
+          <div className="space-y-3 p-6">
+            <Skeleton className="h-7 w-2/3" />
+            <Skeleton className="h-4 w-1/3" />
+            <Skeleton className="h-20 w-full" />
+            <Skeleton className="h-11 w-full" />
+          </div>
+        </div>
+      </div>
+    );
   if (!item) return <div className="p-8 text-center">Item not found.</div>;
 
   const outOfStock = !item.is_available || item.stock_qty <= 0;
@@ -50,23 +66,33 @@ export default function ItemDetail() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <button className="mb-4 text-sm text-gray-500" onClick={() => nav(-1)}>← Back</button>
+      <button
+        className="mb-4 inline-flex items-center gap-1 text-sm text-gray-500 transition-colors hover:text-gray-800"
+        onClick={() => nav(-1)}
+      >
+        <ArrowLeft size={16} /> Back
+      </button>
       <div className="card overflow-hidden">
         <img src={imageSrc(item.image_url)} alt={item.name} className="h-56 w-full object-cover" />
         <div className="p-6">
-          <div className="flex items-start justify-between">
-            <h1 className="text-2xl font-bold">{item.name}</h1>
-            <span className="text-xl font-semibold text-brand-700">{formatPrice(item.price_cents + extraCents)}</span>
+          <div className="flex items-start justify-between gap-3">
+            <h1 className="text-2xl font-bold tracking-tight">{item.name}</h1>
+            <span className="whitespace-nowrap text-xl font-semibold text-brand-700">{formatPrice(item.price_cents + extraCents)}</span>
           </div>
-          <div className="mt-1 flex items-center gap-3">
+          {(item.rating_count ?? 0) > 0 && (
+            <div className="mt-1.5">
+              <Stars value={item.rating_avg ?? 0} count={item.rating_count} showValue size={16} />
+            </div>
+          )}
+          <div className="mt-1.5 flex flex-wrap items-center gap-3">
             {item.sku && <span className="font-mono text-xs text-gray-400">SKU {item.sku}</span>}
             <span className="text-xs font-medium text-gray-500">{item.category}</span>
             {outOfStock ? (
-              <span className="rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500">Out of stock</span>
+              <span className="badge-neutral">Out of stock</span>
             ) : item.stock_qty <= 15 ? (
-              <span className="rounded bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">Only {item.stock_qty} left in stock</span>
+              <span className="badge-warning">Only {item.stock_qty} left in stock</span>
             ) : (
-              <span className="rounded bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">{item.stock_qty} in stock</span>
+              <span className="badge-success">{item.stock_qty} in stock</span>
             )}
           </div>
           <p className="mt-2 text-gray-600">{item.description}</p>
@@ -107,6 +133,7 @@ export default function ItemDetail() {
           ))}
 
           <button className="btn-primary mt-6 w-full" onClick={onAdd} disabled={add.isPending || outOfStock}>
+            {!outOfStock && <Plus size={16} />}
             {outOfStock ? "Out of stock" : `Add to cart · ${formatPrice(item.price_cents + extraCents)}`}
           </button>
         </div>

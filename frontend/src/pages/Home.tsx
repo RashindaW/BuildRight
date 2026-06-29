@@ -1,9 +1,12 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { Bot, FlaskConical, MessageCircle, PackageSearch, ShoppingBag } from "lucide-react";
 import { menuApi } from "../lib/api/endpoints";
 import { FilterBar } from "../components/menu/FilterBar";
 import { MenuCard } from "../components/menu/MenuCard";
+import { SkeletonCard } from "../components/ui/Skeleton";
+import { EmptyState } from "../components/ui/EmptyState";
 import { useUiStore } from "../store/uiStore";
 
 type SortKey = "relevance" | "price-asc" | "price-desc" | "name";
@@ -43,11 +46,13 @@ export default function Home() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       <div className="mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-brand-600 via-brand-700 to-brand-800 text-white shadow-sm">
-        <div className="bg-white/10 px-6 py-1.5 text-center text-xs font-medium tracking-wide">
-          🧪 Sandbox demo — test data only · Stripe test mode · re-seeds on deploy
+        <div className="flex items-center justify-center gap-1.5 bg-white/10 px-6 py-1.5 text-center text-xs font-medium tracking-wide">
+          <FlaskConical size={13} /> Sandbox demo — test data only · Stripe test mode · re-seeds on deploy
         </div>
         <div className="p-6 sm:p-8">
-          <h1 className="text-2xl font-bold sm:text-3xl">🤖 BuildRight AI</h1>
+          <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight sm:text-3xl">
+            <Bot size={28} /> BuildRight AI
+          </h1>
           <p className="mt-1 text-base font-medium text-white sm:text-lg">
             The smart hardware store — ask, plan, and build with an AI that never guesses.
           </p>
@@ -63,9 +68,9 @@ export default function Home() {
           <div className="mt-4 flex flex-wrap gap-2">
             <button
               onClick={() => setChatOpen(true)}
-              className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-brand-700 shadow-sm hover:bg-brand-50"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-brand-700 shadow-sm transition hover:bg-brand-50 active:scale-[0.98]"
             >
-              💬 Ask the assistant
+              <MessageCircle size={16} /> Ask the assistant
             </button>
             <Link
               to="/how-to-test"
@@ -80,8 +85,8 @@ export default function Home() {
       {shortlistedItemIds.length > 0 && (
         <section className="mb-6 rounded-2xl border border-brand-200 bg-brand-50/60 p-4 sm:p-5">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-lg font-semibold">
-              🛍️ Shortlisted by the assistant{" "}
+            <h2 className="flex items-center gap-2 text-lg font-semibold">
+              <ShoppingBag size={18} className="text-brand-600" /> Shortlisted by the assistant{" "}
               <span className="text-sm font-normal text-gray-500">({sortedShortlist.length})</span>
             </h2>
             <div className="flex items-center gap-3 text-sm">
@@ -112,7 +117,11 @@ export default function Home() {
             </div>
           </div>
           {shortlist.isLoading ? (
-            <div className="py-6 text-center text-sm text-gray-500">Loading…</div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <SkeletonCard key={i} />
+              ))}
+            </div>
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {sortedShortlist.map((item) => (
@@ -136,7 +145,7 @@ export default function Home() {
           {menu.isLoading ? (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="card h-72 animate-pulse bg-gray-100" />
+                <SkeletonCard key={i} />
               ))}
             </div>
           ) : menu.data && menu.data.items.length > 0 ? (
@@ -146,7 +155,16 @@ export default function Home() {
               ))}
             </div>
           ) : (
-            <p className="py-12 text-center text-gray-500">No items match your filters.</p>
+            <EmptyState
+              icon={<PackageSearch size={24} />}
+              title="No products match your filters"
+              description="Try a different category or clear your search to see the full catalog."
+              action={
+                <button className="btn-soft" onClick={() => { setQ(""); setCategory(""); }}>
+                  Clear filters
+                </button>
+              }
+            />
           )}
         </>
       )}
