@@ -1,0 +1,14 @@
+{
+  "recall@5": {
+    "k": 5,
+    "pairs": 400,
+    "graph_recall": 0.5475,
+    "cooccurrence_recall": 0.98
+  },
+  "recall@10": {
+    "k": 10,
+    "pairs": 400,
+    "graph_recall": 0.79,
+    "cooccurrence_recall": 1.0
+  }
+}
