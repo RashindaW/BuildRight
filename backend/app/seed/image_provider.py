@@ -76,8 +76,9 @@ def placeholder_url(category: str, label: str) -> str:
     deterministic, offline, no files, and same-origin (resolves on HF and via the
     Vite dev proxy). Beats a random scenic stock photo on a hardware item.
     """
+    # `v` cache-busts the year-long immutable cache when the tile art is redesigned.
     from urllib.parse import urlencode
-    return "/api/v1/media/placeholder.svg?" + urlencode({"cat": category, "label": label})
+    return "/api/v1/media/placeholder.svg?" + urlencode({"cat": category, "label": label, "v": "2"})
 
 
 def image_url_for(category: str, type_name: str, slug: str) -> str:

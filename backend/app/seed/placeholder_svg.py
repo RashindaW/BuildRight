@@ -11,6 +11,7 @@ Pure + dependency-free: `render_placeholder(category, label)` returns SVG markup
 
 from __future__ import annotations
 
+import hashlib
 import html
 
 # Each category: a distinct accent colour + a simple 24x24 line/solid icon.
@@ -134,44 +135,78 @@ def style_for(category: str) -> tuple[str, str, str]:
     return CATEGORY_STYLE.get(category, _DEFAULT_STYLE)
 
 
-def render_placeholder(category: str, label: str, *, width: int = 600, height: int = 400) -> str:
-    """Return SVG markup for a product placeholder: category colour + icon + label."""
-    color, icon, cat_label = style_for(category)
-    bg1, bg2 = _mix(color, 0.90), _mix(color, 0.78)
-    icon_svg = icon.format(c=color)
+def _variation(seed_text: str) -> float:
+    """Deterministic 0.45..0.95 gradient-angle factor per product, so a grid of the same
+    category isn't identical tiles (pure hash — stable across processes/runs)."""
+    h = int(hashlib.sha256(seed_text.encode()).hexdigest()[:8], 16)
+    return round(0.45 + (h % 50) / 100.0, 2)
 
-    cx, cy_icon = width / 2, height * 0.40
-    disc_r = 64
-    scale = (disc_r * 1.55) / 24.0
+
+def render_placeholder(category: str, label: str, *, width: int = 600, height: int = 400) -> str:
+    """Return SVG markup for a product placeholder — an industrial dark-slate tile: a
+    graphite ground with a category-tinted glow + engineering grid, a large light icon on
+    a soft chip, the product label, and a BuildRight lockup with an UPPERCASE category tag.
+    """
+    color, icon, cat_label = style_for(category)
+    safe_label = label or cat_label
+    gy2 = _variation(safe_label)
+
+    icon_color = _mix(color, 0.45)   # bright category tint that pops on the dark ground
+    eyebrow_color = _mix(color, 0.40)
+    icon_svg = icon.format(c=icon_color)
+
+    cx, cy_icon = width / 2, height * 0.42
+    chip = 80
+    scale = (chip * 1.35) / 24.0
     tx = cx - 12 * scale
     ty = cy_icon - 12 * scale
 
-    lines = _wrap(label or cat_label)
-    label_y = height * 0.74
+    lines = _wrap(safe_label)
+    label_y = height * 0.77
     label_spans = "".join(
         f'<tspan x="{cx}" dy="{0 if i == 0 else 30}">{html.escape(ln)}</tspan>'
         for i, ln in enumerate(lines)
     )
+    esc = html.escape(safe_label)
 
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
-        f'viewBox="0 0 {width} {height}" role="img" aria-label="{html.escape(label or cat_label)}">'
-        f'<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">'
-        f'<stop offset="0" stop-color="{bg1}"/><stop offset="1" stop-color="{bg2}"/>'
-        f'</linearGradient></defs>'
+        f'viewBox="0 0 {width} {height}" role="img" aria-label="{esc}">'
+        f'<defs>'
+        f'<linearGradient id="bg" x1="0" y1="0" x2="1" y2="{gy2}">'
+        f'<stop offset="0" stop-color="#1e293b"/><stop offset="1" stop-color="#0f172a"/>'
+        f'</linearGradient>'
+        f'<radialGradient id="glow" cx="0.5" cy="0.42" r="0.55">'
+        f'<stop offset="0" stop-color="{color}" stop-opacity="0.34"/>'
+        f'<stop offset="1" stop-color="{color}" stop-opacity="0"/>'
+        f'</radialGradient>'
+        f'<radialGradient id="vig" cx="0.5" cy="0.5" r="0.75">'
+        f'<stop offset="0.6" stop-color="#000000" stop-opacity="0"/>'
+        f'<stop offset="1" stop-color="#000000" stop-opacity="0.28"/>'
+        f'</radialGradient>'
+        f'<pattern id="grid" width="26" height="26" patternUnits="userSpaceOnUse">'
+        f'<path d="M26 0H0V26" fill="none" stroke="#ffffff" stroke-width="0.6"/>'
+        f'</pattern>'
+        f'</defs>'
         f'<rect width="{width}" height="{height}" fill="url(#bg)"/>'
-        f'<circle cx="{cx}" cy="{cy_icon}" r="{disc_r}" fill="#ffffff" '
-        f'opacity="0.92"/>'
+        f'<rect width="{width}" height="{height}" fill="url(#grid)" opacity="0.06"/>'
+        f'<rect width="{width}" height="{height}" fill="url(#glow)"/>'
+        f'<rect x="{cx - chip:.0f}" y="{cy_icon - chip:.0f}" width="{2 * chip}" height="{2 * chip}" '
+        f'rx="24" fill="#ffffff" fill-opacity="0.05" stroke="#ffffff" stroke-opacity="0.12"/>'
         f'<g transform="translate({tx:.1f},{ty:.1f}) scale({scale:.3f})" '
         f'fill="none" stroke-linecap="round" stroke-linejoin="round">{icon_svg}</g>'
         f'<text x="{cx}" y="{label_y}" text-anchor="middle" '
-        f'font-family="system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif" '
-        f'font-size="30" font-weight="700" fill="#1e293b">{label_spans}</text>'
-        f'<text x="24" y="36" font-family="system-ui,Segoe UI,Roboto,sans-serif" '
-        f'font-size="18" font-weight="800" fill="{color}">BuildRight</text>'
+        f'font-family="Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif" '
+        f'font-size="30" font-weight="700" fill="#f1f5f9">{label_spans}</text>'
+        f'<rect x="24" y="22" width="16" height="16" rx="4" fill="#f59e0b"/>'
+        f'<text x="47" y="35" font-family="Inter,system-ui,Segoe UI,Roboto,sans-serif" '
+        f'font-size="17" font-weight="800" fill="#e2e8f0">BuildRight</text>'
         f'<text x="{width - 24}" y="{height - 22}" text-anchor="end" '
-        f'font-family="system-ui,Segoe UI,Roboto,sans-serif" font-size="15" '
-        f'font-weight="600" letter-spacing="1.5" fill="{color}" opacity="0.85">'
+        f'font-family="Inter,system-ui,Segoe UI,Roboto,sans-serif" font-size="15" '
+        f'font-weight="700" letter-spacing="2" fill="{eyebrow_color}">'
         f'{html.escape(cat_label.upper())}</text>'
+        f'<rect width="{width}" height="{height}" fill="url(#vig)"/>'
+        f'<rect x="0.5" y="0.5" width="{width - 1}" height="{height - 1}" fill="none" '
+        f'stroke="#ffffff" stroke-opacity="0.10"/>'
         f'</svg>'
     )
