@@ -81,11 +81,11 @@ def create_app() -> FastAPI:
 
     # Routers
     from app.api.routers import (
-        admin, analytics, auth, cart, chat, media, menu, orders, payments, reviews,
+        admin, admin_chat, analytics, auth, cart, chat, media, menu, orders, payments, reviews,
     )
     api_prefix = "/api/v1"
     for r in (auth.router, menu.router, reviews.router, cart.router, orders.router, chat.router,
-              admin.router, payments.router, analytics.router, media.router):
+              admin.router, admin_chat.router, payments.router, analytics.router, media.router):
         app.include_router(r, prefix=api_prefix)
 
     @app.get("/health/live")

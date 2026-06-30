@@ -20,9 +20,10 @@ export async function streamChat(
   sessionId: string,
   onEvent: (e: ChatEvent) => void,
   signal?: AbortSignal,
+  path = "/api/v1/chat/stream",
 ): Promise<void> {
   await ensureCsrf();
-  const res = await fetch("/api/v1/chat/stream", {
+  const res = await fetch(path, {
     method: "POST",
     credentials: "include",
     headers: {

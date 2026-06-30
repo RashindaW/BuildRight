@@ -142,6 +142,11 @@ async def stream_chat(
     user_question: str,
     max_tokens: int | None = None,
     has_image: bool = False,
+    *,
+    system_prompt: str | None = None,
+    tools_override: list | None = None,
+    executors_override: dict | None = None,
+    validate_prices: bool = True,
 ) -> AsyncIterator[dict]:
     """Yield SSE event dicts: {event, data}.
 
@@ -159,7 +164,9 @@ async def stream_chat(
     from app.ai import tools
 
     client = _get_async_client()
-    executors = _build_executors()
+    executors = executors_override if executors_override is not None else _build_executors()
+    sys_prompt = system_prompt or SYSTEM_PROMPT_RETAIL
+    tool_defs = tools_override if tools_override is not None else tools.TOOLS
 
     # Route once per turn; the chosen model drives every round of the tool loop.
     route_label, route_model = await router.classify_turn(
@@ -189,8 +196,8 @@ async def stream_chat(
                 model=route_model,
                 max_tokens=max_tokens or models.MAX_TOKENS,
                 temperature=models.TEMPERATURE,
-                system=SYSTEM_PROMPT_RETAIL,
-                tools=tools.TOOLS,
+                system=sys_prompt,
+                tools=tool_defs,
                 messages=messages,
             )
             input_tokens += resp.usage.input_tokens
@@ -266,13 +273,17 @@ async def stream_chat(
         if isinstance(m, dict) and m.get("role") == "assistant" and isinstance(m.get("content"), str):
             carried_prices |= extract_prices(m["content"])
 
-    # Hard price guard
-    result = validate_response(
-        final_text, grounded_unique, extra_allowed=carried_prices, allow_multiples=True
-    )
-    if not result.ok:
-        logger.warning('"guardrail_price_violation: %s"', result.reason)
-        final_text = SAFE_FALLBACK
+    # Hard price guard — skipped for personas whose answers legitimately contain figures
+    # (e.g. the admin analytics chat, which reports revenue/margins).
+    result = None
+    if validate_prices:
+        result = validate_response(
+            final_text, grounded_unique, extra_allowed=carried_prices, allow_multiples=True
+        )
+        if not result.ok:
+            logger.warning('"guardrail_price_violation: %s"', result.reason)
+            final_text = SAFE_FALLBACK
+    guardrail_violation = bool(result and not result.ok)
 
     # Soft citation check — append a disclaimer rather than replacing the answer
     citation_ok = validate_citations(final_text, grounded_chunks)
@@ -292,7 +303,7 @@ async def stream_chat(
             "text": final_text,
             "input_tokens": input_tokens,
             "output_tokens": output_tokens,
-            "guardrail_violation": not result.ok,
+            "guardrail_violation": guardrail_violation,
             "grounded_item_ids": [it.get("slug") or it.get("id") for it in grounded_unique],
             "grounded_doc_ids": [c.chunk_id for c in grounded_chunks],
             "cart_dirty": cart_dirty,

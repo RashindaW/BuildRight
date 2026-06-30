@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { analyticsApi } from "../../lib/api/endpoints";
 import { formatPrice } from "../../lib/format";
+import { AdminChat } from "../../components/manager/AdminChat";
 
 function Kpi({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
@@ -47,6 +48,8 @@ export default function ManagerDashboard() {
           </select>
         </label>
       </div>
+
+      <AdminChat />
 
       {/* KPI row */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
