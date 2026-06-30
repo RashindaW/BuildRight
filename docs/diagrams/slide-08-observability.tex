@@ -1,0 +1,31 @@
+\documentclass[border=6pt]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,shapes.geometric}
+\definecolor{navy}{HTML}{161E29}
+\definecolor{slate}{HTML}{2E3D50}
+\definecolor{slatefill}{HTML}{E9EDF2}
+\definecolor{accent}{HTML}{B45309}
+\definecolor{accentfill}{HTML}{FEF3C7}
+\definecolor{edge}{HTML}{51647D}
+\begin{document}
+\begin{tikzpicture}[
+  font=\sffamily\small,
+  box/.style={rounded corners=3pt, draw=slate, line width=0.7pt, fill=slatefill, text=navy, align=center, inner sep=5pt, minimum height=10mm, minimum width=32mm},
+  dark/.style={box, fill=navy, draw=navy, text=white, minimum width=44mm},
+  acc/.style={box, draw=accent, line width=1.1pt, fill=accentfill, text=navy},
+  lbl/.style={font=\sffamily\scriptsize, text=slate},
+  arr/.style={-{Stealth[length=2.4mm]}, line width=0.8pt, draw=edge},
+]
+\node[acc] (turn) {Every chat turn};
+\node[dark, right=18mm of turn] (tel) {Telemetry record\\{\scriptsize model $\cdot$ route $\cdot$ tokens $\cdot$ tools $\cdot$ guardrail}};
+\node[box, right=18mm of tel, yshift=16mm] (ops) {AI-Ops\\{\scriptsize cost $\cdot$ route mix}};
+\node[box, right=18mm of tel] (attr) {AI attribution\\{\scriptsize chat-sourced revenue}};
+\node[box, right=18mm of tel, yshift=-16mm] (csat) {CSAT\\{\scriptsize 1--5 ratings}};
+\node[box, below=12mm of tel, minimum width=44mm] (eval) {Offline eval harness\\{\scriptsize hit@k $\cdot$ MRR $\cdot$ nDCG $\cdot$ faithfulness}};
+\draw[arr] (turn) -- (tel);
+\draw[arr] (tel) -- (ops);
+\draw[arr] (tel) -- (attr);
+\draw[arr] (tel) -- (csat);
+\draw[arr] (tel) -- (eval);
+\end{tikzpicture}
+\end{document}

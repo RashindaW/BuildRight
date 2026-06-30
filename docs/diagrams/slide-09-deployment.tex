@@ -1,0 +1,31 @@
+\documentclass[border=6pt]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,shapes.geometric}
+\definecolor{navy}{HTML}{161E29}
+\definecolor{slate}{HTML}{2E3D50}
+\definecolor{slatefill}{HTML}{E9EDF2}
+\definecolor{accent}{HTML}{B45309}
+\definecolor{accentfill}{HTML}{FEF3C7}
+\definecolor{edge}{HTML}{51647D}
+\begin{document}
+\begin{tikzpicture}[
+  font=\sffamily\small,
+  box/.style={rounded corners=3pt, draw=slate, line width=0.7pt, fill=slatefill, text=navy, align=center, inner sep=5pt, minimum height=10mm, minimum width=34mm},
+  dark/.style={box, fill=navy, draw=navy, text=white},
+  acc/.style={box, draw=accent, line width=1.1pt, fill=accentfill, text=navy},
+  lbl/.style={font=\sffamily\scriptsize, text=slate},
+  arr/.style={-{Stealth[length=2.4mm]}, line width=0.8pt, draw=edge},
+]
+\node[box] (node) {Stage 1: Node\\{\scriptsize build React SPA}};
+\node[dark, right=16mm of node] (py) {Stage 2: Python\\{\scriptsize FastAPI serves SPA + API}};
+\node[box, right=16mm of py] (img) {One Docker image\\{\scriptsize seeds at startup}};
+\node[box, right=16mm of img, yshift=11mm, minimum width=30mm] (hf) {HF Spaces};
+\node[box, right=16mm of img, yshift=-11mm, minimum width=30mm] (cloud) {Cloud Run / ECS / Fly};
+\node[acc, below=12mm of py, minimum width=64mm] (db) {SQLite (local) \;$\leftrightarrow$\; Postgres + pgvector (cloud) $\cdot$ one env var};
+\draw[arr] (node) -- (py);
+\draw[arr] (py) -- (img);
+\draw[arr] (img) -- (hf);
+\draw[arr] (img) -- (cloud);
+\draw[arr] (py) -- (db);
+\end{tikzpicture}
+\end{document}

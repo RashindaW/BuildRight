@@ -1,0 +1,31 @@
+\documentclass[border=6pt]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,shapes.geometric}
+\definecolor{navy}{HTML}{161E29}
+\definecolor{slate}{HTML}{2E3D50}
+\definecolor{slatefill}{HTML}{E9EDF2}
+\definecolor{accent}{HTML}{B45309}
+\definecolor{accentfill}{HTML}{FEF3C7}
+\definecolor{edge}{HTML}{51647D}
+\begin{document}
+\begin{tikzpicture}[
+  font=\sffamily\small,
+  box/.style={rounded corners=3pt, draw=slate, line width=0.7pt, fill=slatefill, text=navy, align=center, inner sep=5pt, minimum height=10mm, minimum width=30mm},
+  dark/.style={box, fill=navy, draw=navy, text=white},
+  acc/.style={box, draw=accent, line width=1.1pt, fill=accentfill, text=navy},
+  lbl/.style={font=\sffamily\scriptsize, text=slate},
+  arr/.style={-{Stealth[length=2.4mm]}, line width=0.7pt, draw=edge},
+  accarr/.style={-{Stealth[length=2.6mm]}, line width=1.1pt, draw=accent},
+]
+\node[box, align=left] (shopper) {DIY shopper\\[1pt]{\scriptsize 10k SKUs to choose from}\\{\scriptsize ``how much paint?''}\\{\scriptsize ``return policy?''}};
+\node[acc, right=22mm of shopper] (ai) {\textbf{BuildRight AI}\\{\scriptsize grounded chat assistant}};
+\node[box, right=24mm of ai, yshift=13mm] (a) {Right product, fast};
+\node[box, right=24mm of ai] (b) {Costed project plan};
+\node[box, right=24mm of ai, yshift=-13mm] (c) {Checkout \& reorder};
+\node[lbl, below=4mm of ai, text width=42mm, align=center] (g) {Answers grounded in the catalog + policy knowledge base $\cdot$ never guesses a price};
+\draw[accarr] (shopper) -- (ai);
+\draw[arr] (ai) -- (a);
+\draw[arr] (ai) -- (b);
+\draw[arr] (ai) -- (c);
+\end{tikzpicture}
+\end{document}

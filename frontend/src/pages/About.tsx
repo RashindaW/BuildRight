@@ -1,30 +1,7 @@
 import { Link } from "react-router-dom";
-
-const ARCHITECTURE = String.raw`
-┌──────────────────────────────────────────────────────────────────────┐
-│  React SPA  (Vite · TypeScript · Tailwind · TanStack Query · Zustand) │
-│  storefront · chat widget (text / 🎤 voice / 🖼️ image) · dashboards    │
-└───────────────────────────┬──────────────────────────────────────────┘
-                            │  REST + SSE  (single origin)
-┌───────────────────────────▼──────────────────────────────────────────┐
-│  FastAPI  (Python)                                                    │
-│                                                                       │
-│   ┌──────────────┐    ┌──────────────────────────────────────────┐   │
-│   │ Model Router │ →  │  Tool-use loop  +  Guardrails            │   │
-│   │ Haiku triage │    │  search · reorder · project planner ·    │   │
-│   │  → Sonnet    │    │  recommender · vision · materials math   │   │
-│   └──────────────┘    └──────────────────────────────────────────┘   │
-│                                                                       │
-│   Hybrid RAG (vector + keyword · RRF)   ·   Vision / OCR / Voice-STT  │
-│   RBAC + JWT/CSRF   ·   Stripe payments + refunds   ·   MCP server    │
-│   AI observability (cost · routing · tools)   ·   Chat-quality eval   │
-└───────────────────────────┬──────────────────────────┬───────────────┘
-                            │                          │
-              ┌─────────────▼──────────┐   ┌───────────▼─────────────────┐
-              │  SQLite / PostgreSQL    │   │  Anthropic Claude · Groq    │
-              │  + pgvector embeddings  │   │  Whisper · Unsplash · Stripe│
-              └─────────────────────────┘   └─────────────────────────────┘
-`;
+import { Layers } from "lucide-react";
+import { Hero } from "../components/layout/Hero";
+import { Carousel } from "../components/about/Carousel";
 
 const CAPABILITIES: { title: string; points: string[] }[] = [
   {
@@ -48,15 +25,15 @@ const CAPABILITIES: { title: string; points: string[] }[] = [
     points: [
       "Product & policy search, reorder from history",
       "Conversational project planner: 'repair my room' → measurements → costed materials list → add to cart → upsell",
-      "Recommender: frequently-bought-with (collaborative filtering) + content similarity",
+      "GNN recommender: a co-purchase graph that propagates signal into 'complete-the-job' suggestions",
     ],
   },
   {
     title: "Multimodal",
     points: [
-      "🖼️ Find-this-item from a photo (Claude vision)",
-      "📝 Handwritten stock-sheet OCR → confirm → audited stock update (staff)",
-      "🎤 Voice ordering (Groq Whisper) → feeds the normal chat/reorder flow",
+      "Find-this-item from a photo (Claude vision)",
+      "Handwritten stock-sheet OCR → confirm → audited stock update (staff)",
+      "Voice ordering (Groq Whisper) → feeds the normal chat/reorder flow",
     ],
   },
   {
@@ -92,39 +69,38 @@ const LOGINS = [
 export default function About() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
-      <div className="mb-6 rounded-2xl bg-gradient-to-br from-brand-600 to-brand-800 p-6 text-white sm:p-8">
-        <h1 className="text-2xl font-bold sm:text-3xl">🤖 About BuildRight AI</h1>
-        <p className="mt-1 max-w-2xl text-sm opacity-90 sm:text-base">
-          A production-leaning, full-stack hardware store built around a guardrailed, multi-agent AI
-          assistant — hybrid RAG, conversational project planning, multimodal (vision · voice · OCR),
-          recommendations, payments, RBAC dashboards, and AI cost/quality observability.
-        </p>
-      </div>
+      <Hero
+        variant="about"
+        eyebrow={<><Layers size={13} /> How it's built</>}
+        title="How BuildRight AI works"
+        subtitle="A production-leaning, full-stack hardware store built around a guardrailed, multi-agent AI assistant — hybrid RAG, conversational project planning, multimodal (vision · voice · OCR), a GNN recommender, payments, RBAC dashboards, and AI cost/quality observability."
+      />
 
-      <div className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3">
+      <div className="my-8 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3">
         <span className="text-sm text-brand-800">
-          New here? Follow the guided 5-minute tour with copy-ready prompts.
+          New here? Take the guided tour through every feature with copy-ready prompts.
         </span>
-        <Link to="/how-to-test" className="btn-primary">How to test →</Link>
+        <Link to="/how-to-test" className="btn-accent">Take the tour →</Link>
       </div>
 
       <section className="mb-8">
-        <h2 className="mb-3 text-lg font-semibold">System architecture</h2>
-        <div className="card overflow-x-auto p-4">
-          <pre className="text-[11px] leading-tight text-gray-700 sm:text-xs">{ARCHITECTURE}</pre>
-        </div>
+        <h2 className="mb-1 text-lg font-semibold">System architecture</h2>
+        <p className="mb-3 text-sm text-gray-500">
+          Step through how the product is built — use the arrows (or ← / → keys).
+        </p>
+        <Carousel />
       </section>
 
       <section className="mb-8">
         <h2 className="mb-3 text-lg font-semibold">Capabilities at a glance</h2>
         <div className="grid gap-4 md:grid-cols-2">
           {CAPABILITIES.map((c) => (
-            <div key={c.title} className="card p-4">
+            <div key={c.title} className="card card-hover p-4">
               <h3 className="font-semibold text-brand-700">{c.title}</h3>
               <ul className="mt-2 space-y-1 text-sm text-gray-600">
                 {c.points.map((p) => (
                   <li key={p} className="flex gap-2">
-                    <span className="text-brand-500">▸</span>
+                    <span className="text-accent">▸</span>
                     <span>{p}</span>
                   </li>
                 ))}
@@ -173,7 +149,7 @@ export default function About() {
         </div>
         <p className="mt-2 text-xs text-gray-400">
           Tip: ask the assistant "I want to paint my 12×10 room, what do I need?" to see the project
-          planner, or use the 🖼️ / 🎤 buttons in the chat.
+          planner, or use the image / voice buttons in the chat.
         </p>
       </section>
     </div>

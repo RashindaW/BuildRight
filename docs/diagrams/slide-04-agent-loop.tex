@@ -1,0 +1,36 @@
+\documentclass[border=6pt]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,shapes.geometric}
+\definecolor{navy}{HTML}{161E29}
+\definecolor{slate}{HTML}{2E3D50}
+\definecolor{slatefill}{HTML}{E9EDF2}
+\definecolor{accent}{HTML}{B45309}
+\definecolor{accentfill}{HTML}{FEF3C7}
+\definecolor{edge}{HTML}{51647D}
+\begin{document}
+\begin{tikzpicture}[
+  font=\sffamily\small,
+  box/.style={rounded corners=3pt, draw=slate, line width=0.7pt, fill=slatefill, text=navy, align=center, inner sep=5pt, minimum height=10mm, minimum width=30mm},
+  dark/.style={box, fill=navy, draw=navy, text=white},
+  acc/.style={box, draw=accent, line width=1.1pt, fill=accentfill, text=navy},
+  lbl/.style={font=\sffamily\scriptsize, text=slate},
+  arr/.style={-{Stealth[length=2.4mm]}, line width=0.8pt, draw=edge},
+  accarr/.style={-{Stealth[length=2.6mm]}, line width=1.1pt, draw=accent},
+]
+\node[acc] (u) {User turn};
+\node[box, right=16mm of u] (router) {Model router\\{\scriptsize Haiku triage}};
+\node[box, right=20mm of router, yshift=10mm, minimum width=24mm] (haiku) {Haiku\\{\scriptsize simple $\cdot$ cheap}};
+\node[box, right=20mm of router, yshift=-10mm, minimum width=24mm] (sonnet) {Sonnet\\{\scriptsize complex / image}};
+\node[dark, right=18mm of sonnet, yshift=10mm, minimum width=38mm] (loop) {Tool-use loop\\{\scriptsize search $\cdot$ planner $\cdot$ reorder $\cdot$ recommend}};
+\node[acc, below=12mm of loop, minimum width=38mm] (guard) {Guardrail validator\\{\scriptsize price + citation check}};
+\node[box, left=18mm of guard, minimum width=26mm] (ans) {Grounded answer};
+\draw[arr] (u) -- (router);
+\draw[arr] (router) -- (haiku);
+\draw[arr] (router) -- (sonnet);
+\draw[arr] (haiku) -- (loop);
+\draw[arr] (sonnet) -- (loop);
+\draw[accarr] (loop) -- (guard);
+\draw[arr] (guard) -- (ans);
+\draw[arr] (loop.east) to[out=20,in=-20,looseness=4] node[lbl,right] {$\leq 6$ rounds} (loop.north east);
+\end{tikzpicture}
+\end{document}
