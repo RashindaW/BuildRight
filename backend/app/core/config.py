@@ -57,6 +57,7 @@ class Settings(BaseSettings):
     model_router_enabled: bool = True            # toggle the Haiku→Sonnet router
     rerank_enabled: bool = True                  # re-rank KB retrieval (cross-encoder/feature)
     visual_search_enabled: bool = True           # CLIP visual arm in product search (no-op without torch)
+    gnn_recommender_enabled: bool = True          # graph (GNN/SGC) recommender; falls back to co-occurrence
     llm_max_tokens: int = 400
     # Catalog scale + product imagery
     catalog_target: int | None = None            # None = curated ~1.2k; e.g. 10000 for the big catalog

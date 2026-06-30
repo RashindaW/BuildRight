@@ -116,11 +116,18 @@ def list_categories(db: Session = Depends(get_db)):
 
 @router.get("/{slug}/recommendations", response_model=list[MenuItemOut])
 def item_recommendations(slug: str, db: Session = Depends(get_db), limit: int = Query(6, ge=1, le=12)):
-    """Product-page recommendations: real co-purchases first (collaborative
-    filtering), topped up with content-similar items. Order-preserving + deduped."""
+    """Product-page recommendations: the GNN/graph recommender first (when a graph has
+    been built), topped up with real co-purchases (collaborative filtering) and
+    content-similar items. Order-preserving + deduped."""
+    from app.core.config import settings
     from app.services.recommender_service import frequently_bought_with, recommend_similar
 
-    ranked = frequently_bought_with(db, slug, k=limit) + recommend_similar(db, slug, k=limit)
+    ranked = []
+    if settings.gnn_recommender_enabled:
+        from app.ai.recommend.gnn import graph_recommend
+
+        ranked += graph_recommend(db, slug, k=limit)
+    ranked += frequently_bought_with(db, slug, k=limit) + recommend_similar(db, slug, k=limit)
     ids, seen = [], set()
     for r in ranked:
         if r["slug"] not in seen:
