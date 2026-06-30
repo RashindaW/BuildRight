@@ -39,3 +39,6 @@ backend/placeholder_gallery.html
 docs/VECTOR_MLA.md
 docs/SHOWCASE_PITCH.md
 buildright-portfolio.html
+
+# Personal learning guide (LaTeX source + compiled PDF + aux) — keep local
+learning/
