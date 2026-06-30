@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Bot, FlaskConical, MessageCircle, PackageSearch, ShoppingBag } from "lucide-react";
+import { FlaskConical, MessageCircle, PackageSearch, ShoppingBag } from "lucide-react";
 import { menuApi } from "../lib/api/endpoints";
+import { Hero } from "../components/layout/Hero";
 import { FilterBar } from "../components/menu/FilterBar";
 import { MenuCard } from "../components/menu/MenuCard";
 import { SkeletonCard } from "../components/ui/Skeleton";
@@ -45,41 +46,30 @@ export default function Home() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <div className="mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-brand-600 via-brand-700 to-brand-800 text-white shadow-sm">
-        <div className="flex items-center justify-center gap-1.5 bg-white/10 px-6 py-1.5 text-center text-xs font-medium tracking-wide">
-          <FlaskConical size={13} /> Live demo — test data only · Stripe test mode · re-seeds on deploy
-        </div>
-        <div className="p-6 sm:p-8">
-          <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight sm:text-3xl">
-            <Bot size={28} /> BuildRight AI
-          </h1>
-          <p className="mt-1 text-base font-medium text-white sm:text-lg">
-            The smart hardware store — ask, plan, and build with an AI that never guesses.
-          </p>
-          <p className="mt-1 max-w-xl text-sm opacity-80 sm:text-base">
-            Search the catalog, get project plans and honest recommendations, and check store policies —
-            grounded in real data, never invented items or prices.
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {["Hybrid RAG", "Guardrailed", "Multi-agent router", "Multimodal"].map((c) => (
-              <span key={c} className="badge bg-white/15 text-white">{c}</span>
+      <div className="mb-6">
+        <Hero
+          variant="home"
+          eyebrow={<><FlaskConical size={13} /> Live demo — test data · Stripe test mode</>}
+          title="BuildRight AI"
+          subtitle="The smart hardware store — ask, plan, and build with an AI that never guesses. Search the catalog, get project plans and honest recommendations, and check store policies, all grounded in real data."
+        >
+          <div className="flex flex-wrap gap-2">
+            {["Hybrid RAG", "Guardrailed", "Multi-agent router", "GNN recommender", "Multimodal"].map((c) => (
+              <span key={c} className="badge border border-white/20 bg-white/10 text-white">{c}</span>
             ))}
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
-            <button
-              onClick={() => setChatOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-brand-700 shadow-sm transition hover:bg-brand-50 active:scale-[0.98]"
-            >
+            <button onClick={() => setChatOpen(true)} className="btn-accent">
               <MessageCircle size={16} /> Ask the assistant
             </button>
             <Link
               to="/how-to-test"
-              className="rounded-lg border border-white/40 px-4 py-2 text-sm font-medium text-white hover:bg-white/10"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-white/40 px-4 py-2 text-sm font-medium text-white hover:bg-white/10"
             >
-              How to test →
+              Take the tour →
             </Link>
           </div>
-        </div>
+        </Hero>
       </div>
 
       {shortlistedItemIds.length > 0 && (

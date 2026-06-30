@@ -1,5 +1,6 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { Bot, ShoppingCart } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
+import { Wordmark } from "../brand/Wordmark";
 import { useAuth } from "../../context/AuthProvider";
 import { useCart } from "../../hooks/useCart";
 import { useUiStore } from "../../store/uiStore";
@@ -18,11 +19,8 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-30 border-b bg-white/90 backdrop-blur">
       <nav className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
-        <Link to="/" className="flex items-center gap-2 text-lg font-bold tracking-tight text-gray-900">
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-600 text-white shadow-sm">
-            <Bot size={18} />
-          </span>
-          BuildRight <span className="text-brand-600">AI</span>
+        <Link to="/" aria-label="BuildRight AI home">
+          <Wordmark />
         </Link>
         <NavLink to="/" end className={linkClass}>
           Products
