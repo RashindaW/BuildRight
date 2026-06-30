@@ -81,10 +81,10 @@ def create_app() -> FastAPI:
 
     # Routers
     from app.api.routers import (
-        admin, analytics, auth, cart, chat, media, menu, orders, payments,
+        admin, analytics, auth, cart, chat, media, menu, orders, payments, reviews,
     )
     api_prefix = "/api/v1"
-    for r in (auth.router, menu.router, cart.router, orders.router, chat.router,
+    for r in (auth.router, menu.router, reviews.router, cart.router, orders.router, chat.router,
               admin.router, payments.router, analytics.router, media.router):
         app.include_router(r, prefix=api_prefix)
 

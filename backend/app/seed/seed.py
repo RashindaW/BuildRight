@@ -393,6 +393,50 @@ def seed_demo_accounts(db: Session) -> int:
     return created
 
 
+# Sample product reviews — deliberately a mix of positive AND negative, with comments.
+_SAMPLE_REVIEWS = [
+    ("power-tools", 5, "Dave R.", "Plenty of torque and the battery lasts all day — best drill I've owned."),
+    ("power-tools", 2, "Sam K.", "Chuck started slipping after a month. Disappointed for the price."),
+    ("hand-tools", 4, "Priya M.", "Solid build and a comfortable grip. Does exactly what it should."),
+    ("hand-tools", 5, "Lee H.", "Great value. Feels far sturdier than it costs."),
+    ("paint", 5, "Jordan T.", "Excellent coverage and low odour — almost one coat."),
+    ("paint", 1, "Chris L.", "Streaky finish, took three coats. Wouldn't buy again."),
+    ("plumbing", 4, "Alex W.", "Fit perfectly, no leaks, easy install."),
+    ("electrical", 3, "Robin P.", "Works fine, but the packaging arrived damaged."),
+    ("cleaning", 5, "Taylor B.", "Cuts through grease instantly — a little goes a long way."),
+    ("outdoor", 2, "Morgan D.", "Underpowered for thick grass; okay for light trimming."),
+    ("safety", 5, "Casey N.", "Comfortable and the anti-fog actually works. Wear them all shift."),
+    ("fasteners", 4, "Jamie F.", "Good assortment, nothing stripped. Handy case."),
+]
+
+
+def seed_reviews(db: Session) -> int:
+    """Seed a deterministic mix of positive + negative product reviews. Idempotent."""
+    from app.models.review import Review
+    from app.services.review_service import sentiment_for
+
+    if db.execute(select(Review.id).limit(1)).first():
+        return 0
+    n = 0
+    for category, rating, author, comment in _SAMPLE_REVIEWS:
+        item = _pick_item(db, category)
+        if item is None:
+            continue
+        db.add(
+            Review(
+                menu_item_id=item.id,
+                rating=rating,
+                comment=comment,
+                author_name=author,
+                sentiment=sentiment_for(rating),
+                verified_purchase=rating >= 4,
+            )
+        )
+        n += 1
+    db.commit()
+    return n
+
+
 def run() -> None:
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
@@ -401,6 +445,7 @@ def run() -> None:
         n_catalog = seed_catalog(db)
         made_admin = seed_admin(db)
         n_demo = seed_demo_accounts(db)
+        n_reviews = seed_reviews(db)
 
         from app.seed.seed_kb import (
             ingest_buying_guides, ingest_category_guides, ingest_knowledge_base,
@@ -433,7 +478,7 @@ def run() -> None:
         print(
             f"Seed complete: {total_items} products ({n_curated} curated + {n_catalog} generated) | "
             f"{n_chunks} KB chunks | {n_prod_embs} product embeddings | {n_chunk_embs} chunk embeddings | "
-            f"admin_created={made_admin} | demo_accounts={n_demo}"
+            f"admin_created={made_admin} | demo_accounts={n_demo} | reviews={n_reviews}"
         )
     finally:
         db.close()

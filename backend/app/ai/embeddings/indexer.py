@@ -87,6 +87,50 @@ def embed_products(db: Session, provider: EmbeddingProvider) -> int:
     return len(to_upsert)
 
 
+def embed_one_product(db: Session, provider: EmbeddingProvider, item_id: str) -> bool:
+    """Embed a single product on demand (e.g. right after an admin create/edit), so it
+    enters the vector arm immediately without a full reseed. Idempotent via content_hash.
+
+    Removes the embedding if the item is gone or unavailable. Returns True if a vector
+    was written. Best-effort callers should wrap this in try/except — never block a write.
+    """
+    row = db.execute(
+        select(MenuItem, Category)
+        .join(Category, Category.id == MenuItem.category_id)
+        .where(MenuItem.id == item_id)
+    ).first()
+    existing = db.execute(
+        select(ProductEmbedding).where(ProductEmbedding.menu_item_id == item_id)
+    ).scalar_one_or_none()
+
+    # Item missing or unavailable → drop any stale vector so it leaves vector search.
+    if row is None or not row.MenuItem.is_available:
+        if existing:
+            db.delete(existing)
+            db.commit()
+        return False
+
+    item, cat = row.MenuItem, row.Category
+    keywords_str = " ".join(item.keywords or [])
+    sku_str = f"SKU {item.sku}. " if item.sku else ""
+    canonical = f"{sku_str}{item.name}. {cat.name}. {item.description or ''}. {keywords_str}".strip()
+    h = _content_hash(canonical)
+    if existing and existing.content_hash == h and existing.model_id == provider.model_id:
+        return False  # unchanged
+
+    vec = provider.embed_documents([canonical])[0]
+    if existing:
+        existing.embedding = vec
+        existing.content_hash = h
+        existing.model_id = provider.model_id
+    else:
+        db.add(ProductEmbedding(
+            menu_item_id=item_id, embedding=vec, content_hash=h, model_id=provider.model_id,
+        ))
+    db.commit()
+    return True
+
+
 def embed_documents(db: Session, provider: EmbeddingProvider) -> int:
     """Embed all document chunks that are new or whose content changed."""
     chunks = db.execute(

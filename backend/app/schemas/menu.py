@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import datetime
+
 from pydantic import BaseModel, Field
 
 from app.schemas.common import ORMBase
@@ -42,9 +44,11 @@ class MenuItemOut(BaseModel):
     spice_level: int
     prep_time_min: int | None
     option_groups: list[OptionGroupOut] = []
+    rating_avg: float | None = None
+    rating_count: int = 0
 
     @classmethod
-    def from_model(cls, item) -> "MenuItemOut":
+    def from_model(cls, item, *, rating_avg: float | None = None, rating_count: int = 0) -> "MenuItemOut":
         return cls(
             id=item.id,
             slug=item.slug,
@@ -65,7 +69,26 @@ class MenuItemOut(BaseModel):
             spice_level=item.spice_level,
             prep_time_min=item.prep_time_min,
             option_groups=[OptionGroupOut.model_validate(g) for g in item.option_groups],
+            rating_avg=rating_avg,
+            rating_count=rating_count,
         )
+
+
+class ReviewIn(BaseModel):
+    model_config = {"extra": "forbid"}
+    rating: int = Field(ge=1, le=5)
+    comment: str | None = Field(default=None, max_length=2000)
+    author_name: str | None = Field(default=None, max_length=80)
+
+
+class ReviewOut(ORMBase):
+    id: str
+    rating: int
+    comment: str | None
+    author_name: str
+    sentiment: str
+    verified_purchase: bool
+    created_at: datetime
 
 
 class MenuItemCreate(BaseModel):

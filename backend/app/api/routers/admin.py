@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
@@ -16,6 +18,20 @@ from app.schemas.common import MessageResponse
 from app.schemas.menu import MenuItemCreate, MenuItemOut, MenuItemUpdate
 from app.schemas.order import OrderOut, OrderStatusUpdate
 from app.services import audit_service, order_service
+
+logger = logging.getLogger("app.api.admin")
+
+
+def _reembed(db: Session, item_id: str) -> None:
+    """Embed a just-created/edited product so it enters vector search immediately.
+    Best-effort: a failure (e.g. provider down) must never fail the admin write."""
+    try:
+        from app.ai.embeddings.indexer import embed_one_product
+        from app.ai.embeddings.provider import get_embedding_provider
+
+        embed_one_product(db, get_embedding_provider(), item_id)
+    except Exception:  # noqa: BLE001
+        logger.warning("embed-on-add failed for %s (item still lexically searchable)", item_id)
 
 router = APIRouter(
     prefix="/admin", tags=["admin"],
@@ -67,6 +83,7 @@ def create_item(body: MenuItemCreate, request: Request, admin=Depends(require_ad
     db.flush()
     _apply_tags(db, item, body.dietary_tags, body.allergens)
     db.commit()
+    _reembed(db, item.id)
     audit_service.log(db, "admin.menu.create", actor_id=admin.id, target=body.slug)
     return MenuItemOut.from_model(_get_full(db, item.id))
 
@@ -87,6 +104,7 @@ def update_item(item_id: str, body: MenuItemUpdate, admin=Depends(require_admin)
             setattr(item, f, data[f])
     _apply_tags(db, item, data.get("dietary_tags"), data.get("allergens"))
     db.commit()
+    _reembed(db, item.id)
     audit_service.log(db, "admin.menu.update", actor_id=admin.id, target=item.slug, detail=data)
     return MenuItemOut.from_model(_get_full(db, item.id))
 

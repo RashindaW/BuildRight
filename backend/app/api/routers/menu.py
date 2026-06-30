@@ -10,6 +10,7 @@ from app.core.errors import NotFoundError
 from app.models.menu import Allergen, Category, DietaryTag, MenuItem
 from app.schemas.common import Page
 from app.schemas.menu import CategoryOut, MenuItemOut
+from app.services.review_service import rating_map
 
 router = APIRouter(prefix="/menu", tags=["menu"])
 
@@ -21,6 +22,16 @@ def _base_query():
         selectinload(MenuItem.allergens),
         selectinload(MenuItem.option_groups),
     )
+
+
+def _serialize_with_ratings(db: Session, items: list[MenuItem]) -> list[MenuItemOut]:
+    """Attach (avg, count) rating aggregates in a single grouped query (no N+1)."""
+    rmap = rating_map(db, [i.id for i in items])
+    out = []
+    for i in items:
+        avg, count = rmap.get(i.id, (None, 0))
+        out.append(MenuItemOut.from_model(i, rating_avg=avg, rating_count=count))
+    return out
 
 
 @router.get("", response_model=Page[MenuItemOut])
@@ -58,7 +69,7 @@ def list_menu(
     start = (page - 1) * page_size
     page_items = all_items[start:start + page_size]
     return Page(
-        items=[MenuItemOut.from_model(i) for i in page_items],
+        items=_serialize_with_ratings(db, page_items),
         total=total, page=page, page_size=page_size,
     )
 
@@ -81,13 +92,13 @@ def items_by_ids(body: ItemsByIds, db: Session = Depends(get_db)):
     for it in items:
         by_key.setdefault(it.slug, it)
         by_key.setdefault(it.id, it)
-    out, seen = [], set()
+    ordered, seen = [], set()
     for k in ids:
         it = by_key.get(k)
         if it and it.id not in seen:
             seen.add(it.id)
-            out.append(MenuItemOut.from_model(it))
-    return out
+            ordered.append(it)
+    return _serialize_with_ratings(db, ordered)
 
 
 @router.get("/categories", response_model=list[CategoryOut])
@@ -120,7 +131,8 @@ def item_recommendations(slug: str, db: Session = Depends(get_db), limit: int = 
         return []
     items = db.execute(_base_query().where(MenuItem.slug.in_(ids))).scalars().unique().all()
     by_slug = {it.slug: it for it in items}
-    return [MenuItemOut.from_model(by_slug[s]) for s in ids if s in by_slug]
+    ordered = [by_slug[s] for s in ids if s in by_slug]
+    return _serialize_with_ratings(db, ordered)
 
 
 @router.get("/{slug}", response_model=MenuItemOut)
@@ -128,4 +140,5 @@ def get_item(slug: str, db: Session = Depends(get_db)):
     item = db.execute(_base_query().where(MenuItem.slug == slug)).scalars().first()
     if not item:
         raise NotFoundError("Menu item")
-    return MenuItemOut.from_model(item)
+    avg, count = rating_map(db, [item.id]).get(item.id, (None, 0))
+    return MenuItemOut.from_model(item, rating_avg=avg, rating_count=count)
