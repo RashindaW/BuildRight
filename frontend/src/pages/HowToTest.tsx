@@ -66,7 +66,7 @@ export default function HowToTest() {
         <h1 className="text-2xl font-bold sm:text-3xl">How to test BuildRight in 5 minutes</h1>
         <p className="mt-1 max-w-2xl text-sm opacity-90 sm:text-base">
           Open the chat (💬 bottom-right) and try the prompts below — each one shows a different capability.
-          It's a sandbox: test data only, Stripe test mode, and it re-seeds on every deploy.
+          Test data only, Stripe test mode, and it re-seeds on every deploy.
         </p>
       </div>
 
@@ -89,7 +89,7 @@ export default function HowToTest() {
           </table>
         </div>
         <p className="mt-2 text-xs text-gray-400">
-          Or shop + chat as a guest with no login. Admin is kept private for sandbox integrity.
+          Or shop + chat as a guest with no login. Admin access is kept private.
         </p>
       </section>
 

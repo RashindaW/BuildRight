@@ -23,7 +23,6 @@ export function Navbar() {
             <Bot size={18} />
           </span>
           BuildRight <span className="text-brand-600">AI</span>
-          <span className="badge-warning ml-1 font-normal">Sandbox</span>
         </Link>
         <NavLink to="/" end className={linkClass}>
           Products

@@ -146,8 +146,8 @@ export default function About() {
       <section className="mb-8">
         <h2 className="mb-1 text-lg font-semibold">Demo logins (for reviewers)</h2>
         <p className="mb-3 text-sm text-gray-500">
-          Sign in to explore each access tier. This is a sandboxed demo — test data only, Stripe test
-          mode, and it re-seeds on each deploy.
+          Sign in to explore each access tier. Test data only, Stripe test mode — the demo re-seeds on
+          each deploy.
         </p>
         <div className="card overflow-x-auto">
           <table className="w-full text-sm">

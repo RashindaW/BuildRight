@@ -47,7 +47,7 @@ export default function Home() {
     <div className="mx-auto max-w-6xl px-4 py-8">
       <div className="mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-brand-600 via-brand-700 to-brand-800 text-white shadow-sm">
         <div className="flex items-center justify-center gap-1.5 bg-white/10 px-6 py-1.5 text-center text-xs font-medium tracking-wide">
-          <FlaskConical size={13} /> Sandbox demo — test data only · Stripe test mode · re-seeds on deploy
+          <FlaskConical size={13} /> Live demo — test data only · Stripe test mode · re-seeds on deploy
         </div>
         <div className="p-6 sm:p-8">
           <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight sm:text-3xl">
