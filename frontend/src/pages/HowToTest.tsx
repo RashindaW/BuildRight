@@ -1,4 +1,11 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import {
+  ArrowRight, BarChart3, Check, Copy as CopyIcon, CreditCard, FlaskConical,
+  MessageCircle, Mic, Network, ShieldCheck, ShoppingBag,
+} from "lucide-react";
+import { Hero } from "../components/layout/Hero";
+import { GROUP_ORDER, MISSIONS, type Mission } from "../components/howto/missions";
 
 const LOGINS = [
   { role: "Shopper", email: "demo@buildright.com", pass: "Demo1234!" },
@@ -6,76 +13,98 @@ const LOGINS = [
   { role: "Staff", email: "staff@buildright.com", pass: "StaffDemo1234!" },
 ];
 
-const STEPS: { title: string; prompt?: string; look: string }[] = [
-  {
-    title: "Grounded product search",
-    prompt: "Do you have a cordless drill and how much is the cheapest one?",
-    look: "Real product names + exact prices with SKUs — nothing invented. Prices come from the catalog, validated by a guardrail.",
-  },
-  {
-    title: "Guardrail: apologize + suggest an alternative",
-    prompt: "Do you sell a laser level?",
-    look: "If it's not carried, the assistant apologizes and proactively offers the closest in-stock alternative — it never makes up a product or price.",
-  },
-  {
-    title: "Policy answer with a citation (RAG)",
-    prompt: "What's your return policy for power tools?",
-    look: "An answer grounded in the knowledge base, cited as “Document › Section”. Ask something not in policy and it points you to customer service.",
-  },
-  {
-    title: "Buying-guide knowledge (semantic search)",
-    prompt: "What's the difference between an impact driver and a hammer drill?",
-    look: "A grounded, cited buying-guide answer — semantic search over product knowledge, not a generic web answer.",
-  },
-  {
-    title: "Conversational project planner",
-    prompt: "I want to paint my bedroom, it's 12 by 10 feet with 8 foot walls. What do I need?",
-    look: "A costed materials list (real SKUs, quantities, a subtotal) computed from the measurements, with an offer to add it all to the cart.",
-  },
-  {
-    title: "Recommendations",
-    prompt: "What goes well with a cordless drill?",
-    look: "Cross-sell suggestions from real co-purchase data + content similarity.",
-  },
-  {
-    title: "Multimodal — image & voice",
-    look: "Use the 🖼️ button to find a product from a photo, and the 🎤 button to order by voice. Shortlisted items can be pushed to the storefront with one click.",
-  },
-  {
-    title: "Manager analytics & AI Operations",
-    look: "Log in as Manager → Dashboard. See inventory, profit, AI-attributed sales, and the AI Operations panel: agent cost, route mix (Haiku→Sonnet escalation), tool usage, guardrail rate, and customer-satisfaction scores.",
-  },
-];
+const GROUP_ICON: Record<string, typeof ShoppingBag> = {
+  "Shop as a guest": ShoppingBag,
+  "Reviews & the recommendation graph": Network,
+  "Chat with the AI assistant": MessageCircle,
+  "Multimodal & memory": Mic,
+  "Checkout & orders": CreditCard,
+  "Manager intelligence (log in)": BarChart3,
+  "Power features & access control": ShieldCheck,
+};
+
+/** A clean in-app path to deep-link to, or null if the route is an instruction. */
+function linkTarget(route?: string): string | null {
+  if (!route || !route.startsWith("/")) return null;
+  const first = route.split(/\s/)[0];
+  return /^\/[\w\-/]*$/.test(first) ? first : null;
+}
 
 function Copy({ text }: { text: string }) {
+  const [done, setDone] = useState(false);
   return (
     <button
-      onClick={() => navigator.clipboard?.writeText(text)}
-      className="rounded border border-gray-300 px-2 py-0.5 text-xs text-gray-500 hover:bg-gray-100"
+      onClick={() => {
+        navigator.clipboard?.writeText(text);
+        setDone(true);
+        setTimeout(() => setDone(false), 1200);
+      }}
+      className="inline-flex shrink-0 items-center gap-1 rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-500 hover:bg-gray-100"
       title="Copy prompt"
     >
-      Copy
+      {done ? <><Check size={12} /> Copied</> : <><CopyIcon size={12} /> Copy</>}
     </button>
   );
 }
 
+function MissionCard({ m, num }: { m: Mission; num: number }) {
+  const target = linkTarget(m.route);
+  return (
+    <li className="card p-4">
+      <div className="flex gap-3">
+        <span className="badge-brand mt-0.5 shrink-0">{num}</span>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <h4 className="font-semibold text-gray-900">{m.title}</h4>
+            {target && (
+              <Link to={target} className="btn-soft btn-sm shrink-0">
+                Try it <ArrowRight size={13} />
+              </Link>
+            )}
+          </div>
+          <div className="mt-1.5 flex flex-wrap items-center gap-2">
+            <span className="badge-neutral">{m.persona}</span>
+            {m.route && <span className="font-mono text-xs text-gray-400">{m.route}</span>}
+          </div>
+          {m.prompt && (
+            <div className="mt-2 flex items-center gap-2">
+              <code className="min-w-0 flex-1 truncate rounded bg-gray-50 px-2 py-1 text-xs text-gray-700">
+                {m.prompt}
+              </code>
+              <Copy text={m.prompt} />
+            </div>
+          )}
+          <p className="mt-2 text-sm text-gray-600">
+            <span className="font-medium text-gray-500">What to look for: </span>
+            {m.lookFor}
+          </p>
+        </div>
+      </div>
+    </li>
+  );
+}
+
 export default function HowToTest() {
+  let counter = 0;
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <div className="mb-6 rounded-2xl bg-gradient-to-br from-brand-600 to-brand-800 p-6 text-white sm:p-8">
-        <h1 className="text-2xl font-bold sm:text-3xl">How to test BuildRight in 5 minutes</h1>
-        <p className="mt-1 max-w-2xl text-sm opacity-90 sm:text-base">
-          Open the chat (💬 bottom-right) and try the prompts below — each one shows a different capability.
-          Test data only, Stripe test mode, and it re-seeds on every deploy.
-        </p>
-      </div>
+      <Hero
+        variant="test"
+        eyebrow={<><FlaskConical size={13} /> Guided tour</>}
+        title="Test every feature in about six minutes"
+        subtitle="A guided lap, not a manual. Follow the missions top to bottom — start as a guest, push the assistant until it surprises you, dig into a product's reviews and recommendation graph, then log in as the manager to watch the machine's vitals. Tap any “Try it” to jump there; tap “Copy” to paste a prompt into the chat."
+      />
 
-      <section className="mb-8">
+      <section className="my-8">
         <h2 className="mb-3 text-lg font-semibold">Demo logins</h2>
         <div className="card overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="text-left text-gray-500">
-              <tr><th className="px-4 py-2">Role</th><th className="px-4 py-2">Email</th><th className="px-4 py-2">Password</th></tr>
+              <tr>
+                <th className="px-4 py-2">Role</th>
+                <th className="px-4 py-2">Email</th>
+                <th className="px-4 py-2">Password</th>
+              </tr>
             </thead>
             <tbody className="divide-y">
               {LOGINS.map((l) => (
@@ -93,35 +122,31 @@ export default function HowToTest() {
         </p>
       </section>
 
-      <section className="mb-8">
-        <h2 className="mb-3 text-lg font-semibold">Try these, in order</h2>
-        <ol className="space-y-3">
-          {STEPS.map((s, i) => (
-            <li key={s.title} className="card p-4">
-              <div className="flex items-start gap-3">
-                <span className="badge mt-0.5 bg-brand-100 text-brand-700">{i + 1}</span>
-                <div className="min-w-0 flex-1">
-                  <h3 className="font-semibold">{s.title}</h3>
-                  {s.prompt && (
-                    <div className="mt-2 flex items-center gap-2">
-                      <code className="min-w-0 flex-1 truncate rounded bg-gray-50 px-2 py-1 text-xs text-gray-700">
-                        {s.prompt}
-                      </code>
-                      <Copy text={s.prompt} />
-                    </div>
-                  )}
-                  <p className="mt-2 text-sm text-gray-600">
-                    <span className="font-medium text-gray-500">What to look for: </span>{s.look}
-                  </p>
-                </div>
-              </div>
-            </li>
-          ))}
-        </ol>
-      </section>
+      {GROUP_ORDER.map((group) => {
+        const items = MISSIONS.filter((m) => m.group === group);
+        const Icon = GROUP_ICON[group] ?? ShoppingBag;
+        return (
+          <section key={group} className="mb-8">
+            <div className="mb-3 flex items-center gap-2">
+              <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-600 text-white shadow-sm">
+                <Icon size={17} />
+              </span>
+              <h2 className="text-lg font-semibold">{group}</h2>
+              <span className="text-sm text-gray-400">({items.length})</span>
+            </div>
+            <ol className="space-y-3">
+              {items.map((m) => {
+                counter += 1;
+                return <MissionCard key={m.title} m={m} num={counter} />;
+              })}
+            </ol>
+          </section>
+        );
+      })}
 
       <div className="text-sm text-gray-500">
-        Want the architecture + capabilities? See the <Link to="/about" className="text-brand-600 hover:underline">About page</Link>.
+        Want the architecture &amp; how it's built? See the{" "}
+        <Link to="/about" className="text-brand-600 hover:underline">About page</Link>.
       </div>
     </div>
   );
