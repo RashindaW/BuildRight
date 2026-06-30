@@ -30,7 +30,7 @@ export function GraphViz({ data, size = 360 }: { data: RecGraph; size?: number }
         const right = Math.cos(a) >= 0;
         return (
           <Link key={nb.slug} to={`/item/${nb.slug}`}>
-            <circle cx={x} cy={y} r={nodeR} fill="#bfdbfe" stroke="#3b82f6" strokeWidth={1.5} />
+            <circle cx={x} cy={y} r={nodeR} fill="#cdd6e0" stroke="#51647d" strokeWidth={1.5} />
             <text
               x={x + (right ? nodeR + 4 : -(nodeR + 4))}
               y={y + 3}
@@ -44,7 +44,8 @@ export function GraphViz({ data, size = 360 }: { data: RecGraph; size?: number }
         );
       })}
 
-      <circle cx={cx} cy={cy} r={15} fill="#1d4ed8" />
+      <circle cx={cx} cy={cy} r={15} fill="#2e3d50" />
+      <circle cx={cx} cy={cy} r={15} fill="none" stroke="#f59e0b" strokeWidth={2.5} />
       <text x={cx} y={cy + 30} fontSize="10" fontWeight={700} textAnchor="middle" fill="#1e293b">
         {trunc(data.anchor.name, 24)}
       </text>

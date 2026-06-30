@@ -17,18 +17,26 @@ export default {
         ],
       },
       colors: {
-        // Industrial blue — sturdy, trustworthy, hardware-appropriate.
+        // Industrial slate — machined gunmetal steel; serious, premium, hardware-grade.
         brand: {
-          50: "#eff6ff",
-          100: "#dbeafe",
-          200: "#bfdbfe",
-          300: "#93c5fd",
-          400: "#60a5fa",
-          500: "#2563eb",
-          600: "#1d4ed8",
-          700: "#1e40af",
-          800: "#1e3a8a",
-          900: "#172554",
+          50: "#f5f7fa",
+          100: "#e9edf2",
+          200: "#cdd6e0",
+          300: "#a7b5c4",
+          400: "#7689a0",
+          500: "#51647d",
+          600: "#3b4d63",
+          700: "#2e3d50",
+          800: "#232f3e",
+          900: "#161e29",
+        },
+        // Safety amber — the hi-vis accent for CTAs + "AI is live" highlights.
+        // Use brand-900 (dark) text on the DEFAULT amber; accent-700 for amber text on white.
+        accent: {
+          light: "#fef3c7",
+          DEFAULT: "#f59e0b",
+          600: "#d97706",
+          700: "#b45309",
         },
         // Semantic tokens — replace the inline green/amber/red literals scattered in cards.
         success: { light: "#dcfce7", DEFAULT: "#16a34a", dark: "#15803d" },

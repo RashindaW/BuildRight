@@ -4,7 +4,7 @@ import { ordersApi } from "../lib/api/endpoints";
 import { formatPrice } from "../lib/format";
 
 const STATUS_COLOR: Record<string, string> = {
-  placed: "bg-blue-100 text-blue-800",
+  placed: "bg-brand-100 text-brand-700",
   preparing: "bg-amber-100 text-amber-800",
   ready: "bg-green-100 text-green-800",
   completed: "bg-gray-100 text-gray-700",
