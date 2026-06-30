@@ -108,3 +108,21 @@ export interface ChatMessage {
   pending?: boolean;
   cards?: MenuItem[];
 }
+
+export interface Review {
+  id: string;
+  rating: number;
+  comment: string | null;
+  author_name: string;
+  sentiment: string;
+  verified_purchase: boolean;
+  created_at: string;
+}
+
+export interface ReviewSummary {
+  count: number;
+  average: number | null;
+  positive: number;
+  negative: number;
+  summary: string;
+}

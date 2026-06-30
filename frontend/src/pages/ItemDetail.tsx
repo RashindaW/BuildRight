@@ -5,6 +5,8 @@ import { ArrowLeft, Plus } from "lucide-react";
 import { menuApi } from "../lib/api/endpoints";
 import { formatPrice, imageSrc, ALLERGEN_LABELS } from "../lib/format";
 import { DietaryBadge } from "../components/menu/DietaryBadge";
+import { MenuCard } from "../components/menu/MenuCard";
+import { ProductReviews } from "../components/menu/ProductReviews";
 import { Skeleton } from "../components/ui/Skeleton";
 import { Stars } from "../components/ui/Stars";
 import { useCartMutations } from "../hooks/useCart";
@@ -18,6 +20,11 @@ export default function ItemDetail() {
   const { data: item, isLoading } = useQuery({
     queryKey: ["menu-item", slug],
     queryFn: () => menuApi.get(slug!),
+    enabled: !!slug,
+  });
+  const recs = useQuery({
+    queryKey: ["recommendations", slug],
+    queryFn: () => menuApi.recommendations(slug!),
     enabled: !!slug,
   });
   const [selected, setSelected] = useState<Record<string, string>>({});
@@ -138,6 +145,19 @@ export default function ItemDetail() {
           </button>
         </div>
       </div>
+
+      {recs.data && recs.data.length > 0 && (
+        <section className="mt-8">
+          <h2 className="mb-3 text-lg font-semibold">You might also like</h2>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {recs.data.map((it) => (
+              <MenuCard key={it.id} item={it} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      <ProductReviews slug={item.slug} />
     </div>
   );
 }
