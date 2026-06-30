@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { Send, Sparkles } from "lucide-react";
 import { streamChat } from "../../lib/api/chatStream";
+import { WorkingDots } from "../ui/WorkingDots";
 
 const SUGGESTIONS = [
   "What are my best-selling products?",
@@ -20,6 +21,7 @@ export function AdminChat() {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  const [phase, setPhase] = useState<string | null>(null);
   const convId = useRef<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -29,6 +31,7 @@ export function AdminChat() {
   async function send(text: string) {
     if (!text.trim() || busy) return;
     setBusy(true);
+    setPhase("Thinking…");
     setInput("");
     setMessages((m) => [...m, { role: "user", content: text }, { role: "assistant", content: "" }]);
     scrollDown();
@@ -46,8 +49,11 @@ export function AdminChat() {
         "admin",
         (ev) => {
           if (ev.event === "meta") convId.current = (ev.data.conversation_id as string) ?? convId.current;
-          else if (ev.event === "delta") setLast((c) => c + (ev.data.text as string));
-          else if (ev.event === "validated" && ev.data.replace) setLast(() => ev.data.text as string);
+          else if (ev.event === "status") setPhase((ev.data.label as string) ?? null);
+          else if (ev.event === "delta") {
+            setPhase(null);
+            setLast((c) => c + (ev.data.text as string));
+          } else if (ev.event === "validated" && ev.data.replace) setLast(() => ev.data.text as string);
           else if (ev.event === "error") setLast((c) => c || (ev.data.message as string));
           scrollDown();
         },
@@ -55,6 +61,7 @@ export function AdminChat() {
         "/api/v1/admin/chat/stream",
       );
     } finally {
+      setPhase(null);
       setBusy(false);
     }
   }
@@ -91,11 +98,13 @@ export function AdminChat() {
                 }`}
               >
                 {mmsg.role === "assistant" ? (
-                  <div className="markdown">
-                    <ReactMarkdown>
-                      {mmsg.content || (busy && i === messages.length - 1 ? "…" : "")}
-                    </ReactMarkdown>
-                  </div>
+                  mmsg.content ? (
+                    <div className="markdown">
+                      <ReactMarkdown>{mmsg.content}</ReactMarkdown>
+                    </div>
+                  ) : (
+                    <WorkingDots label={i === messages.length - 1 ? phase ?? "Thinking…" : "Thinking…"} />
+                  )
                 ) : (
                   mmsg.content
                 )}

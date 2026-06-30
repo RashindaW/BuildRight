@@ -136,6 +136,37 @@ def _build_executors():
     }
 
 
+# Friendly "what the agent is doing right now" labels, keyed by tool name. Surfaced as
+# SSE `status` events so the chat can show live progress instead of a static spinner.
+_TOOL_STATUS = {
+    "search_products": "Searching the catalog…",
+    "search_menu": "Searching the catalog…",
+    "search_knowledge_base": "Checking our policies & guides…",
+    "recommend_similar": "Finding good matches…",
+    "frequently_bought_with": "Finding what pairs well…",
+    "suggest_complementary": "Finding what pairs well…",
+    "graph_recommend": "Finding good matches…",
+    "compute_materials": "Planning your project…",
+    "add_materials_to_cart": "Adding items to your cart…",
+    "reorder": "Pulling up your past orders…",
+    "get_order_history": "Looking up your orders…",
+    "get_inventory": "Checking inventory…",
+    "get_margins": "Crunching the margins…",
+    "get_ai_attribution": "Attributing AI-driven sales…",
+    "get_ai_ops": "Reviewing AI operations…",
+    "get_csat": "Reading satisfaction scores…",
+    "get_chat_quality": "Scoring chat quality…",
+}
+
+
+def _tool_status(names: list[str]) -> dict:
+    """Pick a friendly label for a round of tool calls (first recognized tool wins)."""
+    for n in names:
+        if n in _TOOL_STATUS:
+            return {"phase": "working", "label": _TOOL_STATUS[n]}
+    return {"phase": "working", "label": "Working on it…"}
+
+
 async def stream_chat(
     prior_messages: list[dict],
     ctx: ToolContext,
@@ -180,6 +211,7 @@ async def stream_chat(
     messages.append({"role": "user", "content": effective_question})
 
     yield {"event": "start", "data": {"model": route_model, "route": route_label}}
+    yield {"event": "status", "data": {"phase": "thinking", "label": "Thinking…"}}
 
     grounded_items: list[dict] = []
     grounded_chunks: list = []
@@ -206,6 +238,8 @@ async def stream_chat(
             if resp.stop_reason == "tool_use":
                 tool_rounds += 1
                 messages.append({"role": "assistant", "content": resp.content})
+                round_tools = [b.name for b in resp.content if b.type == "tool_use"]
+                yield {"event": "status", "data": _tool_status(round_tools)}
                 tool_results = []
                 for block in resp.content:
                     if block.type != "tool_use":
@@ -240,6 +274,7 @@ async def stream_chat(
                         "content": result_json,
                     })
                 messages.append({"role": "user", "content": tool_results})
+                yield {"event": "status", "data": {"phase": "summarizing", "label": "Summarizing what I found…"}}
                 continue
 
             final_text = "".join(b.text for b in resp.content if b.type == "text").strip()
@@ -294,6 +329,7 @@ async def stream_chat(
             "service team or visit buildright.ca.)_"
         )
 
+    yield {"event": "status", "data": {"phase": "finalizing", "label": "Finalizing…"}}
     for chunk in _emit_chunks(final_text):
         yield {"event": "delta", "data": {"text": chunk}}
 

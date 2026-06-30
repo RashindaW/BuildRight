@@ -10,6 +10,7 @@ import { queryClient } from "../../lib/queryClient";
 import { useUiStore } from "../../store/uiStore";
 import { useAuth } from "../../context/AuthProvider";
 import { ProductCardInline } from "./ProductCardInline";
+import { WorkingDots } from "../ui/WorkingDots";
 import type { ChatMessage } from "../../types";
 
 const QUICK = ["Where are cordless drills?", "Do you sell a laser level?", "What's your return policy?"];
@@ -31,6 +32,7 @@ export function ChatWidget() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  const [phase, setPhase] = useState<string | null>(null); // live "thinking/searching/…" label
   const [recording, setRecording] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
   const [imgBusy, setImgBusy] = useState(false);
@@ -49,6 +51,7 @@ export function ChatWidget() {
   async function send(text: string) {
     if (!text.trim() || busy) return;
     setBusy(true);
+    setPhase("Thinking…");
     setInput("");
     setMessages((m) => [...m, { role: "user", content: text }, { role: "assistant", content: "", pending: true }]);
     scrollDown();
@@ -64,7 +67,11 @@ export function ChatWidget() {
     try {
       await streamChat(text, convId.current, sessionId, (ev) => {
         if (ev.event === "meta") convId.current = (ev.data.conversation_id as string) ?? convId.current;
-        else if (ev.event === "delta") setLast((c) => c + (ev.data.text as string));
+        else if (ev.event === "status") setPhase((ev.data.label as string) ?? null);
+        else if (ev.event === "delta") {
+          setPhase(null); // first token arrived — drop the working indicator
+          setLast((c) => c + (ev.data.text as string));
+        }
         else if (ev.event === "validated" && ev.data.replace) setLast(() => ev.data.text as string);
         else if (ev.event === "done") {
           if (ev.data.cart_dirty) queryClient.invalidateQueries({ queryKey: ["cart"] });
@@ -94,6 +101,7 @@ export function ChatWidget() {
         scrollDown();
       });
     } finally {
+      setPhase(null);
       setMessages((m) => {
         const copy = [...m];
         copy[copy.length - 1] = { ...copy[copy.length - 1], pending: false };
@@ -166,6 +174,7 @@ export function ChatWidget() {
       return;
     }
     setImgBusy(true);
+    setPhase("Looking at your image…");
     setMessages((m) => [
       ...m,
       { role: "user", content: `Sent a photo (${file.name})` },
@@ -198,6 +207,7 @@ export function ChatWidget() {
         return copy;
       });
     } finally {
+      setPhase(null);
       setImgBusy(false);
       if (fileRef.current) fileRef.current.value = "";
     }
@@ -289,9 +299,13 @@ export function ChatWidget() {
               }`}
             >
               {m.role === "assistant" ? (
-                <div className="markdown">
-                  <ReactMarkdown>{m.content || (m.pending ? "…" : "")}</ReactMarkdown>
-                </div>
+                m.content ? (
+                  <div className="markdown">
+                    <ReactMarkdown>{m.content}</ReactMarkdown>
+                  </div>
+                ) : m.pending ? (
+                  <WorkingDots label={i === messages.length - 1 ? phase ?? "Thinking…" : "Thinking…"} />
+                ) : null
               ) : (
                 m.content
               )}
@@ -338,6 +352,12 @@ export function ChatWidget() {
           <ShoppingBag size={15} /> Show these {shortlistedItemIds.length} item{shortlistedItemIds.length > 1 ? "s" : ""} on the storefront →
         </button>
       )}
+      {(recording || transcribing) && (
+        <div className="flex items-center gap-2 border-t bg-brand-50 px-3 py-1.5 text-xs font-medium text-brand-700">
+          <span className={`h-2 w-2 rounded-full ${recording ? "animate-pulse bg-danger" : "animate-bounce bg-brand-400"}`} />
+          {recording ? "Listening… tap the stop button when you're done" : "Transcribing your voice…"}
+        </div>
+      )}
       {voiceErr && (
         <div className="border-t bg-amber-50 px-3 py-1.5 text-xs text-amber-700">{voiceErr}</div>
       )}
@@ -382,10 +402,15 @@ export function ChatWidget() {
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder={recording ? "Listening…" : transcribing ? "Transcribing…" : "Type your question…"}
+          placeholder={
+            recording ? "Listening…"
+              : transcribing ? "Transcribing…"
+              : imgBusy ? "Reading your photo… one moment"
+              : "Type your question…"
+          }
           className="input flex-1"
           aria-label="Chat message"
-          disabled={recording || transcribing}
+          disabled={recording || transcribing || imgBusy}
         />
         <button className="btn-primary shrink-0 px-3" disabled={busy} aria-label="Send">
           <Send size={16} />
