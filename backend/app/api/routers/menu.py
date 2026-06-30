@@ -142,6 +142,25 @@ def item_recommendations(slug: str, db: Session = Depends(get_db), limit: int = 
     return _serialize_with_ratings(db, ordered)
 
 
+@router.get("/{slug}/graph")
+def item_graph(slug: str, db: Session = Depends(get_db), limit: int = Query(8, ge=1, le=12)):
+    """The GNN recommendation neighbourhood for an item — the anchor plus its top graph
+    neighbours with similarity scores — for the 'why recommended' visualisation."""
+    from app.ai.recommend.gnn import graph_recommend
+
+    item = db.execute(_base_query().where(MenuItem.slug == slug)).scalars().first()
+    if not item:
+        raise NotFoundError("Menu item")
+    recs = graph_recommend(db, slug, k=limit)
+    return {
+        "anchor": {"slug": item.slug, "name": item.name, "category": item.category.slug},
+        "neighbors": [
+            {"slug": r["slug"], "name": r["name"], "score": r["score"], "category": r["category"]}
+            for r in recs
+        ],
+    }
+
+
 @router.get("/{slug}", response_model=MenuItemOut)
 def get_item(slug: str, db: Session = Depends(get_db)):
     item = db.execute(_base_query().where(MenuItem.slug == slug)).scalars().first()

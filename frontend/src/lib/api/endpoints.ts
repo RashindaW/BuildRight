@@ -1,5 +1,7 @@
 import { api, postForm } from "./client";
-import type { Cart, Category, MenuItem, Order, Page, Review, ReviewSummary, User } from "../../types";
+import type {
+  Cart, Category, MenuItem, Order, Page, RecGraph, Review, ReviewSummary, User,
+} from "../../types";
 
 // ---- Media (voice / image) ----
 export const mediaApi = {
@@ -50,6 +52,7 @@ export const menuApi = {
   categories: () => api<Category[]>("/menu/categories"),
   byIds: (ids: string[]) => api<MenuItem[]>("/menu/by-ids", { method: "POST", body: { ids } }),
   recommendations: (slug: string) => api<MenuItem[]>(`/menu/${slug}/recommendations`),
+  graph: (slug: string) => api<RecGraph>(`/menu/${slug}/graph`),
   reviews: (slug: string) => api<Page<Review>>(`/menu/${slug}/reviews`),
   reviewSummary: (slug: string) => api<ReviewSummary>(`/menu/${slug}/review-summary`),
   addReview: (slug: string, body: { rating: number; comment?: string; author_name?: string }) =>

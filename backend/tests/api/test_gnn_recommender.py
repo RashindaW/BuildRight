@@ -47,6 +47,14 @@ def test_gnn_build_and_recommend_isolated():
         for r in recs:
             assert r["slug"] != item.slug
             assert "score" in r and "name" in r
+
+        # Recall@k eval over held-out co-purchases — the graph model is measured, not assumed.
+        from app.ai.eval.recommender_eval import evaluate
+
+        metrics = evaluate(db, k=5, sample=120)
+        assert metrics["pairs"] > 0
+        assert 0.0 <= metrics["graph_recall"] <= 1.0
+        assert 0.0 <= metrics["cooccurrence_recall"] <= 1.0
     finally:
         db.close()
         engine.dispose()
@@ -61,3 +69,12 @@ def test_graph_recommend_degrades_without_graph(seeded_item):
         assert graph_recommend(db, seeded_item["slug"]) == []
     finally:
         db.close()
+
+
+def test_item_graph_endpoint(client, seeded_item):
+    """The /graph viz endpoint returns the anchor + (possibly empty) neighbour list."""
+    r = client.get(f"/api/v1/menu/{seeded_item['slug']}/graph")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["anchor"]["slug"] == seeded_item["slug"]
+    assert isinstance(body["neighbors"], list)
