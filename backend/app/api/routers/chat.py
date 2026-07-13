@@ -142,6 +142,10 @@ def chat_stream(
                 output_tokens=out_tokens,
                 tools_used=meta.get("tools_used") or [],
                 guardrail_violation=bool(meta.get("guardrail_violation", False)),
+                predicted_difficulty=meta.get("predicted_difficulty"),
+                escalated=bool(meta.get("escalated", False)),
+                router_version=meta.get("router_version"),
+                cost_usd=meta.get("cost_usd"),
             ))
             c = s.get(Conversation, conv_id)
             if c:

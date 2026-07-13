@@ -26,6 +26,7 @@ from app.ai.guardrails import (
     validate_citations,
     validate_response,
 )
+from app.ai.pricing import cost_usd
 from app.ai.prompts import build_memory_preamble, build_user_message
 from app.ai.providers.base import ProviderError
 from app.ai.registry import registry
@@ -176,6 +177,8 @@ async def stream_chat(
     tools_override: list | None = None,
     executors_override: dict | None = None,
     validate_prices: bool = True,
+    _forced_model: str | None = None,
+    _attempt: int = 1,
 ) -> AsyncIterator[dict]:
     """Yield SSE event dicts: {event, data}.
 
@@ -198,12 +201,24 @@ async def stream_chat(
     tool_defs = tools_override if tools_override is not None else tools.TOOLS
 
     # Route once per turn; the chosen model drives every round of the tool loop.
-    route_label, route_model = await router.classify_turn(
-        client, user_question, has_image=has_image
-    )
+    if _forced_model:
+        route_label, route_model = "escalated", _forced_model  # cascade second opinion
+    else:
+        route_label, route_model = await router.classify_turn(
+            client, user_question, has_image=has_image
+        )
     # Resolve the routed model to its provider (anthropic entries — and test fakes —
     # wrap `client`; openai_compat entries get their own adapter from the registry).
     provider = registry.acquire(route_model, fallback_client=client)
+
+    # Learned-difficulty telemetry (zero-latency NumPy head; None when v2 is off).
+    predicted_difficulty: float | None = None
+    if settings.router_v2_enabled:
+        try:
+            from app.ai.routing.difficulty import p_cheap_ok
+            predicted_difficulty = round(1.0 - p_cheap_ok(user_question, has_image=has_image), 3)
+        except Exception:  # noqa: BLE001
+            predicted_difficulty = None
 
     preamble = build_memory_preamble(ctx.preferences)
     effective_question = preamble + user_question if preamble else user_question
@@ -214,7 +229,10 @@ async def stream_chat(
     yield {"event": "start", "data": {"model": route_model, "route": route_label}}
     yield {"event": "status", "data": {"phase": "thinking", "label": "Thinking…"}}
     # Glass-box trace: surface the routing decision (which brain, and why) to the UI.
-    yield {"event": "trace", "data": {"type": "route", "model": route_model, "label": route_label}}
+    yield {"event": "trace", "data": {
+        "type": "route", "model": route_model, "label": route_label,
+        "predicted_difficulty": predicted_difficulty,
+    }}
 
     grounded_items: list[dict] = []
     grounded_chunks: list = []
@@ -260,10 +278,9 @@ async def stream_chat(
                 if kind == "delta":
                     out = gate.feed(val) if gate else val
                     if gate and gate.violation:
-                        # Abort the stream: replace anything shown with the fallback.
+                        # Abort the stream; the post-loop block escalates or replaces.
                         await agen.aclose()
                         logger.warning('"guardrail_price_violation_stream: %s"', gate.violation)
-                        yield {"event": "validated", "data": {"replace": True, "text": SAFE_FALLBACK}}
                         final_text = SAFE_FALLBACK
                         guardrail_violation = True
                         completed = True
@@ -336,7 +353,6 @@ async def stream_chat(
             tail = gate.finish() if gate else ""
             if gate and gate.violation:
                 logger.warning('"guardrail_price_violation_stream: %s"', gate.violation)
-                yield {"event": "validated", "data": {"replace": True, "text": SAFE_FALLBACK}}
                 final_text = SAFE_FALLBACK
                 guardrail_violation = True
             else:
@@ -354,6 +370,34 @@ async def stream_chat(
             registry.mark_unhealthy(route_model)  # health loop / next turn routes around it
         yield {"event": "error", "data": {"message": models.API_ERROR_MESSAGE}}
         return
+
+    # Guardrail violation: CASCADE — a failed cheap answer earns one visible retry on
+    # the strongest healthy model before we settle for the safe fallback.
+    if guardrail_violation:
+        escalate_to: str | None = None
+        if settings.router_cascade_enabled and validate_prices and _attempt == 1:
+            try:
+                from app.ai.routing.policy import strongest_healthy
+                cand = strongest_healthy(exclude=route_model)
+                if cand and cand != route_model:
+                    escalate_to = cand
+            except Exception:  # noqa: BLE001
+                escalate_to = None
+        if escalate_to:
+            logger.info('"cascade_escalation: %s -> %s"', route_model, escalate_to)
+            yield {"event": "status", "data": {"phase": "escalating", "label": "Getting a second opinion…"}}
+            yield {"event": "delta_reset", "data": {}}
+            yield {"event": "trace", "data": {"type": "escalation", "from": route_model, "to": escalate_to}}
+            async for ev in stream_chat(
+                prior_messages, ctx, user_question, max_tokens, has_image,
+                system_prompt=system_prompt, tools_override=tools_override,
+                executors_override=executors_override, validate_prices=validate_prices,
+                _forced_model=escalate_to, _attempt=2,
+            ):
+                if ev["event"] != "start":  # a single logical turn: keep the outer start
+                    yield ev
+            return
+        yield {"event": "validated", "data": {"replace": True, "text": SAFE_FALLBACK}}
 
     # If the model never stopped calling tools (rounds exhausted) or produced no text,
     # substitute a fallback rather than emitting/persisting a silent blank turn. The
@@ -406,5 +450,9 @@ async def stream_chat(
             "route": route_label,
             "tools_used": tools_used,
             "tool_rounds": tool_rounds,
+            "predicted_difficulty": predicted_difficulty,
+            "escalated": _attempt > 1,
+            "router_version": "v2" if settings.router_v2_enabled else "v1",
+            "cost_usd": cost_usd(route_model, input_tokens, output_tokens),
         },
     }

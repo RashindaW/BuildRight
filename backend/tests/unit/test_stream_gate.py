@@ -188,6 +188,10 @@ async def test_stream_chat_true_streaming_and_reset(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_stream_chat_violation_replaces_with_fallback(monkeypatch):
+    # Cascade disabled here — this test pins the terminal fallback path
+    # (escalation behavior is covered in test_router_v2.py).
+    from app.core.config import settings
+    monkeypatch.setattr(settings, "router_cascade_enabled", False)
     final_resp = _Resp("end_turn", [_Blk(type="text", text="x")])
     script = [(["This beauty is only $499.99", " — a total steal for the weekend."], final_resp)]
     monkeypatch.setattr(service, "_get_async_client", lambda: _client_with_script(script))

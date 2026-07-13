@@ -74,9 +74,24 @@ async def classify_turn(
 
     Returns ``(label, model_id)``. Best-effort: defaults to the cheap model on
     anything ambiguous or on any classifier error.
+
+    When router v2 is enabled, dispatches to the learned zero-latency policy
+    (registry candidates + difficulty head + cost-quality trade-off); this v1
+    heuristic+LLM path remains the flag-off fallback and the safety net.
     """
     if not settings.model_router_enabled:
         return SIMPLE, settings.llm_model
+
+    if settings.router_v2_enabled:
+        try:
+            from app.ai.routing.policy import decide
+            d = decide(user_question, has_image=has_image)
+            if d is not None:
+                logger.info('"route_v2: %s difficulty=%.2f candidates=%d"',
+                            d.model_id, d.predicted_difficulty, d.candidates)
+                return d.label, d.model_id
+        except Exception:  # noqa: BLE001 - v2 must never take chat down
+            logger.exception("router v2 failed — falling back to v1")
 
     # An image always escalates — vision turns need the heavy model.
     if has_image:

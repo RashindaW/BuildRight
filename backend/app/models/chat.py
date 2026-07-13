@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import Boolean, ForeignKey, Integer, JSON, String, Text
+from sqlalchemy import Boolean, Float, ForeignKey, Integer, JSON, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, new_id
@@ -46,5 +46,10 @@ class Message(TimestampMixin, Base):
     output_tokens: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     tools_used: Mapped[list | None] = mapped_column(JSON, nullable=True)
     guardrail_violation: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    # Router v2 telemetry (assistant turns): learned difficulty, cascade, realized cost.
+    predicted_difficulty: Mapped[float | None] = mapped_column(Float, nullable=True)
+    escalated: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    router_version: Mapped[str | None] = mapped_column(String(8), nullable=True)
+    cost_usd: Mapped[float | None] = mapped_column(Float, nullable=True)
 
     conversation: Mapped[Conversation] = relationship(back_populates="messages")

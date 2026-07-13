@@ -1,4 +1,8 @@
-"""Model-router classification tests (keyless — heuristic paths don't call the API)."""
+"""Model-router V1 classification tests (keyless — heuristic paths don't call the API).
+
+These pin the v1 heuristic+classifier fallback, so router v2 is disabled here;
+v2 behavior is covered by tests/unit/test_router_v2.py.
+"""
 
 from __future__ import annotations
 
@@ -6,6 +10,11 @@ import pytest
 
 from app.ai import router
 from app.core.config import settings
+
+
+@pytest.fixture(autouse=True)
+def _v1_only(monkeypatch):
+    monkeypatch.setattr(settings, "router_v2_enabled", False)
 
 
 class _FakeBlock:

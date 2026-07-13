@@ -59,6 +59,10 @@ class Settings(BaseSettings):
     visual_search_enabled: bool = True           # CLIP visual arm in product search (no-op without torch)
     gnn_recommender_enabled: bool = True          # graph (GNN/SGC) recommender; falls back to co-occurrence
     stream_tokens_enabled: bool = True            # true token streaming (off → buffered rounds, same gate)
+    # Router v2 — learned zero-latency routing over the model registry.
+    router_v2_enabled: bool = True                # off → v1 heuristic + LLM classifier
+    router_policy: Literal["economy", "balanced", "quality"] = "balanced"
+    router_cascade_enabled: bool = True           # guardrail-failed cheap answer retries on the heavy model
     llm_max_tokens: int = 400
     # Catalog scale + product imagery
     catalog_target: int | None = None            # None = curated ~1.2k; e.g. 10000 for the big catalog
