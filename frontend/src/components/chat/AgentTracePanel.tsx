@@ -48,6 +48,7 @@ export function AgentTracePanel({ trace, live }: { trace: TraceStep[]; live?: bo
   const tools = effective.filter((t) => t.type === "tool");
   const guard = [...trace].reverse().find((t) => t.type === "guardrail");
   const cost = [...trace].reverse().find((t) => t.type === "cost");
+  const cache = trace.find((t) => t.type === "cache" && t.hit);
 
   return (
     <div className="mt-1.5 max-w-[85%] text-left">
@@ -66,7 +67,15 @@ export function AgentTracePanel({ trace, live }: { trace: TraceStep[]; live?: bo
 
       {(open || live) && (
         <div className="mt-1 flex flex-wrap gap-1">
-          {route && (
+          {cache && (
+            <span
+              className="badge animate-fade-in-up border border-accent/40 bg-accent-light text-accent-700"
+              title="Served instantly from the semantic answer cache — prices re-validated against the live catalog"
+            >
+              <Zap size={11} /> Instant · cached
+            </span>
+          )}
+          {route && route.model !== "semantic-cache" && (
             <span
               className="badge animate-fade-in-up border border-brand-200 bg-brand-50 text-brand-700"
               title={MODEL_BADGE[route.model ?? ""]?.hint ?? route.model}

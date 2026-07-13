@@ -63,6 +63,8 @@ class Settings(BaseSettings):
     router_v2_enabled: bool = True                # off → v1 heuristic + LLM classifier
     router_policy: Literal["economy", "balanced", "quality"] = "balanced"
     router_cascade_enabled: bool = True           # guardrail-failed cheap answer retries on the heavy model
+    semantic_cache_enabled: bool = True           # first-turn guest answers served from cache ($0, instant)
+    redis_url: str = ""                           # optional semantic-cache backend; blank → in-memory
     llm_max_tokens: int = 400
     # Catalog scale + product imagery
     catalog_target: int | None = None            # None = curated ~1.2k; e.g. 10000 for the big catalog

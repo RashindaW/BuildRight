@@ -200,6 +200,33 @@ async def stream_chat(
     sys_prompt = system_prompt or SYSTEM_PROMPT_RETAIL
     tool_defs = tools_override if tools_override is not None else tools.TOOLS
 
+    # Semantic cache: first-turn GUEST questions (no history, no memory) may be served
+    # instantly from a validated cached answer — $0, ~0ms, stale prices re-checked.
+    cacheable = (
+        validate_prices and _attempt == 1 and not prior_messages
+        and not ctx.user_id and ctx.db is not None
+    )
+    if cacheable:
+        from app.ai import semantic_cache
+        hit = semantic_cache.lookup(ctx.db, user_question)
+        if hit is not None:
+            yield {"event": "start", "data": {"model": "semantic-cache", "route": "cache"}}
+            yield {"event": "trace", "data": {"type": "cache", "hit": True}}
+            yield {"event": "delta", "data": {"text": hit.text}}
+            yield {"event": "trace", "data": {"type": "guardrail", "ok": True,
+                                              "prices_checked": len(extract_prices(hit.text))}}
+            yield {"event": "trace", "data": {"type": "cost", "usd": 0.0, "saved_pct": 100}}
+            yield {"event": "done", "data": {
+                "text": hit.text, "input_tokens": 0, "output_tokens": 0,
+                "guardrail_violation": False,
+                "grounded_item_ids": hit.grounded_item_ids, "grounded_doc_ids": [],
+                "cart_dirty": False, "model": "semantic-cache", "route": "cache",
+                "tools_used": [], "tool_rounds": 0,
+                "predicted_difficulty": None, "escalated": False,
+                "router_version": "cache", "cost_usd": 0.0, "cache": "semantic",
+            }}
+            return
+
     # Route once per turn; the chosen model drives every round of the tool loop.
     if _forced_model:
         route_label, route_model = "escalated", _forced_model  # cascade second opinion
@@ -435,6 +462,14 @@ async def stream_chat(
             "ok": not guardrail_violation,
             "prices_checked": len(extract_prices(final_text)),
         }}
+
+    # A clean, grounded first-turn guest answer becomes a cache entry for the next visitor.
+    if cacheable and completed and not guardrail_violation and final_text != SAFE_FALLBACK:
+        from app.ai import semantic_cache
+        semantic_cache.store(
+            ctx.db, user_question, final_text,
+            [it.get("slug") or it.get("id") for it in grounded_unique],
+        )
 
     # Cost transparency: what this turn cost vs the always-heavy counterfactual.
     turn_cost = cost_usd(route_model, input_tokens, output_tokens)

@@ -103,7 +103,8 @@ export interface Order {
 }
 
 export interface TraceStep {
-  type: "route" | "tool" | "guardrail" | "escalation" | "cost";
+  type: "route" | "tool" | "guardrail" | "escalation" | "cost" | "cache";
+  hit?: boolean;
   model?: string;
   label?: string;
   name?: string;
