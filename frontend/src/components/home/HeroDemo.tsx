@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Bot, Cpu, ShieldCheck, Wrench } from "lucide-react";
+import { Bot, CircleDollarSign, Cpu, ShieldCheck, Wrench } from "lucide-react";
 
 /** Scripted, looping "watch the agent work" demo for the Home hero.
  * Pure frontend animation over canned data — zero API calls per visitor. */
@@ -8,7 +8,7 @@ interface Scenario {
   question: string;
   status: string;
   answer: string;
-  chips: { icon: "cpu" | "wrench" | "shield"; label: string }[];
+  chips: { icon: "cpu" | "wrench" | "shield" | "dollar"; label: string }[];
 }
 
 const SCENARIOS: Scenario[] = [
@@ -29,9 +29,10 @@ const SCENARIOS: Scenario[] = [
     answer:
       "Yes — the Mastercraft 20V Cordless Drill/Driver is $89.99 and in stock. It pairs well with a 100-pc bit set.",
     chips: [
-      { icon: "cpu", label: "Haiku · fast" },
+      { icon: "cpu", label: "Haiku · routed cheap" },
       { icon: "wrench", label: "Catalog search" },
       { icon: "shield", label: "Prices verified" },
+      { icon: "dollar", label: "saved 79%" },
     ],
   },
   {
@@ -47,7 +48,7 @@ const SCENARIOS: Scenario[] = [
   },
 ];
 
-const CHIP_ICON = { cpu: Cpu, wrench: Wrench, shield: ShieldCheck };
+const CHIP_ICON = { cpu: Cpu, wrench: Wrench, shield: ShieldCheck, dollar: CircleDollarSign };
 
 // Phases: type question → thinking → stream answer → show chips → hold → next
 export function HeroDemo() {

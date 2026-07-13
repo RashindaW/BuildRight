@@ -12,13 +12,15 @@ export interface Mission {
 
 export const TOUR_INTRO = "BuildRight AI is a real hardware store wired to a multi-agent assistant — and this is your guided lap, not a manual. Follow the missions top to bottom and you'll touch every headline feature in about six minutes: no setup, no dead ends, one Stripe test card. You'll start as a guest browsing the shelves, talk to the assistant until it surprises you, dig into a product's reviews and its recommendation graph, then log in as the manager to watch the machine's vitals. Everything is test data, Stripe is in test mode, and it re-seeds on every deploy — so click hard and break nothing. Tap any \"Try it\" to teleport straight there; tap \"Copy\" on a prompt and paste it into the chat.";
 
+// AI-first ordering: visitors have no time — the agentic features open the tour;
+// the classic e-commerce mechanics follow.
 export const GROUP_ORDER: string[] = [
-  "Shop as a guest",
-  "Reviews & the recommendation graph",
   "Chat with the AI assistant",
   "Multimodal & memory",
-  "Checkout & orders",
+  "Reviews & the recommendation graph",
   "Manager intelligence (log in)",
+  "Shop as a guest",
+  "Checkout & orders",
   "Power features & access control"
 ];
 

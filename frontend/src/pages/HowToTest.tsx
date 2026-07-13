@@ -5,6 +5,7 @@ import {
   MessageCircle, Mic, Network, ShieldCheck, ShoppingBag,
 } from "lucide-react";
 import { Hero } from "../components/layout/Hero";
+import { HeroDemo } from "../components/home/HeroDemo";
 import { GROUP_ORDER, MISSIONS, type Mission } from "../components/howto/missions";
 
 const LOGINS = [
@@ -91,8 +92,9 @@ export default function HowToTest() {
       <Hero
         variant="test"
         eyebrow={<><FlaskConical size={13} /> Guided tour</>}
-        title="Test every feature in about six minutes"
-        subtitle="A guided lap, not a manual. Follow the missions top to bottom — start as a guest, push the assistant until it surprises you, dig into a product's reviews and recommendation graph, then log in as the manager to watch the machine's vitals. Tap any “Try it” to jump there; tap “Copy” to paste a prompt into the chat."
+        aside={<HeroDemo />}
+        title="Test the AI in about six minutes"
+        subtitle="A guided lap, not a manual — the agentic AI comes first. Open the chat and push the assistant until it surprises you (watch it route between models, call tools, and verify every price live), then explore the recommendation graph, the manager copilot, and the classic store mechanics. Tap any “Try it” to jump there; tap “Copy” to paste a prompt into the chat."
       />
 
       <section className="my-8">
