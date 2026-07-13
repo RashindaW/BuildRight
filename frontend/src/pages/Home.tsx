@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { FlaskConical, MessageCircle, PackageSearch, ShoppingBag } from "lucide-react";
 import { menuApi } from "../lib/api/endpoints";
 import { Hero } from "../components/layout/Hero";
+import { HeroDemo } from "../components/home/HeroDemo";
 import { FilterBar } from "../components/menu/FilterBar";
 import { MenuCard } from "../components/menu/MenuCard";
 import { SkeletonCard } from "../components/ui/Skeleton";
@@ -50,6 +51,7 @@ export default function Home() {
         <Hero
           variant="home"
           eyebrow={<><FlaskConical size={13} /> Live demo — test data · Stripe test mode</>}
+          aside={<HeroDemo />}
           title="BuildRight AI"
           subtitle="The smart hardware store — ask, plan, and build with an AI that never guesses. Search the catalog, get project plans and honest recommendations, and check store policies, all grounded in real data."
         >

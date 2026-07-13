@@ -16,12 +16,14 @@ export function Hero({
   title,
   subtitle,
   children,
+  aside,
 }: {
   variant: Variant;
   eyebrow?: ReactNode;
   title: ReactNode;
   subtitle?: ReactNode;
   children?: ReactNode;
+  aside?: ReactNode;
 }) {
   return (
     <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0f172a] text-white shadow-pop">
@@ -40,15 +42,18 @@ export function Hero({
         style={{ background: GLOW[variant] }}
         aria-hidden="true"
       />
-      <div className="relative px-6 py-10 sm:px-10 sm:py-12">
-        {eyebrow && (
-          <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs font-medium tracking-wide text-white/80">
-            {eyebrow}
-          </div>
-        )}
-        <h1 className="max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl">{title}</h1>
-        {subtitle && <p className="mt-2 max-w-2xl text-sm text-white/80 sm:text-base">{subtitle}</p>}
-        {children && <div className="mt-5">{children}</div>}
+      <div className="relative flex flex-col gap-8 px-6 py-10 sm:px-10 sm:py-12 lg:flex-row lg:items-center">
+        <div className="min-w-0 flex-1">
+          {eyebrow && (
+            <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs font-medium tracking-wide text-white/80">
+              {eyebrow}
+            </div>
+          )}
+          <h1 className="max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl">{title}</h1>
+          {subtitle && <p className="mt-2 max-w-2xl text-sm text-white/80 sm:text-base">{subtitle}</p>}
+          {children && <div className="mt-5">{children}</div>}
+        </div>
+        {aside && <div className="hidden shrink-0 lg:block">{aside}</div>}
       </div>
     </div>
   );
