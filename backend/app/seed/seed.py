@@ -450,6 +450,13 @@ def run() -> None:
         from app.seed.seed_interactions import seed_interactions
         n_interactions = seed_interactions(db)
 
+        # Point every product (incl. the hand-curated demo items, which ship with fixed
+        # tile URLs) at its panel-curated photo; types without one keep the branded tile.
+        if not settings.use_placeholder_images:
+            from app.seed.image_provider import backfill_type_photos
+            n_photos, _ = backfill_type_photos(db)
+            logger.info("type-photo backfill: %d products now use curated photos", n_photos)
+
         from app.seed.seed_kb import (
             ingest_buying_guides, ingest_category_guides, ingest_knowledge_base,
         )
