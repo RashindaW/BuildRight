@@ -101,11 +101,21 @@ def create_app() -> FastAPI:
             db_ok = True
         except Exception:
             db_ok = False
+        # Per-provider status from the model registry: ready iff the DB is up and at
+        # least one model's credentials resolve (Anthropic remains the backbone today).
+        from app.ai.registry import registry
+        providers = registry.provider_status()
         key_ok = bool(settings.anthropic_api_key.get_secret_value())
-        ready_ = db_ok and key_ok
+        any_model = any(providers.values()) if providers else key_ok
+        ready_ = db_ok and any_model
         return JSONResponse(
             status_code=status.HTTP_200_OK if ready_ else status.HTTP_503_SERVICE_UNAVAILABLE,
-            content={"status": "ready" if ready_ else "not_ready", "db": db_ok, "api_key": key_ok},
+            content={
+                "status": "ready" if ready_ else "not_ready",
+                "db": db_ok,
+                "api_key": key_ok,          # kept for back-compat consumers
+                "providers": providers,
+            },
         )
 
     @app.get("/version")

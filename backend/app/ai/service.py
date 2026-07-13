@@ -27,6 +27,8 @@ from app.ai.guardrails import (
     validate_response,
 )
 from app.ai.prompts import build_memory_preamble, build_user_message
+from app.ai.providers.base import ProviderError
+from app.ai.registry import registry
 from app.core.config import settings
 
 logger = logging.getLogger("app.ai")
@@ -109,31 +111,9 @@ def summarize_need(messages: list[dict]) -> str:
 _MAX_TOOL_ROUNDS = 6
 
 
-async def _round_events(client, kwargs: dict):
-    """Run one model round, yielding ("delta", text) events then ("final", resp).
-
-    Uses true token streaming (client.messages.stream) when the client supports it
-    and streaming is enabled; otherwise falls back to a buffered create() whose text
-    is emitted as a single delta — so BOTH paths flow through the same downstream
-    price gate (test fakes only implement create()).
-    """
-    stream_ctx = getattr(client.messages, "stream", None)
-    if stream_ctx is None or not settings.stream_tokens_enabled:
-        resp = await client.messages.create(**kwargs)
-        text = "".join(b.text for b in resp.content if b.type == "text").strip()
-        if text:
-            yield ("delta", text)
-        yield ("final", resp)
-        return
-
-    async with client.messages.stream(**kwargs) as s:
-        async for ev in s:
-            if (
-                getattr(ev, "type", "") == "content_block_delta"
-                and getattr(getattr(ev, "delta", None), "type", "") == "text_delta"
-            ):
-                yield ("delta", ev.delta.text)
-        yield ("final", await s.get_final_message())
+# Round streaming lives in the provider layer now (providers/base.py ClientAdapter +
+# providers/openai_compat.py): each provider yields ("delta", text)* then ("final",
+# LLMResponse), and the registry picks the adapter for the routed model.
 
 
 def _build_executors():
@@ -221,6 +201,9 @@ async def stream_chat(
     route_label, route_model = await router.classify_turn(
         client, user_question, has_image=has_image
     )
+    # Resolve the routed model to its provider (anthropic entries — and test fakes —
+    # wrap `client`; openai_compat entries get their own adapter from the registry).
+    provider = registry.acquire(route_model, fallback_client=client)
 
     preamble = build_memory_preamble(ctx.preferences)
     effective_question = preamble + user_question if preamble else user_question
@@ -264,14 +247,14 @@ async def stream_chat(
             )
             round_text = ""
 
-            agen = _round_events(client, dict(
+            agen = provider.stream_events(
                 model=route_model,
                 max_tokens=max_tokens or models.MAX_TOKENS,
                 temperature=models.TEMPERATURE,
                 system=sys_prompt,
                 tools=tool_defs,
                 messages=messages,
-            ))
+            )
             resp = None
             async for kind, val in agen:
                 if kind == "delta":
@@ -364,8 +347,11 @@ async def stream_chat(
             completed = True
             break
 
-    except (anthropic.APIConnectionError, anthropic.RateLimitError, anthropic.APIError) as e:
+    except (anthropic.APIConnectionError, anthropic.RateLimitError, anthropic.APIError,
+            ProviderError) as e:
         logger.warning('"llm_chat_error: %s"', type(e).__name__)
+        if isinstance(e, ProviderError) and e.retryable:
+            registry.mark_unhealthy(route_model)  # health loop / next turn routes around it
         yield {"event": "error", "data": {"message": models.API_ERROR_MESSAGE}}
         return
 

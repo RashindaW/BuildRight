@@ -36,10 +36,22 @@ def _rates(model: str | None) -> tuple[float, float] | None:
 
 
 def cost_usd(model: str | None, input_tokens: int, output_tokens: int) -> float:
-    """Estimated USD cost of a turn. Unknown model → 0.0 (logged once-ish)."""
+    """Estimated USD cost of a turn.
+
+    The model registry (models.yaml) is the source of truth; the legacy Claude prefix
+    table remains as a fallback for historical Message rows. An unknown model costs
+    0.0 but WARNS — a silent $0 under-reports the AI-Ops dashboard.
+    """
+    if model:
+        from app.ai.registry import registry  # local import avoids a module cycle
+        entry = registry.get(model)
+        if entry is not None and (entry.price_in or entry.price_out):
+            return round(
+                (input_tokens * entry.price_in + output_tokens * entry.price_out) / _PER_MILLION, 6
+            )
     rates = _rates(model)
     if rates is None:
-        logger.debug("no pricing for model=%r; cost counted as 0", model)
+        logger.warning("no pricing for model=%r; cost counted as 0 (add it to models.yaml)", model)
         return 0.0
     in_rate, out_rate = rates
     cost = (input_tokens * in_rate + output_tokens * out_rate) / _PER_MILLION
