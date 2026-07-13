@@ -231,7 +231,7 @@ export function ChatWidget() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-40 flex h-[32rem] w-96 max-w-[calc(100vw-2rem)] animate-fade-in-up flex-col overflow-hidden rounded-xl2 border border-gray-200 bg-white shadow-pop">
+    <div className="fixed bottom-6 right-6 z-40 flex h-[32rem] max-h-[calc(100dvh-5rem)] w-96 max-w-[calc(100vw-2rem)] animate-fade-in-up flex-col overflow-hidden rounded-xl2 border border-gray-200 bg-white shadow-pop">
       <div className="flex items-center justify-between border-b bg-brand-600 px-4 py-3 text-white">
         <span className="flex items-center gap-2 font-semibold">
           <Bot size={18} /> BuildRight AI assistant
