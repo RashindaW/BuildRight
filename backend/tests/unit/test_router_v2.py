@@ -75,6 +75,43 @@ class _Resp:
 
 
 @pytest.mark.asyncio
+async def test_provider_failure_fails_over_to_healthy_model(monkeypatch):
+    """A retryable provider failure mid-turn retries once on the strongest healthy
+    model — and marks the dead one unhealthy so later turns route around it."""
+    from app.ai.providers.base import ProviderConnectionError
+
+    calls = {"n": 0}
+
+    class _Msgs:
+        async def create(self, **kw):
+            calls["n"] += 1
+            if calls["n"] == 1:
+                raise ProviderConnectionError("connection refused", provider="pool", model="claude-haiku-4-5")
+            return _Resp("Here to help — what are you building today, if I may ask kindly?")
+
+    class _Client:
+        messages = _Msgs()
+
+    async def _fake_classify(client, q, has_image=False, model=None):
+        return ("simple", "claude-haiku-4-5")
+
+    monkeypatch.setattr(service, "_get_async_client", lambda: _Client())
+    monkeypatch.setattr(router, "classify_turn", _fake_classify)
+    monkeypatch.setattr(service, "_build_executors", lambda: {})
+
+    events = []
+    async for ev in service.stream_chat([], ToolContext(menu=[], db=None), "hi there friend"):
+        events.append(ev)
+
+    done = events[-1]["data"]
+    assert done["escalated"] is True
+    assert done["model"] == "claude-sonnet-4-6"
+    assert "building" in done["text"]
+    assert registry.get("claude-haiku-4-5").healthy is False  # marked for future turns
+    registry.mark_healthy("claude-haiku-4-5")
+
+
+@pytest.mark.asyncio
 async def test_cascade_escalates_violation_to_heavy(monkeypatch):
     answers = [
         _Resp("This beauty is only $499.99 today — trust me, a steal for the weekend."),  # cheap: fabricated

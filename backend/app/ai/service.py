@@ -394,7 +394,29 @@ async def stream_chat(
             ProviderError) as e:
         logger.warning('"llm_chat_error: %s"', type(e).__name__)
         if isinstance(e, ProviderError) and e.retryable:
-            registry.mark_unhealthy(route_model)  # health loop / next turn routes around it
+            registry.mark_unhealthy(route_model)  # next turns route around it
+            # Provider failover: retry this turn once on the strongest healthy model —
+            # a dead GPU pool degrades to the API tier instead of erroring at the user.
+            if _attempt == 1:
+                try:
+                    from app.ai.routing.policy import strongest_healthy
+                    alt = strongest_healthy(exclude=route_model)
+                except Exception:  # noqa: BLE001
+                    alt = None
+                if alt and alt != route_model:
+                    logger.info('"provider_failover: %s -> %s"', route_model, alt)
+                    yield {"event": "status", "data": {"phase": "failover", "label": "Switching to a backup model…"}}
+                    yield {"event": "delta_reset", "data": {}}
+                    yield {"event": "trace", "data": {"type": "escalation", "from": route_model, "to": alt}}
+                    async for ev in stream_chat(
+                        prior_messages, ctx, user_question, max_tokens, has_image,
+                        system_prompt=system_prompt, tools_override=tools_override,
+                        executors_override=executors_override, validate_prices=validate_prices,
+                        _forced_model=alt, _attempt=2,
+                    ):
+                        if ev["event"] != "start":
+                            yield ev
+                    return
         yield {"event": "error", "data": {"message": models.API_ERROR_MESSAGE}}
         return
 
