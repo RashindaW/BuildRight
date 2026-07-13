@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { Navbar } from "./components/layout/Navbar";
 import { CartDrawer } from "./components/cart/CartDrawer";
 import { ChatWidget } from "./components/chat/ChatWidget";
+import { CommandPalette } from "./components/ui/CommandPalette";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -40,6 +41,7 @@ export default function App() {
       </main>
       <CartDrawer />
       <ChatWidget />
+      <CommandPalette />
     </div>
   );
 }

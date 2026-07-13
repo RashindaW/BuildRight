@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { Menu, ShoppingCart, X } from "lucide-react";
+import { Menu, Search, ShoppingCart, X } from "lucide-react";
 import { Wordmark } from "../brand/Wordmark";
 import { useAuth } from "../../context/AuthProvider";
 import { useCart } from "../../hooks/useCart";
@@ -49,6 +49,14 @@ export function Navbar() {
         </div>
 
         <div className="ml-auto flex items-center gap-2 sm:gap-3">
+          {/* command palette hint (Ctrl/Cmd+K) */}
+          <button
+            className="hidden items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs text-gray-400 transition-colors hover:border-gray-300 hover:text-gray-600 sm:inline-flex"
+            onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true }))}
+            aria-label="Open search (Ctrl+K)"
+          >
+            <Search size={13} /> Search <kbd className="rounded border border-gray-200 bg-white px-1 text-[10px]">Ctrl K</kbd>
+          </button>
           {/* cart is available to guests + users */}
           <button
             className="relative grid h-9 w-9 place-items-center rounded-lg text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
