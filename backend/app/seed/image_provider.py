@@ -96,6 +96,55 @@ def image_url_for(category: str, type_name: str, slug: str) -> str:
     return placeholder_url(category, type_name)
 
 
+def _type_for_name(category: str, item_name: str) -> str | None:
+    """Recover the catalog product TYPE from a stored product name.
+
+    Generated names embed the type verbatim ("Mastercraft 20V Cordless Drill/Driver"
+    ← type "Cordless Drill/Driver"), and the curated demo items follow the same
+    convention. Longest match wins; the item's own category is searched first, then
+    all categories (some curated items sit in an adjacent category).
+    """
+    from app.seed.catalog_generator import CATEGORIES
+
+    name_l = item_name.lower()
+    best: str | None = None
+    for cat in sorted(CATEGORIES, key=lambda c: c["slug"] != category):  # own category first
+        for ptype in cat["types"]:
+            t = ptype["name"]
+            if t.lower() in name_l and (best is None or len(t) > len(best)):
+                best = t
+        if best and cat["slug"] == category:
+            break
+    return best
+
+
+def backfill_type_photos(db) -> tuple[int, int]:
+    """Point existing products at their curated per-TYPE photo (type_images.json).
+
+    Items whose type has no curated photo keep their current URL (the branded SVG
+    tile fallback). Returns (updated, unmatched). Idempotent.
+    """
+    from sqlalchemy import select
+    from app.models.menu import Category, MenuItem
+
+    pool = load_type_images()
+    cat_slug = {c.id: c.slug for c in db.execute(select(Category)).scalars()}
+    updated = unmatched = 0
+    for item in db.execute(select(MenuItem)).scalars():
+        cat = cat_slug.get(item.category_id, "")
+        type_name = _type_for_name(cat, item.name)
+        urls = pool.get(type_slug(type_name)) if type_name else None
+        if not urls:
+            unmatched += 1
+            continue
+        url = urls[_stable_index(item.slug, len(urls))]
+        if item.image_url != url:
+            item.image_url = url
+            updated += 1
+    db.commit()
+    return updated, unmatched
+
+
 def backfill_placeholder_images(db) -> int:
     """Point every existing product at its category SVG placeholder. Returns the
     count updated. Idempotent — safe to re-run on any DB (dev SQLite or Postgres)."""

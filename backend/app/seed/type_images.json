@@ -1,782 +1,389 @@
 {
-"cordless-drill-driver": [
-"https://images.pexels.com/photos/30413428/pexels-photo-30413428.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/4792512/pexels-photo-4792512.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"hammer-drill": [
-"https://images.pexels.com/photos/17419779/pexels-photo-17419779.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/6790761/pexels-photo-6790761.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"impact-driver": [
-"https://images.pexels.com/photos/30486958/pexels-photo-30486958.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/6790937/pexels-photo-6790937.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"circular-saw": [
-"https://images.pexels.com/photos/8820186/pexels-photo-8820186.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/20141374/pexels-photo-20141374.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"jigsaw": [
-"https://images.pexels.com/photos/36661783/pexels-photo-36661783.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/5505122/pexels-photo-5505122.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"reciprocating-saw": [
-"https://images.pexels.com/photos/8820186/pexels-photo-8820186.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/4329223/pexels-photo-4329223.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"adjustable-wrench": [
+"https://images.pexels.com/photos/30413496/pexels-photo-30413496.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
 "angle-grinder": [
-"https://images.pexels.com/photos/33473424/pexels-photo-33473424.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
 "https://images.pexels.com/photos/4315559/pexels-photo-4315559.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"random-orbital-sander": [
-"https://images.pexels.com/photos/5710754/pexels-photo-5710754.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/5710740/pexels-photo-5710740.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"camp-stove": [
+"https://images.pexels.com/photos/6271469/pexels-photo-6271469.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"router": [
-"https://images.pexels.com/photos/1024697/pexels-photo-1024697.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/2881224/pexels-photo-2881224.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"oscillating-multi-tool": [
-"https://images.pexels.com/photos/37250044/pexels-photo-37250044.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/7911475/pexels-photo-7911475.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"heat-gun": [
-"https://images.pexels.com/photos/6025904/pexels-photo-6025904.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/10126666/pexels-photo-10126666.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"mitre-saw": [
-"https://images.pexels.com/photos/8820186/pexels-photo-8820186.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/37022579/pexels-photo-37022579.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"claw-hammer": [
-"https://images.pexels.com/photos/19582317/pexels-photo-19582317.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/8447781/pexels-photo-8447781.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"screwdriver-set": [
-"https://images.pexels.com/photos/11882650/pexels-photo-11882650.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/4556501/pexels-photo-4556501.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"adjustable-wrench": [
-"https://images.pexels.com/photos/30413496/pexels-photo-30413496.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/210881/pexels-photo-210881.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"tape-measure": [
-"https://images.pexels.com/photos/10895042/pexels-photo-10895042.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/5750188/pexels-photo-5750188.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"utility-knife": [
-"https://images.pexels.com/photos/5038398/pexels-photo-5038398.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/4378650/pexels-photo-4378650.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"pliers-set": [
-"https://images.pexels.com/photos/5583076/pexels-photo-5583076.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/5583081/pexels-photo-5583081.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"socket-set": [
-"https://images.pexels.com/photos/35207407/pexels-photo-35207407.png?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/4480531/pexels-photo-4480531.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"hex-key-set": [
-"https://images.pexels.com/photos/36694107/pexels-photo-36694107.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/28426468/pexels-photo-28426468.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"hand-saw": [
-"https://images.pexels.com/photos/36960447/pexels-photo-36960447.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/9280/wood-working-garden-tool.jpg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"spirit-level": [
-"https://images.pexels.com/photos/6251067/pexels-photo-6251067.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/8470044/pexels-photo-8470044.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"pry-bar": [
-"https://images.pexels.com/photos/16807991/pexels-photo-16807991.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/5845951/pexels-photo-5845951.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"tool-bag": [
-"https://images.pexels.com/photos/34955393/pexels-photo-34955393.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/30562751/pexels-photo-30562751.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"wood-screws": [
-"https://images.pexels.com/photos/8447775/pexels-photo-8447775.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/5583083/pexels-photo-5583083.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"deck-screws": [
-"https://images.pexels.com/photos/8346401/pexels-photo-8346401.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/8447775/pexels-photo-8447775.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"drywall-screws": [
-"https://images.pexels.com/photos/93396/pexels-photo-93396.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/8447775/pexels-photo-8447775.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"hex-bolts": [
-"https://images.pexels.com/photos/28119588/pexels-photo-28119588.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/28119519/pexels-photo-28119519.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"anchors": [
-"https://images.pexels.com/photos/16230875/pexels-photo-16230875.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/811440/pexels-photo-811440.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"nails": [
-"https://images.pexels.com/photos/7066298/pexels-photo-7066298.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/973405/pexels-photo-973405.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"cabinet-hinges": [
-"https://images.pexels.com/photos/17503605/pexels-photo-17503605.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/5691518/pexels-photo-5691518.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"door-hardware-set": [
-"https://images.pexels.com/photos/13425280/pexels-photo-13425280.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/792034/pexels-photo-792034.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"picture-hanging-kit": [
-"https://images.pexels.com/photos/8947560/pexels-photo-8947560.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/23224982/pexels-photo-23224982.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"threaded-rod": [
-"https://images.pexels.com/photos/257759/pexels-photo-257759.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/28219486/pexels-photo-28219486.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"washers-assortment": [
-"https://images.pexels.com/photos/5853939/pexels-photo-5853939.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/9966689/pexels-photo-9966689.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"motor-oil": [
-"https://images.pexels.com/photos/13065691/pexels-photo-13065691.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/13065697/pexels-photo-13065697.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"wiper-blades": [
-"https://images.pexels.com/photos/8586715/pexels-photo-8586715.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/8478211/pexels-photo-8478211.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"car-battery": [
-"https://images.pexels.com/photos/37177070/pexels-photo-37177070.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/32282232/pexels-photo-32282232.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"jump-starter": [
-"https://images.pexels.com/photos/6473244/pexels-photo-6473244.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/5562431/pexels-photo-5562431.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"floor-jack": [
-"https://images.pexels.com/photos/4116206/pexels-photo-4116206.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/8985925/pexels-photo-8985925.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"tire-inflator": [
-"https://images.pexels.com/photos/12996982/pexels-photo-12996982.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/3807386/pexels-photo-3807386.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"microfibre-towels": [
-"https://images.pexels.com/photos/2964113/pexels-photo-2964113.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/45980/pexels-photo-45980.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"windshield-washer-fluid": [
-"https://images.pexels.com/photos/7854087/pexels-photo-7854087.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/4870706/pexels-photo-4870706.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"wrench-set-metric": [
-"https://images.pexels.com/photos/36694138/pexels-photo-36694138.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/36694137/pexels-photo-36694137.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"car-cover": [
-"https://images.pexels.com/photos/8652514/pexels-photo-8652514.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/30254660/pexels-photo-30254660.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"construction-adhesive": [
+"https://images.pexels.com/photos/5691660/pexels-photo-5691660.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
 "cordless-kettle": [
-"https://images.pexels.com/photos/10965752/pexels-photo-10965752.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
 "https://images.pexels.com/photos/10965747/pexels-photo-10965747.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"toaster": [
-"https://images.pexels.com/photos/3997309/pexels-photo-3997309.png?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/7696932/pexels-photo-7696932.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"door-hardware-set": [
+"https://images.pexels.com/photos/792034/pexels-photo-792034.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"blender": [
-"https://images.pexels.com/photos/19773943/pexels-photo-19773943.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/8845109/pexels-photo-8845109.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"dust-masks": [
+"https://images.pexels.com/photos/6816061/pexels-photo-6816061.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"cookware-set": [
-"https://images.pexels.com/photos/15245005/pexels-photo-15245005.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/31110049/pexels-photo-31110049.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"fire-extinguisher": [
+"https://images.pexels.com/photos/12072478/pexels-photo-12072478.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"knife-block-set": [
-"https://images.pexels.com/photos/6004123/pexels-photo-6004123.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/8093920/pexels-photo-8093920.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"floor-mat": [
+"https://images.pexels.com/photos/5840868/pexels-photo-5840868.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"food-storage-containers": [
-"https://images.pexels.com/photos/10568352/pexels-photo-10568352.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/8580727/pexels-photo-8580727.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"coffee-maker": [
-"https://images.pexels.com/photos/26651105/pexels-photo-26651105.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/12122684/pexels-photo-12122684.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"air-fryer": [
-"https://images.pexels.com/photos/35285814/pexels-photo-35285814.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/5237903/pexels-photo-5237903.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"microwave-oven": [
-"https://images.pexels.com/photos/8142867/pexels-photo-8142867.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/32168944/pexels-photo-32168944.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"dish-rack": [
-"https://images.pexels.com/photos/29778641/pexels-photo-29778641.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/6612568/pexels-photo-6612568.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"lawn-mower": [
-"https://images.pexels.com/photos/37554739/pexels-photo-37554739.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/5163429/pexels-photo-5163429.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"string-trimmer": [
-"https://images.pexels.com/photos/29288279/pexels-photo-29288279.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/11400234/pexels-photo-11400234.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"leaf-blower": [
-"https://images.pexels.com/photos/34573523/pexels-photo-34573523.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/36953758/pexels-photo-36953758.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"hedge-trimmer": [
-"https://images.pexels.com/photos/24595771/pexels-photo-24595771.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/24595769/pexels-photo-24595769.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"pressure-washer": [
-"https://images.pexels.com/photos/6873175/pexels-photo-6873175.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/4876678/pexels-photo-4876678.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"chainsaw": [
-"https://images.pexels.com/photos/8820171/pexels-photo-8820171.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/13790935/pexels-photo-13790935.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"wheelbarrow": [
-"https://images.pexels.com/photos/5881432/pexels-photo-5881432.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/29275222/pexels-photo-29275222.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"garden-hose": [
-"https://images.pexels.com/photos/13472779/pexels-photo-13472779.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/17335758/pexels-photo-17335758.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"patio-heater": [
-"https://images.pexels.com/photos/923289/pexels-photo-923289.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/2821729/pexels-photo-2821729.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"propane-tank": [
-"https://images.pexels.com/photos/32227363/pexels-photo-32227363.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/16271901/pexels-photo-16271901.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"garage-heater": [
+"https://images.pexels.com/photos/4062445/pexels-photo-4062445.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
 "garden-soil": [
-"https://images.pexels.com/photos/7944396/pexels-photo-7944396.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/5830992/pexels-photo-5830992.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"https://images.pexels.com/photos/7944396/pexels-photo-7944396.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"mulch": [
-"https://images.pexels.com/photos/11742397/pexels-photo-11742397.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/4167967/pexels-photo-4167967.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"hammer-drill": [
+"https://images.pexels.com/photos/4792494/pexels-photo-4792494.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"garden-tool-set": [
-"https://images.pexels.com/photos/9507250/pexels-photo-9507250.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/6231726/pexels-photo-6231726.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"hearing-protection": [
+"https://images.pexels.com/photos/5202427/pexels-photo-5202427.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"pruning-shears": [
-"https://images.pexels.com/photos/7854134/pexels-photo-7854134.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/18566999/pexels-photo-18566999.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"lawn-mower": [
+"https://images.pexels.com/photos/37554739/pexels-photo-37554739.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"watering-can": [
-"https://images.pexels.com/photos/7782086/pexels-photo-7782086.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/8543292/pexels-photo-8543292.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"lumber-stud": [
+"https://images.pexels.com/photos/12278568/pexels-photo-12278568.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"motor-oil": [
+"https://images.pexels.com/photos/13065691/pexels-photo-13065691.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"paint-brush-set": [
+"https://images.pexels.com/photos/5756858/pexels-photo-5756858.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"patio-umbrella": [
+"https://images.pexels.com/photos/5724126/pexels-photo-5724126.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
 "plant-pots": [
-"https://images.pexels.com/photos/37382517/pexels-photo-37382517.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/9057700/pexels-photo-9057700.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"https://images.pexels.com/photos/37382517/pexels-photo-37382517.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"lawn-fertilizer": [
-"https://images.pexels.com/photos/4386491/pexels-photo-4386491.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/186236/pexels-photo-186236.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"primer": [
+"https://images.pexels.com/photos/1669754/pexels-photo-1669754.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"grass-seed": [
-"https://images.pexels.com/photos/34338567/pexels-photo-34338567.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/6403359/pexels-photo-6403359.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"push-broom": [
+"https://images.pexels.com/photos/36832085/pexels-photo-36832085.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"garden-gloves": [
-"https://images.pexels.com/photos/24425471/pexels-photo-24425471.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/27177518/pexels-photo-27177518.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"solar-path-lights": [
+"https://images.pexels.com/photos/31197719/pexels-photo-31197719.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"tire-inflator": [
+"https://images.pexels.com/photos/12996982/pexels-photo-12996982.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"wood-stain": [
+"https://images.pexels.com/photos/221027/pexels-photo-221027.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"air-conditioner": [
+"https://images.pexels.com/photos/24828656/pexels-photo-24828656.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"area-rug": [
+"https://images.pexels.com/photos/30488351/pexels-photo-30488351.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"blender": [
+"https://images.pexels.com/photos/8845109/pexels-photo-8845109.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"camping-tent": [
+"https://images.pexels.com/photos/10762666/pexels-photo-10762666.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"ceiling-fixture": [
+"https://images.pexels.com/photos/30675504/pexels-photo-30675504.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"claw-hammer": [
+"https://images.pexels.com/photos/8447781/pexels-photo-8447781.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"cookware-set": [
+"https://images.pexels.com/photos/30981356/pexels-photo-30981356.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"deck-screws": [
+"https://images.pexels.com/photos/5583069/pexels-photo-5583069.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"first-aid-kit": [
+"https://images.pexels.com/photos/31837693/pexels-photo-31837693.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"floor-trim": [
+"https://images.pexels.com/photos/19866428/pexels-photo-19866428.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"garden-tool-set": [
+"https://images.pexels.com/photos/9507250/pexels-photo-9507250.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"hand-saw": [
+"https://images.pexels.com/photos/30907885/pexels-photo-30907885.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"heat-gun": [
+"https://images.pexels.com/photos/10126666/pexels-photo-10126666.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"interior-paint": [
+"https://images.pexels.com/photos/7217935/pexels-photo-7217935.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"knife-block-set": [
+"https://images.pexels.com/photos/6004123/pexels-photo-6004123.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"mulch": [
+"https://images.pexels.com/photos/9035374/pexels-photo-9035374.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"paint-roller-kit": [
+"https://images.pexels.com/photos/5583059/pexels-photo-5583059.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"pegboard-kit": [
+"https://images.pexels.com/photos/8661618/pexels-photo-8661618.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"plastic-drawers": [
+"https://images.pexels.com/photos/12640687/pexels-photo-12640687.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"programmable-thermostat": [
+"https://images.pexels.com/photos/7616651/pexels-photo-7616651.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
 "raised-garden-bed": [
-"https://images.pexels.com/photos/5958784/pexels-photo-5958784.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/7247451/pexels-photo-7247451.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"https://images.pexels.com/photos/5958784/pexels-photo-5958784.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"all-purpose-cleaner": [
-"https://images.pexels.com/photos/10568275/pexels-photo-10568275.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/10557894/pexels-photo-10557894.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"microfibre-mop": [
-"https://images.pexels.com/photos/3769711/pexels-photo-3769711.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/36729566/pexels-photo-36729566.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"safety-glasses": [
+"https://images.pexels.com/photos/7789650/pexels-photo-7789650.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
 "shop-vacuum": [
-"https://images.pexels.com/photos/3616735/pexels-photo-3616735.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/38325/vacuum-cleaner-carpet-cleaner-housework-housekeeping-38325.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"https://images.pexels.com/photos/3616735/pexels-photo-3616735.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"broom-and-dustpan": [
-"https://images.pexels.com/photos/19408638/pexels-photo-19408638.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/10557495/pexels-photo-10557495.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"snow-blower": [
+"https://images.pexels.com/photos/6862296/pexels-photo-6862296.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"disinfectant-wipes": [
-"https://images.pexels.com/photos/4240994/pexels-photo-4240994.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/4099467/pexels-photo-4099467.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"string-lights": [
+"https://images.pexels.com/photos/966861/pexels-photo-966861.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"toaster": [
+"https://images.pexels.com/photos/3997309/pexels-photo-3997309.png?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"wall-outlets": [
+"https://images.pexels.com/photos/978743/pexels-photo-978743.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"windshield-washer-fluid": [
+"https://images.pexels.com/photos/7854087/pexels-photo-7854087.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"work-boots": [
+"https://images.pexels.com/photos/6316211/pexels-photo-6316211.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"bathroom-faucet": [
+"https://images.pexels.com/photos/12196323/pexels-photo-12196323.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"car-battery": [
+"https://images.pexels.com/photos/37177072/pexels-photo-37177072.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"ceramic-tile": [
+"https://images.pexels.com/photos/6611251/pexels-photo-6611251.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"closet-organizer": [
+"https://images.pexels.com/photos/5008418/pexels-photo-5008418.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"drop-cloth": [
+"https://images.pexels.com/photos/7217935/pexels-photo-7217935.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"electrical-wire": [
+"https://images.pexels.com/photos/28286031/pexels-photo-28286031.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"fishing-rod-combo": [
+"https://images.pexels.com/photos/8916853/pexels-photo-8916853.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"folding-chair": [
+"https://images.pexels.com/photos/6292987/pexels-photo-6292987.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
 "garbage-bags": [
-"https://images.pexels.com/photos/4651148/pexels-photo-4651148.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
 "https://images.pexels.com/photos/9222613/pexels-photo-9222613.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
 "glass-cleaner": [
-"https://images.pexels.com/photos/11215808/pexels-photo-11215808.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/6223025/pexels-photo-6223025.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"sponges-and-scrubbers": [
-"https://images.pexels.com/photos/7814649/pexels-photo-7814649.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/10574054/pexels-photo-10574054.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"pressure-washer-soap": [
-"https://images.pexels.com/photos/4876676/pexels-photo-4876676.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/6873101/pexels-photo-6873101.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"push-broom": [
-"https://images.pexels.com/photos/33463632/pexels-photo-33463632.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/36832085/pexels-photo-36832085.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"interior-paint": [
-"https://images.pexels.com/photos/5583116/pexels-photo-5583116.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/5583126/pexels-photo-5583126.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"exterior-paint": [
-"https://images.pexels.com/photos/1135450/pexels-photo-1135450.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/16194722/pexels-photo-16194722.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"primer": [
-"https://images.pexels.com/photos/1669754/pexels-photo-1669754.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/12969381/pexels-photo-12969381.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"paint-brush-set": [
-"https://images.pexels.com/photos/5756858/pexels-photo-5756858.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/1424544/pexels-photo-1424544.png?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"paint-roller-kit": [
-"https://images.pexels.com/photos/5583052/pexels-photo-5583052.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/5583059/pexels-photo-5583059.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"wood-stain": [
-"https://images.pexels.com/photos/8337527/pexels-photo-8337527.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/6470960/pexels-photo-6470960.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"spray-paint": [
-"https://images.pexels.com/photos/7951258/pexels-photo-7951258.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/7951592/pexels-photo-7951592.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"painter-s-tape": [
-"https://images.pexels.com/photos/7217976/pexels-photo-7217976.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/7217961/pexels-photo-7217961.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"drop-cloth": [
-"https://images.pexels.com/photos/7217935/pexels-photo-7217935.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/7217931/pexels-photo-7217931.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"caulk": [
-"https://images.pexels.com/photos/6124242/pexels-photo-6124242.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/3615723/pexels-photo-3615723.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"extension-cord": [
-"https://images.pexels.com/photos/28190367/pexels-photo-28190367.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/14071432/pexels-photo-14071432.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"power-bar": [
-"https://images.pexels.com/photos/27810159/pexels-photo-27810159.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/19025671/pexels-photo-19025671.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"wall-outlets": [
-"https://images.pexels.com/photos/3615711/pexels-photo-3615711.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/36272732/pexels-photo-36272732.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"light-switch": [
-"https://images.pexels.com/photos/6000686/pexels-photo-6000686.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/12996907/pexels-photo-12996907.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"electrical-wire": [
-"https://images.pexels.com/photos/3615731/pexels-photo-3615731.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/28286031/pexels-photo-28286031.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"wire-connectors": [
-"https://images.pexels.com/photos/7286937/pexels-photo-7286937.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/8853527/pexels-photo-8853527.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"voltage-tester": [
-"https://images.pexels.com/photos/10185562/pexels-photo-10185562.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/772444/pexels-photo-772444.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"smoke-detector": [
-"https://images.pexels.com/photos/25020272/pexels-photo-25020272.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/24503710/pexels-photo-24503710.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"doorbell": [
-"https://images.pexels.com/photos/1978/door-wooden-bell-old.jpg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/36890984/pexels-photo-36890984.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"electrical-tape": [
-"https://images.pexels.com/photos/30847546/pexels-photo-30847546.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/3614763/pexels-photo-3614763.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"kitchen-faucet": [
-"https://images.pexels.com/photos/15357336/pexels-photo-15357336.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/12040632/pexels-photo-12040632.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"bathroom-faucet": [
-"https://images.pexels.com/photos/10099095/pexels-photo-10099095.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/12196323/pexels-photo-12196323.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"toilet": [
-"https://images.pexels.com/photos/25461701/pexels-photo-25461701.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/4239036/pexels-photo-4239036.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"shower-head": [
-"https://images.pexels.com/photos/4194866/pexels-photo-4194866.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/8688578/pexels-photo-8688578.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"sump-pump": [
-"https://images.pexels.com/photos/28240873/pexels-photo-28240873.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/37252656/pexels-photo-37252656.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"pex-pipe": [
-"https://images.pexels.com/photos/7937299/pexels-photo-7937299.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/7937292/pexels-photo-7937292.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"pipe-wrench": [
-"https://images.pexels.com/photos/12105083/pexels-photo-12105083.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/29226620/pexels-photo-29226620.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"plunger": [
-"https://images.pexels.com/photos/6834351/pexels-photo-6834351.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/24032781/pexels-photo-24032781.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"plumber-s-tape": [
-"https://images.pexels.com/photos/8488061/pexels-photo-8488061.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/16552851/pexels-photo-16552851.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"water-heater": [
-"https://images.pexels.com/photos/10847199/pexels-photo-10847199.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/19980200/pexels-photo-19980200.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"led-bulbs": [
-"https://images.pexels.com/photos/3946250/pexels-photo-3946250.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/5853954/pexels-photo-5853954.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"shop-light": [
-"https://images.pexels.com/photos/20451421/pexels-photo-20451421.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/3989434/pexels-photo-3989434.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"flashlight": [
-"https://images.pexels.com/photos/4888467/pexels-photo-4888467.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/6246138/pexels-photo-6246138.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"work-light": [
-"https://images.pexels.com/photos/6870319/pexels-photo-6870319.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/7541353/pexels-photo-7541353.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"ceiling-fixture": [
-"https://images.pexels.com/photos/298542/pexels-photo-298542.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/1253128/pexels-photo-1253128.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"outdoor-security-light": [
-"https://images.pexels.com/photos/19653611/pexels-photo-19653611.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/12700807/pexels-photo-12700807.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"solar-path-lights": [
-"https://images.pexels.com/photos/31197719/pexels-photo-31197719.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/20855739/pexels-photo-20855739.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"string-lights": [
-"https://images.pexels.com/photos/966861/pexels-photo-966861.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/2003154/pexels-photo-2003154.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"headlamp": [
-"https://images.pexels.com/photos/6831219/pexels-photo-6831219.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/6831134/pexels-photo-6831134.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"smart-bulb": [
-"https://images.pexels.com/photos/3946161/pexels-photo-3946161.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/20713462/pexels-photo-20713462.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"lumber-stud": [
-"https://images.pexels.com/photos/28441065/pexels-photo-28441065.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/12278568/pexels-photo-12278568.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"plywood-sheet": [
-"https://images.pexels.com/photos/5089123/pexels-photo-5089123.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/5089125/pexels-photo-5089125.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"drywall-sheet": [
-"https://images.pexels.com/photos/27728636/pexels-photo-27728636.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/27728635/pexels-photo-27728635.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"concrete-mix": [
-"https://images.pexels.com/photos/37121347/pexels-photo-37121347.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/37121400/pexels-photo-37121400.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"insulation-roll": [
-"https://images.pexels.com/photos/6124239/pexels-photo-6124239.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/9893816/pexels-photo-9893816.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"landscape-blocks": [
-"https://images.pexels.com/photos/29614998/pexels-photo-29614998.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/24866696/pexels-photo-24866696.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"roofing-shingles": [
-"https://images.pexels.com/photos/237907/pexels-photo-237907.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/37771658/pexels-photo-37771658.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"construction-adhesive": [
-"https://images.pexels.com/photos/6124242/pexels-photo-6124242.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/11806477/pexels-photo-11806477.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"sandpaper-assortment": [
-"https://images.pexels.com/photos/7483053/pexels-photo-7483053.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/12774180/pexels-photo-12774180.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"tarp": [
-"https://images.pexels.com/photos/14033030/pexels-photo-14033030.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/20834842/pexels-photo-20834842.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"storage-tote": [
-"https://images.pexels.com/photos/37114398/pexels-photo-37114398.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/31148418/pexels-photo-31148418.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"shelving-unit": [
-"https://images.pexels.com/photos/18620041/pexels-photo-18620041.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/7578286/pexels-photo-7578286.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"tool-chest": [
-"https://images.pexels.com/photos/6370043/pexels-photo-6370043.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/10728155/pexels-photo-10728155.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"pegboard-kit": [
-"https://images.pexels.com/photos/28228020/pexels-photo-28228020.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/8661618/pexels-photo-8661618.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"garage-hooks": [
-"https://images.pexels.com/photos/16243260/pexels-photo-16243260.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/8661618/pexels-photo-8661618.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"closet-organizer": [
-"https://images.pexels.com/photos/5008418/pexels-photo-5008418.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/36906953/pexels-photo-36906953.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"plastic-drawers": [
-"https://images.pexels.com/photos/3722563/pexels-photo-3722563.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/12640687/pexels-photo-12640687.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"hardware-organizer": [
-"https://images.pexels.com/photos/4792488/pexels-photo-4792488.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/5853928/pexels-photo-5853928.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"wall-cabinet": [
-"https://images.pexels.com/photos/8146315/pexels-photo-8146315.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/7534224/pexels-photo-7534224.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"bin-rack": [
-"https://images.pexels.com/photos/11105206/pexels-photo-11105206.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/36522028/pexels-photo-36522028.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"safety-glasses": [
-"https://images.pexels.com/photos/7789650/pexels-photo-7789650.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/9241701/pexels-photo-9241701.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"work-gloves": [
-"https://images.pexels.com/photos/8821014/pexels-photo-8821014.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/11427400/pexels-photo-11427400.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"hearing-protection": [
-"https://images.pexels.com/photos/5202427/pexels-photo-5202427.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/8488000/pexels-photo-8488000.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"dust-masks": [
-"https://images.pexels.com/photos/6816061/pexels-photo-6816061.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/30413337/pexels-photo-30413337.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"https://images.pexels.com/photos/9462106/pexels-photo-9462106.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
 "hard-hat": [
-"https://images.pexels.com/photos/34965713/pexels-photo-34965713.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
 "https://images.pexels.com/photos/19188877/pexels-photo-19188877.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"knee-pads": [
-"https://images.pexels.com/photos/6203696/pexels-photo-6203696.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/8464552/pexels-photo-8464552.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"first-aid-kit": [
-"https://images.pexels.com/photos/31852747/pexels-photo-31852747.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/31837693/pexels-photo-31837693.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"high-vis-vest": [
-"https://images.pexels.com/photos/34442873/pexels-photo-34442873.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/8487721/pexels-photo-8487721.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"work-boots": [
-"https://images.pexels.com/photos/30493107/pexels-photo-30493107.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/1267362/pexels-photo-1267362.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"fire-extinguisher": [
-"https://images.pexels.com/photos/12072478/pexels-photo-12072478.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/18340568/pexels-photo-18340568.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"space-heater": [
-"https://images.pexels.com/photos/11564927/pexels-photo-11564927.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/36344878/pexels-photo-36344878.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"box-fan": [
-"https://images.pexels.com/photos/4030072/pexels-photo-4030072.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/38086624/pexels-photo-38086624.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"tower-fan": [
-"https://images.pexels.com/photos/8102623/pexels-photo-8102623.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/8102631/pexels-photo-8102631.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"dehumidifier": [
-"https://images.pexels.com/photos/32737485/pexels-photo-32737485.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/19199263/pexels-photo-19199263.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
 "humidifier": [
-"https://images.pexels.com/photos/6941312/pexels-photo-6941312.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/7417504/pexels-photo-7417504.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"furnace-filter": [
-"https://images.pexels.com/photos/7788502/pexels-photo-7788502.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/11056184/pexels-photo-11056184.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"programmable-thermostat": [
-"https://images.pexels.com/photos/12644994/pexels-photo-12644994.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/36730582/pexels-photo-36730582.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"garage-heater": [
-"https://images.pexels.com/photos/4062445/pexels-photo-4062445.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/923289/pexels-photo-923289.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"air-conditioner": [
-"https://images.pexels.com/photos/30962631/pexels-photo-30962631.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/24551564/pexels-photo-24551564.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"ceiling-fan": [
-"https://images.pexels.com/photos/4044806/pexels-photo-4044806.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/3990590/pexels-photo-3990590.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"https://images.pexels.com/photos/10686912/pexels-photo-10686912.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
 "laminate-flooring": [
-"https://images.pexels.com/photos/368754/pexels-photo-368754.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/314073/pexels-photo-314073.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"https://images.pexels.com/photos/368754/pexels-photo-368754.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"vinyl-plank": [
-"https://images.pexels.com/photos/368754/pexels-photo-368754.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/139306/pexels-photo-139306.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"led-bulbs": [
+"https://images.pexels.com/photos/3946159/pexels-photo-3946159.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"ceramic-tile": [
-"https://images.pexels.com/photos/32151425/pexels-photo-32151425.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/6611251/pexels-photo-6611251.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"microfibre-towels": [
+"https://images.pexels.com/photos/2964113/pexels-photo-2964113.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"tile-adhesive": [
-"https://images.pexels.com/photos/11806477/pexels-photo-11806477.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/11806489/pexels-photo-11806489.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"pex-pipe": [
+"https://images.pexels.com/photos/7937299/pexels-photo-7937299.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"grout": [
-"https://images.pexels.com/photos/11806486/pexels-photo-11806486.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/11061219/pexels-photo-11061219.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"pliers-set": [
+"https://images.pexels.com/photos/5583076/pexels-photo-5583076.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"underlayment": [
-"https://images.pexels.com/photos/33404080/pexels-photo-33404080.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/4263067/pexels-photo-4263067.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"propane-tank": [
+"https://images.pexels.com/photos/16271901/pexels-photo-16271901.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"area-rug": [
-"https://images.pexels.com/photos/29304261/pexels-photo-29304261.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/3229076/pexels-photo-3229076.png?auto=compress&cs=tinysrgb&h=650&w=940"
+"random-orbital-sander": [
+"https://images.pexels.com/photos/5710735/pexels-photo-5710735.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"floor-trim": [
-"https://images.pexels.com/photos/19866428/pexels-photo-19866428.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/7601104/pexels-photo-7601104.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"sandpaper-assortment": [
+"https://images.pexels.com/photos/12774180/pexels-photo-12774180.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"tile-cutter": [
-"https://images.pexels.com/photos/11806476/pexels-photo-11806476.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/6611208/pexels-photo-6611208.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"shower-head": [
+"https://images.pexels.com/photos/4194866/pexels-photo-4194866.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"floor-mat": [
-"https://images.pexels.com/photos/36346087/pexels-photo-36346087.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/5840868/pexels-photo-5840868.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"spirit-level": [
+"https://images.pexels.com/photos/6251067/pexels-photo-6251067.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"snow-shovel": [
-"https://images.pexels.com/photos/6952507/pexels-photo-6952507.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/6952509/pexels-photo-6952509.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"threaded-rod": [
+"https://images.pexels.com/photos/28219486/pexels-photo-28219486.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"snow-brush": [
-"https://images.pexels.com/photos/36398674/pexels-photo-36398674.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/6817033/pexels-photo-6817033.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"toilet": [
+"https://images.pexels.com/photos/4239036/pexels-photo-4239036.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"ice-melt": [
-"https://images.pexels.com/photos/36070133/pexels-photo-36070133.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/5477795/pexels-photo-5477795.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"utility-knife": [
+"https://images.pexels.com/photos/5038398/pexels-photo-5038398.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"snow-blower": [
-"https://images.pexels.com/photos/6862296/pexels-photo-6862296.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/36543945/pexels-photo-36543945.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"work-gloves": [
+"https://images.pexels.com/photos/8821014/pexels-photo-8821014.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"patio-set": [
-"https://images.pexels.com/photos/28308521/pexels-photo-28308521.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/26793170/pexels-photo-26793170.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"all-purpose-cleaner": [
+"https://images.pexels.com/photos/10558189/pexels-photo-10558189.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"bbq-grill": [
-"https://images.pexels.com/photos/6014/food-holiday-vacation-summer.jpg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/5374014/pexels-photo-5374014.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"broom-and-dustpan": [
+"https://images.pexels.com/photos/10557495/pexels-photo-10557495.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"christmas-lights": [
-"https://images.pexels.com/photos/13464189/pexels-photo-13464189.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/14755718/pexels-photo-14755718.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"car-cover": [
+"https://images.pexels.com/photos/8652514/pexels-photo-8652514.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"cooler": [
-"https://images.pexels.com/photos/33957225/pexels-photo-33957225.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/33202773/pexels-photo-33202773.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"chainsaw": [
+"https://images.pexels.com/photos/8820171/pexels-photo-8820171.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"pool-chemicals": [
-"https://images.pexels.com/photos/8927674/pexels-photo-8927674.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/9629683/pexels-photo-9629683.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"patio-umbrella": [
-"https://images.pexels.com/photos/14639340/pexels-photo-14639340.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/18243117/pexels-photo-18243117.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"camping-tent": [
-"https://images.pexels.com/photos/2526025/pexels-photo-2526025.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/10513799/pexels-photo-10513799.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"sleeping-bag": [
-"https://images.pexels.com/photos/2974708/pexels-photo-2974708.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/16973723/pexels-photo-16973723.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"camp-stove": [
-"https://images.pexels.com/photos/6271469/pexels-photo-6271469.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/6831220/pexels-photo-6831220.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"folding-chair": [
-"https://images.pexels.com/photos/7114118/pexels-photo-7114118.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/16464580/pexels-photo-16464580.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"bike-pump": [
-"https://images.pexels.com/photos/8926706/pexels-photo-8926706.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/8926733/pexels-photo-8926733.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-],
-"fishing-rod-combo": [
-"https://images.pexels.com/photos/8916853/pexels-photo-8916853.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/4822237/pexels-photo-4822237.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"coffee-maker": [
+"https://images.pexels.com/photos/4050463/pexels-photo-4050463.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
 "cooler-backpack": [
-"https://images.pexels.com/photos/9353433/pexels-photo-9353433.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/6831252/pexels-photo-6831252.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"https://images.pexels.com/photos/9461650/pexels-photo-9461650.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"hiking-poles": [
-"https://images.pexels.com/photos/4763005/pexels-photo-4763005.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/7787407/pexels-photo-7787407.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"dish-rack": [
+"https://images.pexels.com/photos/6612568/pexels-photo-6612568.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"drywall-screws": [
+"https://images.pexels.com/photos/5583069/pexels-photo-5583069.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"extension-cord": [
+"https://images.pexels.com/photos/28190367/pexels-photo-28190367.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"flashlight": [
+"https://images.pexels.com/photos/985117/pexels-photo-985117.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"food-storage-containers": [
+"https://images.pexels.com/photos/7055126/pexels-photo-7055126.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"garden-gloves": [
+"https://images.pexels.com/photos/27177893/pexels-photo-27177893.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"grass-seed": [
+"https://images.pexels.com/photos/11789292/pexels-photo-11789292.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"hardware-organizer": [
+"https://images.pexels.com/photos/4792488/pexels-photo-4792488.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"hex-bolts": [
+"https://images.pexels.com/photos/28119519/pexels-photo-28119519.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"landscape-blocks": [
+"https://images.pexels.com/photos/36420837/pexels-photo-36420837.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
 "life-jacket": [
-"https://images.pexels.com/photos/37783755/pexels-photo-37783755.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/29995941/pexels-photo-29995941.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"https://images.pexels.com/photos/37783755/pexels-photo-37783755.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ],
-"tarp-shelter": [
-"https://images.pexels.com/photos/11749430/pexels-photo-11749430.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-"https://images.pexels.com/photos/11749461/pexels-photo-11749461.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+"microwave-oven": [
+"https://images.pexels.com/photos/32168944/pexels-photo-32168944.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"pruning-shears": [
+"https://images.pexels.com/photos/18566999/pexels-photo-18566999.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"screwdriver-set": [
+"https://images.pexels.com/photos/11882650/pexels-photo-11882650.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"snow-shovel": [
+"https://images.pexels.com/photos/6952507/pexels-photo-6952507.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"sponges-and-scrubbers": [
+"https://images.pexels.com/photos/7814649/pexels-photo-7814649.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"tile-adhesive": [
+"https://images.pexels.com/photos/11806489/pexels-photo-11806489.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"vinyl-plank": [
+"https://images.pexels.com/photos/368754/pexels-photo-368754.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"wire-connectors": [
+"https://images.pexels.com/photos/7286937/pexels-photo-7286937.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"anchors": [
+"https://images.pexels.com/photos/5583051/pexels-photo-5583051.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"caulk": [
+"https://images.pexels.com/photos/5691660/pexels-photo-5691660.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"christmas-lights": [
+"https://images.pexels.com/photos/13464189/pexels-photo-13464189.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"cordless-drill-driver": [
+"https://images.pexels.com/photos/30413428/pexels-photo-30413428.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"disinfectant-wipes": [
+"https://images.pexels.com/photos/4240994/pexels-photo-4240994.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"drywall-sheet": [
+"https://images.pexels.com/photos/27728636/pexels-photo-27728636.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"floor-jack": [
+"https://images.pexels.com/photos/4116206/pexels-photo-4116206.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"garden-hose": [
+"https://images.pexels.com/photos/17335758/pexels-photo-17335758.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"hex-key-set": [
+"https://images.pexels.com/photos/36694136/pexels-photo-36694136.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"impact-driver": [
+"https://images.pexels.com/photos/30486958/pexels-photo-30486958.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"kitchen-faucet": [
+"https://images.pexels.com/photos/37468213/pexels-photo-37468213.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"light-switch": [
+"https://images.pexels.com/photos/6000686/pexels-photo-6000686.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"mitre-saw": [
+"https://images.pexels.com/photos/8820186/pexels-photo-8820186.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"outdoor-security-light": [
+"https://images.pexels.com/photos/4059469/pexels-photo-4059469.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"patio-set": [
+"https://images.pexels.com/photos/28308521/pexels-photo-28308521.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"plunger": [
+"https://images.pexels.com/photos/6834351/pexels-photo-6834351.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"roofing-shingles": [
+"https://images.pexels.com/photos/33404248/pexels-photo-33404248.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"smart-bulb": [
+"https://images.pexels.com/photos/20713462/pexels-photo-20713462.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"socket-set": [
+"https://images.pexels.com/photos/16303694/pexels-photo-16303694.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"spray-paint": [
+"https://images.pexels.com/photos/7107997/pexels-photo-7107997.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"tape-measure": [
+"https://images.pexels.com/photos/4959750/pexels-photo-4959750.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"voltage-tester": [
+"https://images.pexels.com/photos/38292956/pexels-photo-38292956.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"watering-can": [
+"https://images.pexels.com/photos/35630832/pexels-photo-35630832.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"wood-screws": [
+"https://images.pexels.com/photos/8447775/pexels-photo-8447775.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+],
+"wrench-set-metric": [
+"https://images.pexels.com/photos/6789020/pexels-photo-6789020.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
 ]
 }

@@ -20,10 +20,13 @@ RUN npm run build          # → /fe/dist
 FROM python:3.11-slim AS runtime
 # EMBEDDING_PROVIDER=hash → no model download. CATALOG_TARGET sizes the catalog.
 # ENVIRONMENT=production → secure cookies + secret-key validation on the live HTTPS Space.
+# USE_PLACEHOLDER_IMAGES=false → panel-curated per-TYPE product photos (committed
+# type_images.json); types without a vetted photo automatically keep the branded SVG tile.
 ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 \
     EMBEDDING_PROVIDER=hash \
     CATALOG_TARGET=3000 \
-    ENVIRONMENT=production
+    ENVIRONMENT=production \
+    USE_PLACEHOLDER_IMAGES=false
 
 WORKDIR /app/backend
 
