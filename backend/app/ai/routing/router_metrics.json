@@ -1,0 +1,23 @@
+{
+  "holdout_examples": 22,
+  "policies": {
+    "economy": {
+      "optimal_choice_acc": 1.0,
+      "est_cost_per_100_turns": 0.8114,
+      "always_heavy_cost_per_100_turns": 1.275,
+      "cost_saved_pct": 36.4
+    },
+    "balanced": {
+      "optimal_choice_acc": 0.9545,
+      "est_cost_per_100_turns": 0.85,
+      "always_heavy_cost_per_100_turns": 1.275,
+      "cost_saved_pct": 33.3
+    },
+    "quality": {
+      "optimal_choice_acc": 0.4545,
+      "est_cost_per_100_turns": 1.275,
+      "always_heavy_cost_per_100_turns": 1.275,
+      "cost_saved_pct": 0.0
+    }
+  }
+}
