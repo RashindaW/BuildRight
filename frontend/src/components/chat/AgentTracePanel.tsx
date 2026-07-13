@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, Cpu, ShieldAlert, ShieldCheck, Wrench, Zap } from "lucide-react";
+import { ArrowUpRight, ChevronDown, CircleDollarSign, Cpu, ShieldAlert, ShieldCheck, Wrench, Zap } from "lucide-react";
 import type { TraceStep } from "../../types";
 
 const MODEL_BADGE: Record<string, { name: string; hint: string }> = {
@@ -39,9 +39,15 @@ export function AgentTracePanel({ trace, live }: { trace: TraceStep[]; live?: bo
   const [open, setOpen] = useState(false);
   if (!trace.length) return null;
 
-  const route = trace.find((t) => t.type === "route");
-  const tools = trace.filter((t) => t.type === "tool");
-  const guard = trace.find((t) => t.type === "guardrail");
+  // On a cascade, the second attempt's route/tool/guardrail steps are the real story;
+  // show the escalation chip plus the post-escalation steps.
+  const lastEscIdx = trace.map((t) => t.type).lastIndexOf("escalation");
+  const effective = lastEscIdx >= 0 ? trace.slice(lastEscIdx) : trace;
+  const escalation = lastEscIdx >= 0 ? trace[lastEscIdx] : undefined;
+  const route = effective.find((t) => t.type === "route") ?? trace.find((t) => t.type === "route");
+  const tools = effective.filter((t) => t.type === "tool");
+  const guard = [...trace].reverse().find((t) => t.type === "guardrail");
+  const cost = [...trace].reverse().find((t) => t.type === "cost");
 
   return (
     <div className="mt-1.5 max-w-[85%] text-left">
@@ -67,6 +73,19 @@ export function AgentTracePanel({ trace, live }: { trace: TraceStep[]; live?: bo
             >
               <Cpu size={11} /> {shortModel(route.model)}
               {route.label && <span className="font-normal opacity-70">· {route.label}</span>}
+              {typeof route.predicted_difficulty === "number" && (
+                <span className="font-normal opacity-60" title="learned difficulty (0 easy → 1 hard)">
+                  · d={route.predicted_difficulty.toFixed(2)}
+                </span>
+              )}
+            </span>
+          )}
+          {escalation && (
+            <span
+              className="badge animate-fade-in-up border border-warning/40 bg-warning-light text-warning-dark"
+              title={`First answer failed the guardrail on ${shortModel(escalation.from)} — retried on ${shortModel(escalation.to)}`}
+            >
+              <ArrowUpRight size={11} /> 2nd opinion: {shortModel(escalation.to)}
             </span>
           )}
           {tools.map((t, i) => (
@@ -88,6 +107,15 @@ export function AgentTracePanel({ trace, live }: { trace: TraceStep[]; live?: bo
               {guard.ok
                 ? `Prices verified${guard.prices_checked ? ` (${guard.prices_checked})` : ""}`
                 : "Guardrail blocked"}
+            </span>
+          )}
+          {cost && typeof cost.usd === "number" && (
+            <span
+              className="badge animate-fade-in-up border border-accent/40 bg-accent-light text-accent-700"
+              title="This turn's model cost vs always using the heavyweight model"
+            >
+              <CircleDollarSign size={11} /> ${cost.usd.toFixed(4)}
+              {(cost.saved_pct ?? 0) > 0 && <span className="font-normal">· saved {cost.saved_pct}%</span>}
             </span>
           )}
         </div>

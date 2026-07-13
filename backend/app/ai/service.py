@@ -436,6 +436,12 @@ async def stream_chat(
             "prices_checked": len(extract_prices(final_text)),
         }}
 
+    # Cost transparency: what this turn cost vs the always-heavy counterfactual.
+    turn_cost = cost_usd(route_model, input_tokens, output_tokens)
+    heavy_cost = cost_usd(settings.llm_model_heavy, input_tokens, output_tokens)
+    saved_pct = round((1 - turn_cost / heavy_cost) * 100) if heavy_cost > 0 and turn_cost < heavy_cost else 0
+    yield {"event": "trace", "data": {"type": "cost", "usd": round(turn_cost, 5), "saved_pct": saved_pct}}
+
     yield {
         "event": "done",
         "data": {

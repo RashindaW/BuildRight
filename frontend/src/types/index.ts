@@ -103,13 +103,18 @@ export interface Order {
 }
 
 export interface TraceStep {
-  type: "route" | "tool" | "guardrail";
+  type: "route" | "tool" | "guardrail" | "escalation" | "cost";
   model?: string;
   label?: string;
   name?: string;
   ms?: number;
   ok?: boolean;
   prices_checked?: number;
+  predicted_difficulty?: number | null;
+  from?: string;
+  to?: string;
+  usd?: number;
+  saved_pct?: number;
 }
 
 export interface ChatMessage {
