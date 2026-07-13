@@ -98,6 +98,20 @@ class ValidationResult:
         return f"ungrounded prices: {', '.join(self.ungrounded_prices)}"
 
 
+def _price_allowed(pstr: str, allowed: set[str], allow_multiples: bool) -> bool:
+    """Is a normalized $X.XX price grounded — directly, or (when allowed) as an
+    integer multiple 2..99 of a grounded unit price (a qty × unit line total)?"""
+    if pstr in allowed:
+        return True
+    if not allow_multiples:
+        return False
+    pv = float(pstr[1:])
+    return any(
+        u > 0 and any(abs(pv - k * u) < 0.005 for k in range(2, 100))
+        for u in (float(p[1:]) for p in allowed)
+    )
+
+
 def validate_response(
     response: str,
     grounded_items: list[dict],
@@ -116,25 +130,81 @@ def validate_response(
     # Only validate prices the answer asserts as item prices; ignore threshold
     # references like "under $5" that the customer asked to filter by.
     mentioned = _claimed_prices(response)
-
-    if not allow_multiples:
-        ungrounded = sorted(p for p in mentioned if p not in allowed)
-    else:
-        allowed_units = [float(p[1:]) for p in allowed]  # strip leading '$'
-
-        def _is_allowed(pstr: str) -> bool:
-            if pstr in allowed:
-                return True
-            pv = float(pstr[1:])
-            # accept a stated total that is qty × an allowed unit price (qty 2..99)
-            return any(
-                u > 0 and any(abs(pv - k * u) < 0.005 for k in range(2, 100))
-                for u in allowed_units
-            )
-
-        ungrounded = sorted(p for p in mentioned if not _is_allowed(p))
-
+    ungrounded = sorted(p for p in mentioned if not _price_allowed(p, allowed, allow_multiples))
     return ValidationResult(ok=not ungrounded, ungrounded_prices=ungrounded)
+
+
+class StreamingPriceGate:
+    """Token-true price guardrail for streamed answers.
+
+    The grounded price set is fully known BEFORE the final generation starts (tool
+    rounds precede it), so each price can be validated the moment it completes:
+
+    - feed(chunk) buffers text and returns the prefix that is now safe to emit. A
+      short tail (HOLD chars) is always held back so a price split across chunks
+      ("$1" + "2.99") or a trailing threshold cue ("or less") is never judged — or
+      shown — before its text is complete.
+    - A claimed price failing validation sets .violation and the gate emits nothing
+      further; the caller aborts the stream and replaces the message with
+      SAFE_FALLBACK. Invariant: an unvalidated price never renders, even transiently.
+    - finish() validates and releases the held tail at end-of-stream.
+    """
+
+    # Covers a partial trailing price ("$1,234,567.8", "1234.56 dolla") plus the
+    # 12-char post-context window _in_threshold_context needs for completed prices.
+    HOLD = 28
+
+    def __init__(
+        self,
+        grounded_items: list[dict],
+        extra_allowed: set[str] | None = None,
+        allow_multiples: bool = True,
+    ):
+        self._allowed = grounded_price_set(grounded_items) | (extra_allowed or set())
+        self._allow_multiples = allow_multiples
+        self._buf = ""
+        self._released = 0      # buf index already returned to the caller
+        self._checked_end = 0   # price matches ending at/before this are validated
+        self.violation: str | None = None
+
+    @property
+    def emitted_text(self) -> str:
+        return self._buf[: self._released]
+
+    def _validate_region(self, upto: int) -> bool:
+        """Validate claimed prices whose match ends in (checked_end, upto]."""
+        for regex in (_PRICE_RE, _DOLLARS_RE):
+            for m in regex.finditer(self._buf):
+                if not (self._checked_end < m.end() <= upto):
+                    continue
+                if _in_threshold_context(self._buf, m.start(), m.end()):
+                    continue
+                p = _normalize_price(m.group(1))
+                if not _price_allowed(p, self._allowed, self._allow_multiples):
+                    self.violation = p
+                    return False
+        self._checked_end = max(self._checked_end, upto)
+        return True
+
+    def feed(self, chunk: str) -> str:
+        if self.violation:
+            return ""
+        self._buf += chunk
+        safe_end = max(self._released, len(self._buf) - self.HOLD)
+        if not self._validate_region(safe_end):
+            return ""
+        out = self._buf[self._released: safe_end]
+        self._released = safe_end
+        return out
+
+    def finish(self) -> str:
+        if self.violation:
+            return ""
+        if not self._validate_region(len(self._buf)):
+            return ""
+        out = self._buf[self._released:]
+        self._released = len(self._buf)
+        return out
 
 
 SAFE_FALLBACK = (

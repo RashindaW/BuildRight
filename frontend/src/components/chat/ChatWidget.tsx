@@ -71,7 +71,7 @@ export function ChatWidget() {
         else if (ev.event === "delta") {
           setPhase(null); // first token arrived — drop the working indicator
           setLast((c) => c + (ev.data.text as string));
-        }
+        } else if (ev.event === "delta_reset") setLast(() => ""); // interim pre-tool text cleared
         else if (ev.event === "validated" && ev.data.replace) setLast(() => ev.data.text as string);
         else if (ev.event === "done") {
           if (ev.data.cart_dirty) queryClient.invalidateQueries({ queryKey: ["cart"] });

@@ -53,7 +53,8 @@ export function AdminChat() {
           else if (ev.event === "delta") {
             setPhase(null);
             setLast((c) => c + (ev.data.text as string));
-          } else if (ev.event === "validated" && ev.data.replace) setLast(() => ev.data.text as string);
+          } else if (ev.event === "delta_reset") setLast(() => "");
+          else if (ev.event === "validated" && ev.data.replace) setLast(() => ev.data.text as string);
           else if (ev.event === "error") setLast((c) => c || (ev.data.message as string));
           scrollDown();
         },

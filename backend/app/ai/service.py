@@ -1,8 +1,9 @@
 """Assistant service: the LLM call + guardrail enforcement.
 
 - complete(): single-turn, used by the legacy golden-test wrapper.
-- stream_chat(): multi-turn async generator emitting SSE events with
-  buffer-on-price validation (a fabricated price never renders, even mid-stream).
+- stream_chat(): multi-turn async generator emitting SSE events with TRUE token
+  streaming guarded by StreamingPriceGate — each price is validated the moment it
+  completes, so a fabricated price never renders, even transiently mid-stream.
 """
 
 from __future__ import annotations
@@ -19,6 +20,7 @@ from app.ai.guardrails import (
     SAFE_FALLBACK,
     SYSTEM_PROMPT,
     SYSTEM_PROMPT_RETAIL,
+    StreamingPriceGate,
     extract_prices,
     validate_citations,
     validate_response,
@@ -106,16 +108,31 @@ def summarize_need(messages: list[dict]) -> str:
 _MAX_TOOL_ROUNDS = 6
 
 
-def _emit_chunks(text: str, size: int = 48):
-    words = text.split(" ")
-    buf = ""
-    for w in words:
-        buf = w if not buf else f"{buf} {w}"
-        if len(buf) >= size:
-            yield buf + " "
-            buf = ""
-    if buf:
-        yield buf
+async def _round_events(client, kwargs: dict):
+    """Run one model round, yielding ("delta", text) events then ("final", resp).
+
+    Uses true token streaming (client.messages.stream) when the client supports it
+    and streaming is enabled; otherwise falls back to a buffered create() whose text
+    is emitted as a single delta — so BOTH paths flow through the same downstream
+    price gate (test fakes only implement create()).
+    """
+    stream_ctx = getattr(client.messages, "stream", None)
+    if stream_ctx is None or not settings.stream_tokens_enabled:
+        resp = await client.messages.create(**kwargs)
+        text = "".join(b.text for b in resp.content if b.type == "text").strip()
+        if text:
+            yield ("delta", text)
+        yield ("final", resp)
+        return
+
+    async with client.messages.stream(**kwargs) as s:
+        async for ev in s:
+            if (
+                getattr(ev, "type", "") == "content_block_delta"
+                and getattr(getattr(ev, "delta", None), "type", "") == "text_delta"
+            ):
+                yield ("delta", ev.delta.text)
+        yield ("final", await s.get_final_message())
 
 
 def _build_executors():
@@ -189,7 +206,7 @@ async def stream_chat(
     run on the cheap model, while project-planning / multimodal / complex turns
     escalate to the heavy model. Guardrails apply identically either way.
 
-    Events: start | delta | validated | done | error
+    Events: start | status | delta | delta_reset | validated | done | error
     """
     from app.ai import router  # local import avoids module-load cycle
     from app.ai import tools
@@ -218,24 +235,70 @@ async def stream_chat(
     cart_dirty = False
     final_text = ""
     completed = False
+    guardrail_violation = False
     input_tokens = output_tokens = 0
     tools_used: list[str] = []   # tool-use trace for observability
     tool_rounds = 0
 
+    # Prices the assistant already stated (and that passed validation) earlier in this
+    # conversation are still trusted now — carry them forward so multi-turn references
+    # and computed line totals don't trip the guardrail. Needed BEFORE generation now
+    # that prices are validated token-by-token as they stream.
+    carried_prices: set[str] = set()
+    for m in prior_messages:
+        if isinstance(m, dict) and m.get("role") == "assistant" and isinstance(m.get("content"), str):
+            carried_prices |= extract_prices(m["content"])
+
     try:
         for _ in range(_MAX_TOOL_ROUNDS):
-            resp = await client.messages.create(
+            # Token-true guardrail: grounded prices are fully known before this round's
+            # text is generated (tool rounds precede the answer), so each price is
+            # validated the moment it completes — an unvalidated price never renders.
+            gate = (
+                StreamingPriceGate(grounded_items, extra_allowed=carried_prices, allow_multiples=True)
+                if validate_prices
+                else None
+            )
+            round_text = ""
+
+            agen = _round_events(client, dict(
                 model=route_model,
                 max_tokens=max_tokens or models.MAX_TOKENS,
                 temperature=models.TEMPERATURE,
                 system=sys_prompt,
                 tools=tool_defs,
                 messages=messages,
-            )
+            ))
+            resp = None
+            async for kind, val in agen:
+                if kind == "delta":
+                    out = gate.feed(val) if gate else val
+                    if gate and gate.violation:
+                        # Abort the stream: replace anything shown with the fallback.
+                        await agen.aclose()
+                        logger.warning('"guardrail_price_violation_stream: %s"', gate.violation)
+                        yield {"event": "validated", "data": {"replace": True, "text": SAFE_FALLBACK}}
+                        final_text = SAFE_FALLBACK
+                        guardrail_violation = True
+                        completed = True
+                        break
+                    if out:
+                        round_text += out
+                        yield {"event": "delta", "data": {"text": out}}
+                else:  # ("final", resp)
+                    resp = val
+            if guardrail_violation:
+                break
+            if resp is None:  # stream ended without a final message (defensive)
+                break
             input_tokens += resp.usage.input_tokens
             output_tokens += resp.usage.output_tokens
 
             if resp.stop_reason == "tool_use":
+                # Any preamble text shown this round is interim — tell the client to
+                # clear it before the next round streams (it is not persisted).
+                if round_text:
+                    yield {"event": "delta_reset", "data": {}}
                 tool_rounds += 1
                 messages.append({"role": "assistant", "content": resp.content})
                 round_tools = [b.name for b in resp.content if b.type == "tool_use"]
@@ -277,7 +340,19 @@ async def stream_chat(
                 yield {"event": "status", "data": {"phase": "summarizing", "label": "Summarizing what I found…"}}
                 continue
 
-            final_text = "".join(b.text for b in resp.content if b.type == "text").strip()
+            # Final (non-tool) round: release the gate's held tail — it may still
+            # catch a violation in the last few characters.
+            tail = gate.finish() if gate else ""
+            if gate and gate.violation:
+                logger.warning('"guardrail_price_violation_stream: %s"', gate.violation)
+                yield {"event": "validated", "data": {"replace": True, "text": SAFE_FALLBACK}}
+                final_text = SAFE_FALLBACK
+                guardrail_violation = True
+            else:
+                if tail:
+                    round_text += tail
+                    yield {"event": "delta", "data": {"text": tail}}
+                final_text = round_text.strip()
             completed = True
             break
 
@@ -287,12 +362,15 @@ async def stream_chat(
         return
 
     # If the model never stopped calling tools (rounds exhausted) or produced no text,
-    # substitute a fallback rather than emitting/persisting a silent blank turn.
+    # substitute a fallback rather than emitting/persisting a silent blank turn. The
+    # fallback must also be DELIVERED (nothing, or only since-reset interim text, has
+    # been shown for it).
     if not completed or not final_text:
         logger.warning('"llm_chat_tool_rounds_exhausted_or_empty: completed=%s"', completed)
         final_text = SAFE_FALLBACK
+        yield {"event": "validated", "data": {"replace": True, "text": SAFE_FALLBACK}}
 
-    # Deduplicate grounded items by id for the price validator
+    # Deduplicate grounded items by id (for the done event / downstream consumers)
     seen_ids, grounded_unique = set(), []
     for it in grounded_items:
         key = it.get("slug") or it.get("id")
@@ -300,38 +378,18 @@ async def stream_chat(
             seen_ids.add(key)
             grounded_unique.append(it)
 
-    # Prices the assistant already stated (and that passed validation) earlier in this
-    # conversation are still trusted now — carry them forward so multi-turn references
-    # and computed line totals don't trip the guardrail.
-    carried_prices: set[str] = set()
-    for m in prior_messages:
-        if isinstance(m, dict) and m.get("role") == "assistant" and isinstance(m.get("content"), str):
-            carried_prices |= extract_prices(m["content"])
-
-    # Hard price guard — skipped for personas whose answers legitimately contain figures
-    # (e.g. the admin analytics chat, which reports revenue/margins).
-    result = None
-    if validate_prices:
-        result = validate_response(
-            final_text, grounded_unique, extra_allowed=carried_prices, allow_multiples=True
-        )
-        if not result.ok:
-            logger.warning('"guardrail_price_violation: %s"', result.reason)
-            final_text = SAFE_FALLBACK
-    guardrail_violation = bool(result and not result.ok)
-
-    # Soft citation check — append a disclaimer rather than replacing the answer
-    citation_ok = validate_citations(final_text, grounded_chunks)
-    if not citation_ok:
-        logger.info('"guardrail_citation_soft: policy answer without grounded chunks"')
-        final_text += (
-            "\n\n_(For the most accurate policy details, please contact our customer "
-            "service team or visit buildright.ca.)_"
-        )
-
-    yield {"event": "status", "data": {"phase": "finalizing", "label": "Finalizing…"}}
-    for chunk in _emit_chunks(final_text):
-        yield {"event": "delta", "data": {"text": chunk}}
+    # Soft citation check — append a disclaimer rather than replacing the answer.
+    # The answer already streamed, so the disclaimer is delivered as one more delta.
+    if not guardrail_violation:
+        citation_ok = validate_citations(final_text, grounded_chunks)
+        if not citation_ok:
+            logger.info('"guardrail_citation_soft: policy answer without grounded chunks"')
+            disclaimer = (
+                "\n\n_(For the most accurate policy details, please contact our customer "
+                "service team or visit buildright.ca.)_"
+            )
+            final_text += disclaimer
+            yield {"event": "delta", "data": {"text": disclaimer}}
 
     yield {
         "event": "done",
