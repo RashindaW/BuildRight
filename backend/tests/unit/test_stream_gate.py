@@ -169,6 +169,14 @@ async def test_stream_chat_true_streaming_and_reset(monkeypatch):
 
     kinds = [e["event"] for e in events]
     assert "delta_reset" in kinds, "interim pre-tool text must be reset"
+    # Glass-box trace: route decision, timed tool call, guardrail verdict.
+    traces = [e["data"] for e in events if e["event"] == "trace"]
+    ttypes = [t["type"] for t in traces]
+    assert "route" in ttypes and "tool" in ttypes and "guardrail" in ttypes
+    tool_step = next(t for t in traces if t["type"] == "tool")
+    assert tool_step["name"] == "search_products" and "ms" in tool_step
+    guard_step = next(t for t in traces if t["type"] == "guardrail")
+    assert guard_step["ok"] is True
     done = events[-1]
     assert done["event"] == "done"
     assert done["data"]["text"] == "The hammer is $4.00 and ships today from our warehouse."

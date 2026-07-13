@@ -9,9 +9,10 @@ import { ApiError } from "../../lib/api/client";
 import { queryClient } from "../../lib/queryClient";
 import { useUiStore } from "../../store/uiStore";
 import { useAuth } from "../../context/AuthProvider";
+import { AgentTracePanel } from "./AgentTracePanel";
 import { ProductCardInline } from "./ProductCardInline";
 import { WorkingDots } from "../ui/WorkingDots";
-import type { ChatMessage } from "../../types";
+import type { ChatMessage, TraceStep } from "../../types";
 
 const QUICK = ["Where are cordless drills?", "Do you sell a laser level?", "What's your return policy?"];
 
@@ -68,6 +69,13 @@ export function ChatWidget() {
       await streamChat(text, convId.current, sessionId, (ev) => {
         if (ev.event === "meta") convId.current = (ev.data.conversation_id as string) ?? convId.current;
         else if (ev.event === "status") setPhase((ev.data.label as string) ?? null);
+        else if (ev.event === "trace")
+          setMessages((m) => {
+            const copy = [...m];
+            const last = copy[copy.length - 1];
+            copy[copy.length - 1] = { ...last, trace: [...(last.trace ?? []), ev.data as unknown as TraceStep] };
+            return copy;
+          });
         else if (ev.event === "delta") {
           setPhase(null); // first token arrived — drop the working indicator
           setLast((c) => c + (ev.data.text as string));
@@ -310,6 +318,9 @@ export function ChatWidget() {
                 m.content
               )}
             </div>
+            {m.role === "assistant" && m.trace && m.trace.length > 0 && (
+              <AgentTracePanel trace={m.trace} live={!!m.pending} />
+            )}
             {m.role === "assistant" && m.cards && m.cards.length > 0 && (
               <div className="mt-2 space-y-2">
                 {m.cards.map((it) => (

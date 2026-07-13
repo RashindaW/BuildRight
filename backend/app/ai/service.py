@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import logging
+import time
 from collections.abc import AsyncIterator
 
 import anthropic
@@ -229,6 +230,8 @@ async def stream_chat(
 
     yield {"event": "start", "data": {"model": route_model, "route": route_label}}
     yield {"event": "status", "data": {"phase": "thinking", "label": "Thinking…"}}
+    # Glass-box trace: surface the routing decision (which brain, and why) to the UI.
+    yield {"event": "trace", "data": {"type": "route", "model": route_model, "label": route_label}}
 
     grounded_items: list[dict] = []
     grounded_chunks: list = []
@@ -313,11 +316,16 @@ async def stream_chat(
                         continue
                     # A malformed tool_input must not abort the whole stream — return
                     # an error tool_result instead so the model can recover.
+                    _t0 = time.perf_counter()
                     try:
                         result_json, payload = executor(block.input, ctx)
                     except Exception as e:
                         logger.warning('"tool_exec_error: %s %s"', block.name, type(e).__name__)
                         result_json, payload = json.dumps({"error": "tool_failed"}), None
+                    yield {"event": "trace", "data": {
+                        "type": "tool", "name": block.name,
+                        "ms": round((time.perf_counter() - _t0) * 1000),
+                    }}
                     if payload is not None and block.name in (
                         "search_menu", "search_products", "get_order_history",
                         "compute_materials", "suggest_complementary",
@@ -390,6 +398,13 @@ async def stream_chat(
             )
             final_text += disclaimer
             yield {"event": "delta", "data": {"text": disclaimer}}
+
+    if validate_prices:
+        yield {"event": "trace", "data": {
+            "type": "guardrail",
+            "ok": not guardrail_violation,
+            "prices_checked": len(extract_prices(final_text)),
+        }}
 
     yield {
         "event": "done",

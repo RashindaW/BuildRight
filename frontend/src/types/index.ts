@@ -102,11 +102,22 @@ export interface Order {
   items: OrderItem[];
 }
 
+export interface TraceStep {
+  type: "route" | "tool" | "guardrail";
+  model?: string;
+  label?: string;
+  name?: string;
+  ms?: number;
+  ok?: boolean;
+  prices_checked?: number;
+}
+
 export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
   pending?: boolean;
   cards?: MenuItem[];
+  trace?: TraceStep[];
 }
 
 export interface Review {
