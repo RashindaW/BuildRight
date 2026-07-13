@@ -65,19 +65,22 @@ models:
     roles: [fast]
     enabled: true          # routable only when GEMINI_API_KEY resolves
 
-  # ---- Local / rented GPU pool (Stage 3) -------------------------------------
-  # vLLM on the AMD MI300X droplet or the lab A40 server — enable by setting
-  # LOCAL_POOL_BASE_URL + LOCAL_POOL_API_KEY; the health loop handles presence.
-  #
-  # - id: local-qwen-72b
-  #   provider: openai_compat
-  #   model: Qwen/Qwen2.5-72B-Instruct
-  #   base_url: ${LOCAL_POOL_BASE_URL}
-  #   api_key_env: LOCAL_POOL_API_KEY
-  #   price_in: 0.0
-  #   price_out: 0.0
-  #   capabilities: [tools, streaming]
-  #   context_window: 32768
-  #   latency_class: heavy
-  #   roles: [heavy, local]
-  #   enabled: true
+  # ---- Self-hosted GPU pool (Stage 3) ----------------------------------------
+  # vLLM on the AMD MI300X droplet (or any GPU host). The endpoint is resolved from
+  # env at runtime (droplets are ephemeral — no IPs in the repo): set
+  # LOCAL_POOL_BASE_URL=http://<droplet-ip>:8000/v1 and LOCAL_POOL_API_KEY.
+  # Routable only when both resolve; the router falls back to APIs otherwise.
+  # price 0.05/0.05 ≈ the droplet's $1.99/hr amortized — keeps the cost dashboard honest.
+
+  - id: amd-qwen-72b
+    provider: openai_compat
+    model: Qwen/Qwen2.5-72B-Instruct
+    base_url_env: LOCAL_POOL_BASE_URL
+    api_key_env: LOCAL_POOL_API_KEY
+    price_in: 0.05
+    price_out: 0.05
+    capabilities: [tools, streaming]
+    context_window: 16384
+    latency_class: heavy
+    roles: [heavy, local]
+    enabled: true

@@ -35,7 +35,8 @@ class ModelEntry:
     provider: str                      # "anthropic" | "openai_compat"
     model: str                         # provider-native name
     api_key_env: str = ""
-    base_url: str | None = None
+    base_url: str | None = None        # literal URL, or set base_url_env instead
+    base_url_env: str = ""             # env var holding the URL (ephemeral endpoints, e.g. GPU droplets)
     price_in: float = 0.0              # $/Mtok
     price_out: float = 0.0
     capabilities: list[str] = field(default_factory=list)
@@ -53,11 +54,17 @@ class ModelEntry:
         return os.environ.get(self.api_key_env, "") if self.api_key_env else ""
 
     @property
+    def effective_base_url(self) -> str | None:
+        if self.base_url_env:
+            return os.environ.get(self.base_url_env) or self.base_url
+        return self.base_url
+
+    @property
     def configured(self) -> bool:
         """Credentials resolve (and base_url present for openai_compat)."""
         if not self.enabled:
             return False
-        if self.provider == "openai_compat" and not self.base_url:
+        if self.provider == "openai_compat" and not self.effective_base_url:
             return False
         return bool(self.api_key)
 
@@ -162,7 +169,7 @@ class _Registry:
             if prov is None:
                 from app.ai.providers.openai_compat import OpenAICompatProvider
                 prov = OpenAICompatProvider(
-                    name=entry.id, model=entry.model, base_url=entry.base_url,
+                    name=entry.id, model=entry.model, base_url=entry.effective_base_url,
                     api_key=entry.api_key,
                     streaming="streaming" in entry.capabilities and settings.stream_tokens_enabled,
                 )
