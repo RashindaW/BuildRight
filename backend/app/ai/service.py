@@ -22,6 +22,7 @@ from app.ai.guardrails import (
     SYSTEM_PROMPT,
     SYSTEM_PROMPT_RETAIL,
     StreamingPriceGate,
+    claimed_prices,
     extract_prices,
     validate_citations,
     validate_response,
@@ -275,10 +276,16 @@ async def stream_chat(
     # conversation are still trusted now — carry them forward so multi-turn references
     # and computed line totals don't trip the guardrail. Needed BEFORE generation now
     # that prices are validated token-by-token as they stream.
+    #
+    # Must be claimed_prices, NOT extract_prices: extract_prices also returns THRESHOLD
+    # amounts the customer merely filtered by. Carrying those forward silently grounded
+    # them — "options under $500" in turn 1 made a bare "$500.00" claim pass in turn 2,
+    # and (via allow_multiples) $1000/$1500/... too. Those are exactly the round numbers
+    # a hallucinated price takes, so the guardrail eroded as a conversation went on.
     carried_prices: set[str] = set()
     for m in prior_messages:
         if isinstance(m, dict) and m.get("role") == "assistant" and isinstance(m.get("content"), str):
-            carried_prices |= extract_prices(m["content"])
+            carried_prices |= claimed_prices(m["content"])
 
     try:
         for _ in range(_MAX_TOOL_ROUNDS):

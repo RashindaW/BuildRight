@@ -32,13 +32,17 @@ Tone: Be warm, concise, and helpful. Do not lecture customers about the rules; j
 
 # ---- Layer 2: deterministic output validator --------------------------
 
-_PRICE_RE = re.compile(r"\$\s?(\d+(?:\.\d{1,2})?)")
-_DOLLARS_RE = re.compile(r"(\d+(?:\.\d{1,2})?)\s*dollars\b", re.IGNORECASE)
+# Both forms accept thousands separators. Without them "$1,299.99" parsed as "$1", so a
+# CORRECT four-figure price (85 catalog items, and most project subtotals) was read as
+# $1.00, failed validation, and the answer was replaced with SAFE_FALLBACK.
+_AMOUNT = r"\d{1,3}(?:,\d{3})+(?:\.\d{1,2})?|\d+(?:\.\d{1,2})?"
+_PRICE_RE = re.compile(rf"\$\s?({_AMOUNT})")
+_DOLLARS_RE = re.compile(rf"({_AMOUNT})\s*dollars\b", re.IGNORECASE)
 
 
 def _normalize_price(raw: str) -> str:
-    """'4' -> '$4.00', '4.5' -> '$4.50', '11.50' -> '$11.50'."""
-    value = float(raw)
+    """'4' -> '$4.00', '4.5' -> '$4.50', '1,299.99' -> '$1299.99'."""
+    value = float(raw.replace(",", ""))
     return f"${value:.2f}"
 
 
@@ -56,9 +60,13 @@ def extract_prices(text: str) -> set[str]:
 # ("vegan options under $5"), NOT a claim that an item costs that amount. We must
 # not flag these, or legitimate answers get blocked. Item-price assertions
 # ("the burger is $50") have no such cue and remain validated.
+# NOTE: "around"/"about"/"approximately" are deliberately NOT here. They introduce an
+# ESTIMATE, which Rule 2 forbids outright ("never invent, guess, estimate, or round").
+# Treating them as thresholds let "the drill is around $875" through unvalidated — a
+# bypass that opened exactly when the model was least certain. They stay validated.
 _THRESHOLD_PRE = (
     "under", "below", "over", "above", "less than", "more than", "fewer than",
-    "up to", "within", "around", "about", "cheaper than", "between", "at most",
+    "up to", "within", "cheaper than", "between", "at most",
     "at least", "max", "maximum", "no more than", "or less", "or under",
 )
 _THRESHOLD_POST = ("or less", "or under", "or more", "and under", "and over", "or fewer")
@@ -70,8 +78,11 @@ def _in_threshold_context(text: str, start: int, end: int) -> bool:
     return any(c in pre for c in _THRESHOLD_PRE) or any(c in post for c in _THRESHOLD_POST)
 
 
-def _claimed_prices(text: str) -> set[str]:
-    """Prices the text asserts as item prices (excluding threshold/filter mentions)."""
+def claimed_prices(text: str) -> set[str]:
+    """Prices the text asserts as item prices (excluding threshold/filter mentions).
+
+    This — not extract_prices — is the set that may be TRUSTED as grounded, which is why
+    it is public: callers that carry prices across turns must use it too."""
     claimed: set[str] = set()
     for m in _PRICE_RE.finditer(text):
         if not _in_threshold_context(text, m.start(), m.end()):
@@ -129,7 +140,7 @@ def validate_response(
     allowed = grounded_price_set(grounded_items) | (extra_allowed or set())
     # Only validate prices the answer asserts as item prices; ignore threshold
     # references like "under $5" that the customer asked to filter by.
-    mentioned = _claimed_prices(response)
+    mentioned = claimed_prices(response)
     ungrounded = sorted(p for p in mentioned if not _price_allowed(p, allowed, allow_multiples))
     return ValidationResult(ok=not ungrounded, ungrounded_prices=ungrounded)
 
@@ -152,6 +163,8 @@ class StreamingPriceGate:
 
     # Covers a partial trailing price ("$1,234,567.8", "1234.56 dolla") plus the
     # 12-char post-context window _in_threshold_context needs for completed prices.
+    # Safe with separators: the regex is greedy over the whole buffer, so a match ending
+    # >= HOLD chars from the end can never be extended by a later chunk.
     HOLD = 28
 
     def __init__(

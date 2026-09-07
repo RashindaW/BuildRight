@@ -31,7 +31,11 @@ class EmbeddingType(TypeDecorator):
         if dialect.name == "postgresql" and _pgvector_available():
             from pgvector.sqlalchemy import Vector
             return dialect.type_descriptor(Vector(self.dim))
-        return dialect.type_descriptor(JSON())
+        # none_as_null is ESSENTIAL: with the SQLAlchemy default (False) a missing
+        # vector is written as the JSON string 'null', which `WHERE embedding IS NOT
+        # NULL` does not filter out. It then reads back as None and makes np.array()
+        # ragged, taking down the whole vector arm. See vector_index._with_usable_vectors.
+        return dialect.type_descriptor(JSON(none_as_null=True))
 
     def process_result_value(self, value, dialect):
         if value is None:

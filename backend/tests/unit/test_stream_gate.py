@@ -213,3 +213,79 @@ async def test_stream_chat_violation_replaces_with_fallback(monkeypatch):
     done = events[-1]["data"]
     assert done["guardrail_violation"] is True
     assert done["text"] == SAFE_FALLBACK
+
+
+# ---- Regression: thousands separators, token-by-token ------------------------
+
+BIG_ITEMS = [{"price": 1299.99}]
+
+
+def test_grounded_comma_price_streams_unblocked():
+    """A correct four-figure price used to trip the gate ("$1," -> $1.00) and the
+    whole answer was swapped for SAFE_FALLBACK mid-stream."""
+    gate = StreamingPriceGate(BIG_ITEMS, allow_multiples=True)
+    text = "The mitre saw is $1,299.99 and it ships free to your local store today."
+    out = drain(gate, [text[i:i + 4] for i in range(0, len(text), 4)])
+    assert gate.violation is None
+    assert out == text
+
+
+def test_fabricated_comma_price_blocked_mid_stream():
+    gate = StreamingPriceGate(BIG_ITEMS, allow_multiples=True)
+    chunks = ["The mitre saw is $1,4", "50", ".00 today only — limited stock, act fast."]
+    out = drain(gate, chunks)
+    assert gate.violation == "$1450.00"
+    assert "1,45" not in out and "$1,4" not in out
+
+
+# ---- Regression: a threshold from an earlier turn is not a grounded price -----
+#
+# carried_prices used extract_prices (EVERY price seen), so "options under $500" in
+# turn 1 silently grounded a bare "$500.00" claim in turn 2 — and, via allow_multiples,
+# $1000/$1500/... too. Those are exactly the round numbers a hallucination produces.
+
+def _single_round(monkeypatch, text_chunks):
+    from app.core.config import settings
+    monkeypatch.setattr(settings, "router_cascade_enabled", False)
+    final_resp = _Resp("end_turn", [_Blk(type="text", text="x")])
+    monkeypatch.setattr(service, "_get_async_client",
+                        lambda: _client_with_script([(text_chunks, final_resp)]))
+
+    async def _fake_classify(client, q, has_image=False, model=None):
+        return ("simple", "claude-haiku-4-5")
+
+    monkeypatch.setattr(router, "classify_turn", _fake_classify)
+    monkeypatch.setattr(service, "_build_executors", lambda: {})
+
+
+async def _run(prior, question):
+    events = []
+    async for ev in service.stream_chat(prior, ToolContext(menu=[], db=None), question):
+        events.append(ev)
+    return events[-1]["data"]
+
+
+@pytest.mark.asyncio
+async def test_threshold_in_prior_turn_is_not_carried_as_grounded(monkeypatch):
+    _single_round(monkeypatch, ["That one is $500.00", " — a great pick for the job."])
+    prior = [
+        {"role": "user", "content": "anything cheap?"},
+        {"role": "assistant", "content": "Sure — here are options under $500.00 in stock."},
+    ]
+    done = await _run(prior, "how much is the saw?")
+    assert done["guardrail_violation"] is True, "a filter the customer asked for is not a price"
+    assert done["text"] == SAFE_FALLBACK
+
+
+@pytest.mark.asyncio
+async def test_price_asserted_in_prior_turn_is_still_carried(monkeypatch):
+    """The carry-forward must keep working for prices the assistant actually stated,
+    or ordinary multi-turn follow-ups would start failing."""
+    _single_round(monkeypatch, ["Yes — the saw is $500.00", " and it's in stock."])
+    prior = [
+        {"role": "user", "content": "what's the saw?"},
+        {"role": "assistant", "content": "The Sliding Mitre Saw is $500.00."},
+    ]
+    done = await _run(prior, "remind me of the price?")
+    assert done["guardrail_violation"] is False
+    assert done["text"] == "Yes — the saw is $500.00 and it's in stock."

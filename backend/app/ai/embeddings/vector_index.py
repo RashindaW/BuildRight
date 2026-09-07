@@ -6,11 +6,39 @@ can be database-agnostic.
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 
 from sqlalchemy.orm import Session
 
 from app.core.db import engine
+
+logger = logging.getLogger("app.ai.embeddings.vector_index")
+
+
+def _with_usable_vectors(rows: list, attr: str, dim: int) -> list:
+    """Drop rows whose stored vector is missing or the wrong width.
+
+    np.array() over a ragged list raises, and both call sites are wrapped in a broad
+    `except Exception` that degrades to lexical-only — so ONE unembedded row silently
+    disabled semantic search for every query. That is not hypothetical: documents added
+    at runtime (pdf/OCR ingest) arrive without vectors, and a provider/dim change leaves
+    mis-sized ones. Skip them loudly instead of losing the arm.
+    """
+    usable, skipped = [], 0
+    for r in rows:
+        vec = getattr(getattr(r, attr, None), "embedding", None)
+        if vec is not None and len(vec) == dim:
+            usable.append(r)
+        else:
+            skipped += 1
+    if skipped:
+        logger.warning(
+            "vector_index: skipped %d/%d %s row(s) with a missing or mis-sized embedding "
+            "— run `python -m app.seed` (or embed_documents) to backfill them",
+            skipped, len(rows), attr,
+        )
+    return usable
 
 
 @dataclass
@@ -120,7 +148,8 @@ class NumpyVectorIndex:
         if available_only:
             stmt = stmt.where(MenuItem.is_available.is_(True))
 
-        rows = db.execute(stmt).fetchall()
+        rows = _with_usable_vectors(
+            db.execute(stmt).fetchall(), "ProductEmbedding", len(query_vec))
         if not rows:
             return []
 
@@ -157,7 +186,8 @@ class NumpyVectorIndex:
         if doc_types:
             stmt = stmt.where(Document.source_type.in_(doc_types))
 
-        rows = db.execute(stmt).fetchall()
+        rows = _with_usable_vectors(
+            db.execute(stmt).fetchall(), "DocumentChunk", len(query_vec))
         if not rows:
             return []
 

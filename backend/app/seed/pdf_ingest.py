@@ -21,6 +21,25 @@ logger = logging.getLogger("app.seed.pdf_ingest")
 _SAMPLE = Path(__file__).resolve().parent / "samples" / "cordless-drill-spec.pdf"
 
 
+def embed_pending_chunks(db) -> int:
+    """Vectorise any chunk that still has no embedding. Returns the count written.
+
+    Ingestion MUST call this. `_upsert_document` deliberately writes chunks without
+    vectors (the seed embeds them in a later pass), so a document added at runtime is
+    otherwise invisible to the vector arm — and, before the none_as_null fix, its NULL
+    vector poisoned every KB query. Best-effort: a provider outage must not fail the
+    ingest, it only leaves the document lexically searchable until the next seed.
+    """
+    try:
+        from app.ai.embeddings.indexer import embed_documents
+        from app.ai.embeddings.provider import get_embedding_provider
+
+        return embed_documents(db, get_embedding_provider())
+    except Exception:  # noqa: BLE001 - ingestion succeeds; vectors can be backfilled
+        logger.exception("ingest: embedding step failed — document is lexical-only for now")
+        return 0
+
+
 def extract_pages(pdf_path: str | Path) -> list[str]:
     """Return the text of each page (pypdf)."""
     from pypdf import PdfReader
@@ -36,7 +55,8 @@ def ingest_pdf(db, pdf_path: str | Path, slug: str, title: str,
     text = "\n\n".join(f"## Page {i + 1}\n{t}" for i, t in enumerate(pages) if t)
     n = _upsert_document(db, slug, title, source_type, text, source_path=str(pdf_path))
     db.commit()
-    logger.info("pdf_ingest: %s -> %d chunks", slug, n)
+    v = embed_pending_chunks(db)
+    logger.info("pdf_ingest: %s -> %d chunks (%d vectors)", slug, n, v)
     return n
 
 
@@ -54,7 +74,8 @@ def ingest_image_manual(db, data: bytes, media_type: str, slug: str, title: str,
         return 0
     n = _upsert_document(db, slug, title, source_type, text)
     db.commit()
-    logger.info("ocr_ingest: %s -> %d chunks", slug, n)
+    v = embed_pending_chunks(db)
+    logger.info("ocr_ingest: %s -> %d chunks (%d vectors)", slug, n, v)
     return n
 
 
