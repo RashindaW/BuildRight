@@ -52,3 +52,24 @@ def test_unknown_route_no_stack_trace(client):
     r = client.get("/api/v1/nope")
     assert r.status_code == 404
     assert "Traceback" not in r.text
+
+
+def test_health_ready_reports_knowledge_base_integrity(client):
+    """An absent policy corpus has to be visible on the probe, not just in a log line."""
+    body = client.get("/health/ready").json()
+    kb = body["knowledge_base"]
+    assert set(kb) == {"ok", "policy_documents", "by_type"}
+    assert isinstance(kb["by_type"], dict)
+    assert kb["ok"] == (kb["policy_documents"] > 0)
+    # Non-production is NOT gated on it — dev/test run partially seeded all the time.
+    assert body["status"] == "ready"
+
+
+def test_health_ready_is_red_in_production_without_a_policy_corpus(client, monkeypatch):
+    from app.core.config import settings
+
+    monkeypatch.setattr(settings, "environment", "production")
+    r = client.get("/health/ready")
+    assert r.status_code == 503
+    assert r.json()["status"] == "not_ready"
+    assert r.json()["knowledge_base"]["ok"] is False

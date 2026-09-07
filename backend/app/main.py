@@ -24,6 +24,12 @@ from app.models import Base
 
 MAX_BODY_BYTES = 1_000_000  # 1 MB
 
+# Document.source_type values that come from knowledge_base/*.md. The generated buying-
+# and category-guides deliberately do NOT count: they are built in memory, so they are
+# present even when the policy corpus is missing entirely — which is exactly what masked
+# the outage where the image shipped without knowledge_base/.
+POLICY_SOURCE_TYPES = frozenset({"policy", "warranty", "shipping", "price-match", "faq"})
+
 SECURITY_HEADERS = {
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
@@ -108,7 +114,16 @@ def create_app() -> FastAPI:
         providers = registry.provider_status()
         key_ok = bool(settings.anthropic_api_key.get_secret_value())
         any_model = any(providers.values()) if providers else key_ok
-        ready_ = db_ok and any_model
+
+        # Knowledge-base integrity. A deployment that shipped without knowledge_base/
+        # answers every policy question with "I don't have that information" while
+        # product search keeps working, so it has to be visible on the probe instead of
+        # in one startup log line. Only gates readiness in production — dev and test
+        # routinely run against a partially seeded database.
+        kb_by_type = _kb_counts() if db_ok else {}
+        policy_docs = sum(n for t, n in kb_by_type.items() if t in POLICY_SOURCE_TYPES)
+        kb_ok = policy_docs > 0
+        ready_ = db_ok and any_model and (kb_ok or settings.environment != "production")
         return JSONResponse(
             status_code=status.HTTP_200_OK if ready_ else status.HTTP_503_SERVICE_UNAVAILABLE,
             content={
@@ -116,6 +131,11 @@ def create_app() -> FastAPI:
                 "db": db_ok,
                 "api_key": key_ok,          # kept for back-compat consumers
                 "providers": providers,
+                "knowledge_base": {
+                    "ok": kb_ok,
+                    "policy_documents": policy_docs,
+                    "by_type": kb_by_type,
+                },
             },
         )
 
@@ -125,6 +145,22 @@ def create_app() -> FastAPI:
 
     _mount_spa(app)
     return app
+
+
+def _kb_counts() -> dict[str, int]:
+    """{source_type: document count}. Never raises — a readiness probe must not 500."""
+    try:
+        from sqlalchemy import func, select
+
+        from app.models.knowledge import Document
+        with engine.connect() as conn:
+            rows = conn.execute(
+                select(Document.source_type, func.count(Document.id))
+                .group_by(Document.source_type)
+            ).all()
+        return {str(t): int(n) for t, n in rows}
+    except Exception:  # noqa: BLE001 - the table may not exist yet on a cold boot
+        return {}
 
 
 def _mount_spa(app: FastAPI, dist: Path | None = None) -> None:

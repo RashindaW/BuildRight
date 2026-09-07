@@ -66,6 +66,12 @@ class Settings(BaseSettings):
     semantic_cache_enabled: bool = True           # first-turn guest answers served from cache ($0, instant)
     redis_url: str = ""                           # optional semantic-cache backend; blank → in-memory
     llm_max_tokens: int = 400
+    # Seed integrity: refuse to seed a deployment whose policy corpus is missing. The
+    # image once shipped without knowledge_base/ (the Dockerfile did not COPY it), so
+    # every policy question answered "I don't have that information" while product
+    # search kept working — a half-outage that looked healthy. Set
+    # REQUIRE_KNOWLEDGE_BASE=false to deliberately seed without policy documents.
+    require_knowledge_base: bool = True
     # Catalog scale + product imagery
     catalog_target: int | None = None            # None = curated ~1.2k; e.g. 10000 for the big catalog
     image_provider: Literal["placeholder", "unsplash", "pexels"] = "placeholder"

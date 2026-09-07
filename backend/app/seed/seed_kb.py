@@ -15,6 +15,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.ai.embeddings.chunking import chunk_document
+from app.core.config import settings
 from app.models.knowledge import Document, DocumentChunk
 
 logger = logging.getLogger("app.seed.kb")
@@ -23,6 +24,26 @@ _ROOT = Path(__file__).resolve().parents[3]
 _KB_DIR = _ROOT / "knowledge_base"
 
 _H1_RE = re.compile(r"^#\s+(.+)$", re.MULTILINE)
+
+
+class KnowledgeBaseMissingError(RuntimeError):
+    """The policy/FAQ corpus is absent — a packaging defect, not a normal state.
+
+    When it happened, the deployed image had no knowledge_base/ directory: the seed
+    logged one warning, carried on, and the app served 195 generated buying guides and
+    ZERO policy documents. Product questions worked, every policy question answered
+    "I don't have that information", and nothing else reported a problem.
+    """
+
+
+def _missing_corpus(msg: str) -> None:
+    """Raise (default) or warn, per settings.require_knowledge_base."""
+    if settings.require_knowledge_base:
+        raise KnowledgeBaseMissingError(
+            f"{msg} Policy answers would silently degrade to 'contact customer service'. "
+            f"Set REQUIRE_KNOWLEDGE_BASE=false to seed without the policy corpus."
+        )
+    logger.warning("%s Skipping the KB seed (REQUIRE_KNOWLEDGE_BASE=false).", msg)
 
 _SOURCE_TYPE_MAP = {
     "returns": "policy",
@@ -69,12 +90,13 @@ def _upsert_document(db: Session, slug: str, title: str, source_type: str,
 def ingest_knowledge_base(db: Session) -> int:
     """Upsert all KB markdown docs and their chunks. Returns total chunks written."""
     if not _KB_DIR.exists():
-        logger.warning("knowledge_base/ directory not found at %s — skipping KB seed", _KB_DIR)
+        _missing_corpus(f"knowledge_base/ not found at {_KB_DIR} — the deployment did not "
+                        f"ship the policy corpus (check the Dockerfile COPY lines).")
         return 0
 
     md_files = sorted(_KB_DIR.glob("*.md"))
     if not md_files:
-        logger.warning("No .md files found in %s", _KB_DIR)
+        _missing_corpus(f"no .md files in {_KB_DIR} — the policy corpus is empty.")
         return 0
 
     total = 0

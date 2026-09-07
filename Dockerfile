@@ -38,6 +38,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # for it (<repo root>/frontend/dist → /app/frontend/dist).
 COPY backend/ /app/backend/
 COPY menu_data.py /app/menu_data.py
+# The policy/FAQ corpus. seed_kb resolves it at <repo root>/knowledge_base, which is
+# /app here, so it MUST land at /app/knowledge_base. Without it the seed produced 0
+# policy documents and every returns/warranty/shipping answer silently degraded to
+# "contact customer service", while product search kept working.
+COPY knowledge_base/ /app/knowledge_base/
 COPY --from=frontend /fe/dist /app/frontend/dist
 
 # Hugging Face routes to this port (see app_port in the Space README).
