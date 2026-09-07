@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+from pathlib import Path
 
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
@@ -126,28 +127,43 @@ def create_app() -> FastAPI:
     return app
 
 
-def _mount_spa(app: FastAPI) -> None:
+def _mount_spa(app: FastAPI, dist: Path | None = None) -> None:
     """Serve the built React SPA (frontend/dist) with history-API fallback,
-    so the app runs single-origin in production. No-op if dist is absent."""
-    from pathlib import Path
+    so the app runs single-origin in production. No-op if dist is absent.
 
+    `dist` is injectable so the path-traversal containment tests can run against a
+    throwaway bundle instead of needing a built frontend."""
     from fastapi.responses import FileResponse
     from fastapi.staticfiles import StaticFiles
 
-    dist = Path(__file__).resolve().parents[2] / "frontend" / "dist"
+    # Fully resolved: the containment check below compares resolved paths, so the
+    # base must be resolved too (a symlinked dist would otherwise fail every check).
+    dist = (dist or Path(__file__).resolve().parents[2] / "frontend" / "dist").resolve()
     if not dist.exists():
         return
     app.mount("/assets", StaticFiles(directory=dist / "assets"), name="assets")
+
+    index = dist / "index.html"
 
     @app.get("/{full_path:path}")
     def spa(full_path: str):
         if full_path.startswith(("api/", "health", "version", "docs", "openapi")):
             return JSONResponse(status_code=404, content={"error": {"code": "not_found",
                                 "message": "Not found"}})
-        candidate = dist / full_path
-        if full_path and candidate.is_file():
+        if not full_path:
+            return FileResponse(index)
+        # Containment check. `full_path` is attacker-controlled and is NOT normalized by
+        # Starlette, so a percent-encoded traversal ("/..%2f..%2fbackend/.env") arrives
+        # here with its "../" intact. Resolve the join and serve it only if it is still
+        # inside dist — otherwise fall through to the SPA shell. Resolving also collapses
+        # symlinks, so a link inside dist cannot point out of it either.
+        try:
+            candidate = (dist / full_path).resolve()
+        except (OSError, ValueError):        # embedded NUL, name too long, ...
+            return FileResponse(index)
+        if candidate.is_relative_to(dist) and candidate.is_file():
             return FileResponse(candidate)
-        return FileResponse(dist / "index.html")
+        return FileResponse(index)
 
 
 app = create_app()
