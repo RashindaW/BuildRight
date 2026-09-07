@@ -1,10 +1,12 @@
-"""Synthetic purchase interactions — a real user-item graph for the recommender / GNN.
+"""Synthetic purchase interactions — co-purchase baskets for the recommender.
 
-The catalog generator makes product *nodes* but no *edges*: the only real orders are a
-handful of demo ones, which is far too sparse and low-entropy to train a graph model on.
-This module deterministically generates realistic baskets (co-purchases biased by
-cross-category affinity), giving both the co-occurrence recommender and the GNN a genuine
-graph to learn from. Pure + seeded, so re-seeding is reproducible; idempotent.
+The catalog generator makes products but no purchase history, and the handful of demo
+orders is far too sparse for "frequently bought with" to return anything. This module
+deterministically generates realistic baskets (co-purchases biased by cross-category
+affinity). Pure + seeded, so re-seeding is reproducible; idempotent.
+
+Note the affinity clusters below ARE the signal: nothing downstream can recover more
+structure than this rule puts in, which is why a graph model trained on it added nothing.
 """
 
 from __future__ import annotations

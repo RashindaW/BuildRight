@@ -10,14 +10,14 @@ export interface Mission {
   lookFor: string;
 }
 
-export const TOUR_INTRO = "BuildRight AI is a real hardware store wired to a multi-agent assistant — and this is your guided lap, not a manual. Follow the missions top to bottom and you'll touch every headline feature in about six minutes: no setup, no dead ends, one Stripe test card. You'll start as a guest browsing the shelves, talk to the assistant until it surprises you, dig into a product's reviews and its recommendation graph, then log in as the manager to watch the machine's vitals. Everything is test data, Stripe is in test mode, and it re-seeds on every deploy — so click hard and break nothing. Tap any \"Try it\" to teleport straight there; tap \"Copy\" on a prompt and paste it into the chat.";
+export const TOUR_INTRO = "BuildRight AI is a real hardware store wired to a multi-agent assistant — and this is your guided lap, not a manual. Follow the missions top to bottom and you'll touch every headline feature in about six minutes: no setup, no dead ends, one Stripe test card. You'll start as a guest browsing the shelves, talk to the assistant until it surprises you, dig into a product's reviews and its recommendations, then log in as the manager to watch the machine's vitals. Everything is test data, Stripe is in test mode, and it re-seeds on every deploy — so click hard and break nothing. Tap any \"Try it\" to teleport straight there; tap \"Copy\" on a prompt and paste it into the chat.";
 
 // AI-first ordering: visitors have no time — the agentic features open the tour;
 // the classic e-commerce mechanics follow.
 export const GROUP_ORDER: string[] = [
   "Chat with the AI assistant",
   "Multimodal & memory",
-  "Reviews & the recommendation graph",
+  "Reviews & recommendations",
   "Manager intelligence (log in)",
   "Shop as a guest",
   "Checkout & orders",
@@ -28,8 +28,8 @@ export const MISSIONS: Mission[] = [
   { group: "Shop as a guest", title: "Browse, search & filter the storefront", persona: "Guest · no login", route: "/", lookFor: "37 hardware products in a responsive grid — type in the search box or pick a category and it filters instantly, with no empty or duplicate categories." },
   { group: "Shop as a guest", title: "Product imagery is generated SVG — zero photo files", persona: "Guest", route: "/item/circular-saw", lookFor: "Every 'photo' is a category-coloured vector drawn on the fly by the backend (accent hex + hand-built line icon + label) — 20 distinct styles, crisp at any zoom, no binary assets." },
   { group: "Shop as a guest", title: "Live stock status + star ratings on the detail page", persona: "Guest", route: "/item/mastercraft-drill", lookFor: "Real SKU, aggregate star rating, and a colour-coded badge that flips between In stock / Only N left / Out of stock — and options that re-price in real time." },
-  { group: "Reviews & the recommendation graph", title: "Reviews + an AI 'What customers say' summary", persona: "Guest · can post a review", route: "/item/claw-hammer", lookFor: "A sparkle-badged AI blurb distilling all reviews with positive/critical counts and verified-purchase badges; post your own star review and watch the summary and average refresh." },
-  { group: "Reviews & the recommendation graph", title: "GNN recommendations + a 'Why recommended?' graph", persona: "Guest", route: "/item/circular-saw", lookFor: "A 'You might also like' cross-sell rail, then a radial graph-neural-net neighbourhood — anchor in the centre, neighbours sized and linked by learned similarity; tap any node to walk the graph." },
+  { group: "Reviews & recommendations", title: "Reviews + an AI 'What customers say' summary", persona: "Guest · can post a review", route: "/item/claw-hammer", lookFor: "A sparkle-badged AI blurb distilling all reviews with positive/critical counts and verified-purchase badges; post your own star review and watch the summary and average refresh." },
+  { group: "Reviews & recommendations", title: "Cross-sell rail from real co-purchase data", persona: "Guest", route: "/item/circular-saw", lookFor: "A 'You might also like' rail built from actual basket co-occurrence, topped up with content-similar alternatives — each card shows why it is there." },
   { group: "Chat with the AI assistant", title: "Grounded product search with add-to-cart cards", persona: "Guest", route: "/ · open chat ('Ask us', bottom-right)", prompt: "Do you have a cordless drill and how much is the cheapest one?", lookFor: "Real names + exact catalog prices and SKUs (never invented) rendered as product cards inside the reply, each with a one-tap 'Add' straight to the cart." },
   { group: "Chat with the AI assistant", title: "Live working-status indicators while it answers", persona: "Guest", route: "Chat widget · watch the bubble as it streams", prompt: "What's a good drill and what pairs with it?", lookFor: "Not a static spinner — the bubble narrates each phase over SSE: Thinking → Searching the catalog → Summarizing → Finalizing, then tokens stream in." },
   { group: "Chat with the AI assistant", title: "Guardrail: apologize + suggest an in-stock alternative", persona: "Guest", route: "Chat widget", prompt: "Do you sell a laser level?", lookFor: "For something it doesn't carry, it apologizes and offers the closest real alternative — never a fabricated product or price, because a deterministic price/citation check runs before any token renders." },

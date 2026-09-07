@@ -29,7 +29,7 @@ const CAPABILITIES: { title: string; points: string[] }[] = [
     points: [
       "Product & policy search, reorder from history",
       "Conversational project planner: 'repair my room' → measurements → costed materials list → add to cart → upsell",
-      "GNN recommender: a co-purchase graph that propagates signal into 'complete-the-job' suggestions",
+      "Recommendations: real co-purchase collaborative filtering plus content-similar alternatives",
     ],
   },
   {
@@ -80,7 +80,7 @@ export default function About() {
         variant="about"
         eyebrow={<><Layers size={13} /> How it's built</>}
         title="How BuildRight AI works"
-        subtitle="A production-leaning, full-stack hardware store built around a guardrailed, multi-agent AI assistant — hybrid RAG, conversational project planning, multimodal (vision · voice · OCR), a GNN recommender, payments, RBAC dashboards, and AI cost/quality observability."
+        subtitle="A production-leaning, full-stack hardware store built around a guardrailed, multi-agent AI assistant — hybrid RAG, conversational project planning, multimodal (vision · voice · OCR), payments, RBAC dashboards, and AI cost/quality observability."
       />
 
       <div className="my-8 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3">

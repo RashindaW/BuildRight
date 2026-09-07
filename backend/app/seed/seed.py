@@ -479,16 +479,6 @@ def run() -> None:
             logger.exception("embedding step failed — catalog/KB seeded WITHOUT vectors")
             print("WARNING: embeddings could not be generated (see logs). Lexical search still works.")
 
-        # Build the GNN/graph recommender vectors (content features propagated over the
-        # co-purchase graph). Torch-free; degrades to co-occurrence if it fails.
-        n_graph = 0
-        if settings.gnn_recommender_enabled:
-            try:
-                from app.ai.recommend.gnn import build_graph_embeddings
-                n_graph = build_graph_embeddings(db)
-            except Exception:
-                logger.exception("graph embedding step failed — recommender falls back to co-occurrence")
-
         total_items = n_curated + n_catalog
         logger.info(
             "seed complete: %d items (%d curated + %d generated), %d KB chunks, "
@@ -498,7 +488,7 @@ def run() -> None:
         print(
             f"Seed complete: {total_items} products ({n_curated} curated + {n_catalog} generated) | "
             f"{n_chunks} KB chunks | {n_prod_embs} product embeddings | {n_chunk_embs} chunk embeddings | "
-            f"{n_interactions} synthetic orders | {n_graph} graph vectors | "
+            f"{n_interactions} synthetic orders | "
             f"admin_created={made_admin} | demo_accounts={n_demo} | reviews={n_reviews}"
         )
     finally:

@@ -53,15 +53,6 @@ export const ARCH_SLIDES: ArchSlide[] = [
       "A user turn flows into a model router (Haiku triage) that branches to Haiku (simple) or Sonnet (complex/image), both feeding a tool-use loop (search, planner, reorder, recommend, ≤6 rounds), which drops into a guardrail validator (price & citation check) before a grounded answer.",
   }),
   make({
-    n: 5, slug: "recommender-graph",
-    title: "The recommender: a co-purchase graph that propagates",
-    subtitle: "Products that sell together form a graph; signal spreads across it into recommendations",
-    body:
-      "Recommendations come from a graph, not a hard-coded list. Each product is a node, and every time two items are bought together an edge connects them, building a co-purchase graph. A graph neural network then propagates signal along those edges — each product effectively learns from its neighbours and their neighbours — producing an embedding that captures “things that belong in the same job”. From those embeddings the assistant surfaces complete-the-job add-ons and close substitutes (buy a drill, get bits, anchors and screws).",
-    alt:
-      "Four product nodes (drill, bits, anchors, screws) connected by edges in a co-purchase graph feed a graph-propagation (GNN message passing) box, then item embeddings, then a recommendations box of complete-the-job and similar items.",
-  }),
-  make({
     n: 6, slug: "multimodal",
     title: "Multimodal: photo, voice, and handwriting",
     subtitle: "Images, speech, and count sheets all become inputs to the same grounded pipeline",

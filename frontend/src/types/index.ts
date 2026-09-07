@@ -144,14 +144,3 @@ export interface ReviewSummary {
   summary: string;
 }
 
-export interface GraphNode {
-  slug: string;
-  name: string;
-  score?: number;
-  category: string;
-}
-
-export interface RecGraph {
-  anchor: GraphNode;
-  neighbors: GraphNode[];
-}

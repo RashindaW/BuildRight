@@ -57,7 +57,6 @@ class Settings(BaseSettings):
     model_router_enabled: bool = True            # toggle the Haiku→Sonnet router
     rerank_enabled: bool = True                  # re-rank KB retrieval (cross-encoder/feature)
     visual_search_enabled: bool = True           # CLIP visual arm in product search (no-op without torch)
-    gnn_recommender_enabled: bool = True          # graph (GNN/SGC) recommender; falls back to co-occurrence
     stream_tokens_enabled: bool = True            # true token streaming (off → buffered rounds, same gate)
     # Router v2 — learned zero-latency routing over the model registry.
     router_v2_enabled: bool = True                # off → v1 heuristic + LLM classifier

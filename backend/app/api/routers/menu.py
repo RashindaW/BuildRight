@@ -116,18 +116,11 @@ def list_categories(db: Session = Depends(get_db)):
 
 @router.get("/{slug}/recommendations", response_model=list[MenuItemOut])
 def item_recommendations(slug: str, db: Session = Depends(get_db), limit: int = Query(6, ge=1, le=12)):
-    """Product-page recommendations: the GNN/graph recommender first (when a graph has
-    been built), topped up with real co-purchases (collaborative filtering) and
-    content-similar items. Order-preserving + deduped."""
-    from app.core.config import settings
+    """Product-page recommendations: real co-purchases (collaborative filtering) topped up
+    with content-similar items. Order-preserving + deduped."""
     from app.services.recommender_service import frequently_bought_with, recommend_similar
 
-    ranked = []
-    if settings.gnn_recommender_enabled:
-        from app.ai.recommend.gnn import graph_recommend
-
-        ranked += graph_recommend(db, slug, k=limit)
-    ranked += frequently_bought_with(db, slug, k=limit) + recommend_similar(db, slug, k=limit)
+    ranked = frequently_bought_with(db, slug, k=limit) + recommend_similar(db, slug, k=limit)
     ids, seen = [], set()
     for r in ranked:
         if r["slug"] not in seen:
@@ -140,25 +133,6 @@ def item_recommendations(slug: str, db: Session = Depends(get_db), limit: int = 
     by_slug = {it.slug: it for it in items}
     ordered = [by_slug[s] for s in ids if s in by_slug]
     return _serialize_with_ratings(db, ordered)
-
-
-@router.get("/{slug}/graph")
-def item_graph(slug: str, db: Session = Depends(get_db), limit: int = Query(8, ge=1, le=12)):
-    """The GNN recommendation neighbourhood for an item — the anchor plus its top graph
-    neighbours with similarity scores — for the 'why recommended' visualisation."""
-    from app.ai.recommend.gnn import graph_recommend
-
-    item = db.execute(_base_query().where(MenuItem.slug == slug)).scalars().first()
-    if not item:
-        raise NotFoundError("Menu item")
-    recs = graph_recommend(db, slug, k=limit)
-    return {
-        "anchor": {"slug": item.slug, "name": item.name, "category": item.category.slug},
-        "neighbors": [
-            {"slug": r["slug"], "name": r["name"], "score": r["score"], "category": r["category"]}
-            for r in recs
-        ],
-    }
 
 
 @router.get("/{slug}", response_model=MenuItemOut)

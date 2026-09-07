@@ -7,8 +7,12 @@ the storefront can call:
   price proximity) that works without trained embeddings.
 
 Both return serialized item dicts (price in dollars, slug, sku) so callers can
-ground prices through the existing guardrail. A GNN recommender is a future
-upgrade (Phase 4.2b); these prove the surface first.
+ground prices through the existing guardrail.
+
+A graph (SGC/LightGCN-style) recommender was built and removed: measured against this
+co-occurrence baseline it scored recall@5 0.47 vs 1.00 at 31x the latency, because 95% of
+the co-purchase graph was isolated nodes — it was returning content-similar substitutes
+labelled as complements. See the removal commit for the numbers.
 """
 
 from __future__ import annotations

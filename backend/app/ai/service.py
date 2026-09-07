@@ -145,7 +145,6 @@ _TOOL_STATUS = {
     "recommend_similar": "Finding good matches…",
     "frequently_bought_with": "Finding what pairs well…",
     "suggest_complementary": "Finding what pairs well…",
-    "graph_recommend": "Finding good matches…",
     "compute_materials": "Planning your project…",
     "add_materials_to_cart": "Adding items to your cart…",
     "reorder": "Pulling up your past orders…",

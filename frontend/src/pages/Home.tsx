@@ -56,7 +56,7 @@ export default function Home() {
           subtitle="The smart hardware store — ask, plan, and build with an AI that never guesses. Search the catalog, get project plans and honest recommendations, and check store policies, all grounded in real data."
         >
           <div className="flex flex-wrap gap-2">
-            {["Hybrid RAG", "Guardrailed", "Multi-agent router", "GNN recommender", "Multimodal"].map((c) => (
+            {["Hybrid RAG", "Guardrailed", "Multi-agent router", "Multimodal"].map((c) => (
               <span key={c} className="badge border border-white/20 bg-white/10 text-white">{c}</span>
             ))}
           </div>

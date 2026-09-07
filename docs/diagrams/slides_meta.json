@@ -32,14 +32,6 @@
     "alt": "A highlighted User turn box flows into a Model router (Haiku triage) box, which branches to two model boxes: Haiku for simple cheap turns and Sonnet for complex or image turns. Both feed a dark Tool-use loop box listing search, planner, reorder and recommend, with a small self-loop labelled at most 6 rounds. A highlighted arrow drops from the loop to a highlighted Guardrail validator box (price and citation check), which then points left to a Grounded answer box."
   },
   {
-    "n": 5,
-    "slug": "recommender-graph",
-    "title": "The recommender: a co-purchase graph that propagates",
-    "subtitle": "Products that sell together form a graph; signal spreads across it into recommendations",
-    "body": "Recommendations come from a graph, not a hard-coded list. Each product is a node, and every time two items are bought together an edge connects them, building a co-purchase graph. A graph neural network then propagates signal along those edges - each product effectively learns from its neighbours and their neighbours - producing an embedding that captures \"things that belong in the same job\". From those embeddings the assistant surfaces complete-the-job add-ons and close substitutes (buy a drill, get bits, anchors and screws).",
-    "alt": "On the left, four product nodes (drill, bits, anchors, screws) are connected by edges inside a dashed box labelled co-purchase graph. An arrow leads to a dark Graph propagation box labelled GNN message passing, then to an Item embeddings box where neighbours become vectors, and a highlighted arrow drops to a Recommendations box offering complete-the-job and similar items."
-  },
-  {
     "n": 6,
     "slug": "multimodal",
     "title": "Multimodal: photo, voice, and handwriting",

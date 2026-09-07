@@ -29,7 +29,7 @@ COLOR_MAP = {
 
 SLUGS = {
     1: "overview", 2: "architecture", 3: "hybrid-rag", 4: "agent-loop",
-    5: "recommender-graph", 6: "multimodal", 7: "commerce", 8: "observability",
+    6: "multimodal", 7: "commerce", 8: "observability",
     9: "deployment",
 }
 

@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Network, Plus } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
 import { menuApi } from "../lib/api/endpoints";
 import { formatPrice, imageSrc, ALLERGEN_LABELS } from "../lib/format";
 import { DietaryBadge } from "../components/menu/DietaryBadge";
-import { GraphViz } from "../components/menu/GraphViz";
 import { MenuCard } from "../components/menu/MenuCard";
 import { ProductReviews } from "../components/menu/ProductReviews";
 import { Skeleton } from "../components/ui/Skeleton";
@@ -26,11 +25,6 @@ export default function ItemDetail() {
   const recs = useQuery({
     queryKey: ["recommendations", slug],
     queryFn: () => menuApi.recommendations(slug!),
-    enabled: !!slug,
-  });
-  const graph = useQuery({
-    queryKey: ["item-graph", slug],
-    queryFn: () => menuApi.graph(slug!),
     enabled: !!slug,
   });
   const [selected, setSelected] = useState<Record<string, string>>({});
@@ -159,21 +153,6 @@ export default function ItemDetail() {
             {recs.data.map((it) => (
               <MenuCard key={it.id} item={it} />
             ))}
-          </div>
-        </section>
-      )}
-
-      {graph.data && graph.data.neighbors.length > 0 && (
-        <section className="mt-8">
-          <h2 className="mb-1 flex items-center gap-2 text-lg font-semibold">
-            <Network size={18} className="text-brand-600" /> Why these recommendations?
-          </h2>
-          <p className="mb-3 text-sm text-gray-500">
-            A graph neural network places products in a learned space; thicker, shorter links mean
-            items more often used together. Tap a node to explore.
-          </p>
-          <div className="card p-3">
-            <GraphViz data={graph.data} />
           </div>
         </section>
       )}
