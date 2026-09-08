@@ -119,3 +119,15 @@ def test_spa_route_still_serves_real_assets_and_history_fallback(tmp_path):
     assert client.get("/assets/app.js").text == "console.log(1)"
     assert client.get("/").text.startswith("<!doctype html")
     assert client.get("/checkout").text.startswith("<!doctype html")   # SPA route
+
+
+def test_permissions_policy_allows_the_microphone_it_ships_a_feature_for(client):
+    """Regression: the header shipped `microphone=()` — an EMPTY allowlist, which disables
+    the mic for every origin including our own. getUserMedia then rejected with
+    NotAllowedError before the browser prompted, and voice ordering was dead in the UI
+    while the STT backend was fine."""
+    pp = client.get("/health/live").headers["permissions-policy"]
+    assert "microphone=(self)" in pp, pp
+    assert "microphone=()" not in pp, "an empty allowlist disables the feature entirely"
+    # Nothing in the app uses these, so they stay fully off.
+    assert "geolocation=()" in pp and "camera=()" in pp

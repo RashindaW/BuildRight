@@ -34,7 +34,11 @@ SECURITY_HEADERS = {
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
     "Referrer-Policy": "strict-origin-when-cross-origin",
-    "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
+    # microphone=(self): the voice-ordering feature calls getUserMedia, and an empty
+    # allowlist "()" disables the feature for EVERY origin including our own — the browser
+    # then rejects with NotAllowedError before it even prompts. Geolocation and camera stay
+    # fully disabled because nothing in the app uses them (image search is a file input).
+    "Permissions-Policy": "geolocation=(), microphone=(self), camera=()",
 }
 
 
